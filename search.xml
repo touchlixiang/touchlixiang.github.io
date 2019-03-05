@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[Python 模块的使用]]></title>
+    <url>%2F2019%2F03%2F04%2Fmodule%2F</url>
+    <content type="text"><![CDATA[什么是模块在Python中，一个.py文件就被称之为一个模块 模块的调用模块一旦被调用，即相当于执行另外一个另外一个py文件中的代码，多次import导入同一个模块，只会执行一次。 模块的导入 – import1234# demo.pymoney = 100def read(): print('in read',money) 12345678# func.pyimport demodef read(): print('my read func')money = 200read() # 自己本地的print(demo.money) # 调用模块的demo.read() # 调用模块的 模块导入流程 先从sys.modules里查看是否已经被导入 如果没有被导入就依据sys.path路径去寻找模块 找到了就导入，没有找到就报错 创建这个模块的命名空间 执行文件,把文件中的名字都放到命名空间中 sys.modules会加入这个模块，当这个模块再被impoet时就不会被重复导入 123456import sysimport demo# sys.modules 是一个字典，内部包含模块名与模块对象的映射，该字典决定了导入模块时是否需要重新导入print(sys.modules.keys())# sys.path 是python的搜索模块的路径listprint(sys.path) 导入模块的顺序 内置模块 time,re 扩展模块 pip3安装的 django 自定义模块 demo 单独导入 – from…import…123from time import sleepsleep(1)print('hey') 123456from demo import read,moneymoney = 200def read(): print('my read',money)read() # my read 200print(money) # 200 查看结果1. 如果本地有read()方法则优先调用本地的。2. 即使导入了money这个变量也无法替代本地变量,会发生冲突。为什么要使用 from…import?1. import是导入了模块里面的所有名字 比较占用内存。2. 导入一个变量进来，占用的内容较少,只要不用重名即可。 1234# 导入多个名字from demo import money,readprint(money) # 100print(read) # &lt;function read at 0x0000000000B62620&gt; 1234567891011121314151617# 导入全部* 配合 __all__# 如果在模块中定义了__all__ 那么如果import * ，只有存在这个列表中的名字才能调用# import demo 不受这个约束# demo__all__ = ['money','read'] # 只和 from demo import * 能配合起来money = 100def read(): print('in read',money)def read2(): print('in read2',money)# funcfrom demo import *print(money) # 100read() # in read 100read2() # NameError: name 'read2' is not defined 把模块当做脚本执行我们可以通过模块的全局变量name来查看模块名：12345# demo2print(__name__) # __main__# funcimport demo2 # demo2 当我在文件中import demo2的时候,demo2中的print(__name__)执行返回的是demo2 当我在demo模块中print(__name__)的时候返回的是 __main__ 在哪个页面页面上点的run 在哪个页面上就是__main__ 如果不在本页面上执行,在其他页面上调用模块名导入执行,那么就返回模块名 if name == ‘main‘: 作用:用来控制.py文件在不同的应用场景下执行不同的逻辑123456789101112131415# demo2def login(): print('正在执行登录程序')if __name__ == '__main__': print('in demo2.py') # in demo2.py ret = login() # 正在执行登录程序 print(ret) # None # funcimport demo2ret = demo2.login() # 正在执行登录程序print(ret) # None# 这样就符合了：模块导入的时候什么都不执行,所有想做的都放在模块里面去,在执行程序的时候就不会受影响，也能调用模块中想要的名字]]></content>
+      <categories>
+        <category>Python基础</category>
+      </categories>
+      <tags>
+        <tag>模块</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Readme]]></title>
+    <url>%2F2019%2F03%2F04%2FReadme%2F</url>
+    <content type="text"></content>
+      <categories>
+        <category>Note</category>
+      </categories>
+      <tags>
+        <tag>Note</tag>
+      </tags>
+  </entry>
+</search>
