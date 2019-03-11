@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Note,">
+  <meta name="keywords" content="迭代器,">
 
 
 
@@ -79,18 +79,17 @@
 
 
 
-<meta name="description" content="Beijing">
-<meta name="keywords" content="Note">
+<meta name="keywords" content="迭代器">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Readme">
-<meta property="og:url" content="https://touchlixiang.github.io/2019/03/04/Readme/index.html">
+<meta property="og:title" content="Python三大利器 — 迭代器">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/03/11/iterator/index.html">
 <meta property="og:site_name" content="My Notes">
-<meta property="og:description" content="Beijing">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-04T08:34:00.939Z">
+<meta property="og:image" content="https://touchlixiang.github.io/img/gudandeshu.jpg">
+<meta property="og:updated_time" content="2019-03-11T10:51:51.892Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Readme">
-<meta name="twitter:description" content="Beijing">
+<meta name="twitter:title" content="Python三大利器 — 迭代器">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/gudandeshu.jpg">
 
 
 
@@ -120,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="https://touchlixiang.github.io/2019/03/04/Readme/">
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/03/11/iterator/">
 
 
 
 
 
-  <title>Readme | My Notes</title>
+  <title>Python三大利器 — 迭代器 | My Notes</title>
   
 
 
@@ -285,7 +284,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/03/04/Readme/">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/03/11/iterator/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Harris Li">
@@ -302,7 +301,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Readme</h1>
+          <h1 class="post-title" itemprop="name headline">Python三大利器 — 迭代器</h1>
         
 
         <div class="post-meta">
@@ -314,8 +313,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-04T16:32:27+08:00">
-                2019-03-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-11T15:46:57+08:00">
+                2019-03-11
               </time>
             
 
@@ -337,8 +336,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Note/" itemprop="url" rel="index">
-                    <span itemprop="name">Note</span>
+                  <a href="/categories/Python三大利器/" itemprop="url" rel="index">
+                    <span itemprop="name">Python三大利器</span>
                   </a>
                 </span>
 
@@ -374,7 +373,48 @@
       
 
       
-        
+        <p><img src="/img/gudandeshu.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="for循环是如何工作的"><a href="#for循环是如何工作的" class="headerlink" title="for循环是如何工作的"></a>for循环是如何工作的</h2><p>当我们拥有一个列表 <code>l = [1,2,3,4,5]</code>,想取列表中的内容，有几种方式？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1 通过索引下标和切片取值</span></span><br><span class="line">l = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line">print(l[<span class="number">0</span>])     <span class="comment"># 1</span></span><br><span class="line">print(l[<span class="number">0</span>:<span class="number">2</span>])   <span class="comment"># [1, 2]</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 2 通过for循环取值</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> l:</span><br><span class="line">    print(i)</span><br></pre></td></tr></table></figure>
+<p>他们的区别是，使用索引取值可以取到任意位置的值，前提是我知道这个值在什么位置，而for循环是取到每一个值，不需要关心这个值在什么位置，也不能跳过任何一个值去取其他位置的值，我们可以称作循环遍历。那么for循环到底是怎么工作的呢？</p>
+<h2 id="都有哪些数据类型可以被for循环"><a href="#都有哪些数据类型可以被for循环" class="headerlink" title="都有哪些数据类型可以被for循环"></a>都有哪些数据类型可以被for循环</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> s <span class="keyword">in</span> <span class="string">'abcde'</span>:</span><br><span class="line">    print(s)    <span class="comment"># 返回字符串中每一个字符 a b c d e</span></span><br><span class="line"></span><br><span class="line">dic = &#123;<span class="string">'name'</span>:<span class="string">'leo'</span>,<span class="string">'age'</span>:<span class="number">26</span>&#125;</span><br><span class="line"><span class="keyword">for</span> key <span class="keyword">in</span> dic:</span><br><span class="line">    print(key)  <span class="comment"># 默认返回字典中的键 name , age</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> value <span class="keyword">in</span> dic.values():</span><br><span class="line">    print(value) <span class="comment"># 返回字典中的值 leo,26 </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k,v <span class="keyword">in</span> dic.items():</span><br><span class="line">    print(k,v)  <span class="comment"># 返回字典中的键值对 name leo  age 26</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">12345</span>:</span><br><span class="line">    print(i)    <span class="comment"># TypeError: 'int' object is not iterable</span></span><br></pre></td></tr></table></figure>
+<p>当我们循环数字类型的时候报错了，说int类型不是<b><font size="5" color="blue"> iterable（可迭代的）</font></b></p>
+<h2 id="迭代和可迭代协议"><a href="#迭代和可迭代协议" class="headerlink" title="迭代和可迭代协议"></a>迭代和可迭代协议</h2><p>通过对数字类型的报错，不可被for循环的数据类型会报错 不是一个可迭代的，那么如何是不是说可迭代的数据类型就可以被for循环，如何判断数据类型是否可以被迭代？<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Iterable</span><br><span class="line">l = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]</span><br><span class="line">t = (<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>)</span><br><span class="line">d = &#123;<span class="number">1</span>:<span class="number">2</span>,<span class="number">3</span>:<span class="number">4</span>&#125;</span><br><span class="line">s = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>&#125;</span><br><span class="line">num = <span class="number">123</span></span><br><span class="line">money = <span class="number">10.10</span></span><br><span class="line">print(isinstance(l,Iterable))       <span class="comment"># True</span></span><br><span class="line">print(isinstance(t,Iterable))       <span class="comment"># True</span></span><br><span class="line">print(isinstance(d,Iterable))       <span class="comment"># True</span></span><br><span class="line">print(isinstance(s,Iterable))       <span class="comment"># True</span></span><br><span class="line">print(isinstance(num,Iterable))     <span class="comment"># False</span></span><br><span class="line">print(isinstance(money,Iterable))   <span class="comment"># False</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 下面这三种也是可以被循环遍历</span></span><br><span class="line"><span class="comment"># f = open()    </span></span><br><span class="line"><span class="comment"># range()</span></span><br><span class="line"><span class="comment"># enumerate 枚举</span></span><br></pre></td></tr></table></figure></p>
+<p>可以将某个数据集内的数据“一个挨着一个的取出来”，就叫做迭代<br>总结出一条规律来：能被for循环的就是“可迭代的”。<br>但是如果正着想，for怎么知道谁是可迭代的呢？为什么能被for循环？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 为什么能够被循环</span></span><br><span class="line"><span class="comment"># dir 可以返回这个数据类型的拥有的所有方法</span></span><br><span class="line"><span class="comment"># 查看列表、字典、字符串、和range的双下方法 有什么共同方法</span></span><br><span class="line"><span class="comment"># 求交集</span></span><br><span class="line">ret = set(dir([]))&amp;set(dir(&#123;&#125;))&amp;set(dir(<span class="string">''</span>))&amp;set(dir(range(<span class="number">10</span>)))</span><br><span class="line">print(ret)  <span class="comment"># 我们找一个和iterable比较相似的方法， '__iter__',</span></span><br><span class="line"><span class="comment"># 我们再来看看无法被迭代的数据类型 有没有__iter__方法</span></span><br><span class="line">print(<span class="string">'__iter__'</span> <span class="keyword">in</span> dir(int))                   <span class="comment"># False</span></span><br><span class="line">print(<span class="string">'__iter__'</span> <span class="keyword">in</span> dir(bool))                  <span class="comment"># False</span></span><br><span class="line">print(<span class="string">'__iter__'</span> <span class="keyword">in</span> dir(list))                  <span class="comment"># True</span></span><br><span class="line">print(<span class="string">'__iter__'</span> <span class="keyword">in</span> dir(dict))                  <span class="comment"># True</span></span><br><span class="line">print(<span class="string">'__iter__'</span> <span class="keyword">in</span> dir(set))                   <span class="comment"># True</span></span><br><span class="line">print(<span class="string">'__iter__'</span> <span class="keyword">in</span> dir(tuple))                 <span class="comment"># True</span></span><br><span class="line">print(<span class="string">'__iter__'</span> <span class="keyword">in</span> dir(range(<span class="number">10</span>)))             <span class="comment"># True</span></span><br><span class="line">print(<span class="string">'__iter__'</span> <span class="keyword">in</span> dir(enumerate([])))         <span class="comment"># True</span></span><br></pre></td></tr></table></figure>
+<p>再总结出一条新的规律: 能被for循环的就是“可迭代的”,只要是能被for循环的数据类型，就一定拥有<code>__iter__</code>双下方法</p>
+<h2 id="双下方法-iter-做了什么"><a href="#双下方法-iter-做了什么" class="headerlink" title="双下方法__iter__做了什么"></a>双下方法<code>__iter__</code>做了什么</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">print([].__iter__())    <span class="comment"># &lt;list_iterator object at 0x0000000002308940&gt;  迭代器 iterator</span></span><br><span class="line"><span class="comment"># [].__iter__() 得到了一个list_iterator</span></span><br><span class="line"><span class="comment"># 那么迭代器有什么作用呢？让我们来看看列表list和转换成列表_迭代器所有方法的差集</span></span><br><span class="line">print(set(dir([].__iter__()))- set(dir([])) )   <span class="comment"># &#123;'__setstate__', '__length_hint__', '__next__'&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 迭代器多出来的这三个方法的作用:</span></span><br><span class="line"><span class="comment">#__length_hint__ 获取迭代器中元素的长度</span></span><br><span class="line"><span class="comment"># print([1,2,3,4,5].__iter__().__length_hint__())       # 5 元素个数</span></span><br><span class="line"><span class="comment"># __setstate__ 可以指定从其他位置取值</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># __next__ 一个一个的取值</span></span><br><span class="line"><span class="comment"># 迭代器取值</span></span><br><span class="line">l = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>] <span class="comment"># 列表</span></span><br><span class="line">iterator = l.__iter__() <span class="comment"># iterator现在是一个迭代器,他内部有.__next__()方法</span></span><br><span class="line">print(iterator.__next__())  <span class="comment"># 1</span></span><br><span class="line">print(iterator.__next__())  <span class="comment"># 2</span></span><br><span class="line">print(iterator.__next__())  <span class="comment"># 3</span></span><br><span class="line">print(iterator.__next__())  <span class="comment"># 报错 StopIteration</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>通过上面的例子我们发现,当一个可迭代的对象调用了<strong>iter</strong>()方法会生成一个<b><font size="5" color="red"> iterator (迭代器) </font></b></li>
+<li>迭代器中含有<code>_next__()</code>方法，他可以一个一个的取值,如果我们一直取next取到迭代器里已经没有元素了，就会抛出一个异常StopIteration，告诉我们，列表中已经没有有效的元素了</li>
+</ol>
+<h2 id="可迭代协议-与-迭代器协议"><a href="#可迭代协议-与-迭代器协议" class="headerlink" title="可迭代协议 与 迭代器协议"></a>可迭代协议 与 迭代器协议</h2><p>根据上面的例子我们总结出以下概念：</p>
+<ol>
+<li>能被for循环的数据类型都是<font size="5" color="blue"> 可迭代的 (iterable) </font></li>
+<li>当这个数据类型调用<code>.__iter__()</code>方法会生成一个 <font size="5" color="red"> 迭代器(iterator) </font></li>
+<li>迭代器.<strong>next</strong>()可以一个一个的取值</li>
+<li>for循环其实就是在使用迭代器，只有是可迭代对象或者迭代器，才能用for循环</li>
+<li>for循环的本质就是迭代器</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> l:</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line">    <span class="comment"># 首先会去找l.__iter__() ==&gt; iterator =  l.__iter__()</span></span><br><span class="line">    <span class="comment"># i = iterator.__next__()</span></span><br><span class="line">    <span class="comment"># 当没有值的时候 自动停止结束 也不会报错</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 模拟for循环</span></span><br><span class="line">l = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line">iterator = l.__iter__() <span class="comment"># 变成一个迭代器</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    print(iterator.__next__())</span><br></pre></td></tr></table></figure>
+<div class="note info"><p><b><font size="5" color="blue">可迭代协议:</font></b> 只要含有<code>__iter__()</code>方法的都是可迭代的</p></div><br><div class="note info"><p><b><font size="5" color="red">迭代器协议:</font></b> 内部含有<code>__next__()</code>方法和<code>__iter__()</code>方法的就是迭代器</p></div>
+
+
+
+
+<h2 id="可迭代的不一定就是迭代器"><a href="#可迭代的不一定就是迭代器" class="headerlink" title="可迭代的不一定就是迭代器"></a>可迭代的不一定就是迭代器</h2><ol>
+<li>迭代器：内部有<code>__iter__</code>和<code>__next__</code>方法 ，所以他一定是可迭代的</li>
+<li>可迭代的不一定是迭代器，要看有没有<code>__next__</code>方法<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Iterable</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Iterator</span><br><span class="line"></span><br><span class="line">print(isinstance([],Iterable))      <span class="comment"># 可迭代的  # True</span></span><br><span class="line">print(isinstance([],Iterator))      <span class="comment"># 迭代器    # False  ,list是可迭代的，但不是一个迭代器</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">'__iter__'</span> <span class="keyword">in</span> dir(range(<span class="number">12</span>)))  <span class="comment"># True</span></span><br><span class="line">print(<span class="string">'__next__'</span> <span class="keyword">in</span> dir(range(<span class="number">12</span>)))  <span class="comment"># False</span></span><br><span class="line">print(isinstance(range(<span class="number">100000000</span>),Iterable))  <span class="comment"># True</span></span><br><span class="line">print(isinstance(range(<span class="number">100000000</span>),Iterator))  <span class="comment"># False  , range是可迭代器，但不是一个迭代器，因为它没有__next__()方法</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="迭代器的好处"><a href="#迭代器的好处" class="headerlink" title="迭代器的好处"></a>迭代器的好处</h2><ol>
+<li>迭代器会从容器类型中 一个一个的取值，会把所有的值都取到。</li>
+<li>它可以节省内存空间,迭代器并不会在内存中再占用一大块内存，而是随着循环每次生成一个,或者每次<strong>next</strong>()每次给我一个<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># print(range(10000000))          # 很快，但是并不会在内存中真正的生成数据</span></span><br><span class="line"><span class="comment"># print(list(range(10000000)))    # 强制转列表会导致崩溃,list是真正存在并存储在内存里 ，range是要一个给一个</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
       
     </div>
     
@@ -391,7 +431,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Note/" rel="tag"><i class="fa fa-tag"></i> Note</a>
+            <a href="/tags/迭代器/" rel="tag"><i class="fa fa-tag"></i> 迭代器</a>
           
         </div>
       
@@ -404,15 +444,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2019/03/11/generator/" rel="next" title="Python三大利器 — 生成器">
+                <i class="fa fa-chevron-left"></i> Python三大利器 — 生成器
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/03/04/module/" rel="prev" title="Python 模块的使用">
-                Python 模块的使用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -464,8 +504,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -527,6 +576,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#for循环是如何工作的"><span class="nav-number">1.</span> <span class="nav-text">for循环是如何工作的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#都有哪些数据类型可以被for循环"><span class="nav-number">2.</span> <span class="nav-text">都有哪些数据类型可以被for循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代和可迭代协议"><span class="nav-number">3.</span> <span class="nav-text">迭代和可迭代协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双下方法-iter-做了什么"><span class="nav-number">4.</span> <span class="nav-text">双下方法__iter__做了什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可迭代协议-与-迭代器协议"><span class="nav-number">5.</span> <span class="nav-text">可迭代协议 与 迭代器协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可迭代的不一定就是迭代器"><span class="nav-number">6.</span> <span class="nav-text">可迭代的不一定就是迭代器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代器的好处"><span class="nav-number">7.</span> <span class="nav-text">迭代器的好处</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
