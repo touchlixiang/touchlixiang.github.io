@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="协程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="协程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="协程">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/04/30/coroutines/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/syyx1.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/greenlet.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/gevent1.png">
+<meta property="og:updated_time" content="2019-05-08T02:38:23.907Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="协程">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/syyx1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/04/30/coroutines/">
+
+
+
+
+
+  <title>协程 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/04/30/coroutines/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">协程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-30T10:39:00+08:00">
+                2019-04-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/并发编程/" itemprop="url" rel="index">
+                    <span itemprop="name">并发编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/syyx1.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="什么是协程"><a href="#什么是协程" class="headerlink" title="什么是协程"></a>什么是协程</h2><ol>
+<li>在操作系统中进程是资源分配的最小单位,线程是CPU调度的最小单位。</li>
+<li>无论是创建多进程还是创建多线程来解决问题，都要消耗一定的时间来创建进程、创建线程、以及管理他们之间的切换。</li>
+<li>基于单线程来实现并发又成为一个新的课题，即只用一个主线程（很明显可利用的cpu只有一个）情况下实现并发。这样就可以节省创建线进程所消耗的时间。</li>
+</ol>
+<ul>
+<li><p>并发的本质：切换+保存状态<br>cpu正在运行一个任务，会在两种情况下切走去执行其他的任务（切换由操作系统强制控制），一种情况是该任务发生了阻塞，另外一种情况是该任务计算的时间过长。</p>
+</li>
+<li><p>协程的本质<br>就是在单线程下，由用户自己控制一个任务遇到io阻塞了就切换另外一个任务去执行，以此来提升效率。为了实现它，我们需要找寻一种可以同时满足以下条件的解决方案：</p>
+</li>
+</ul>
+<ol>
+<li>可以控制多个任务之间的切换，切换之前将任务的状态保存下来，以便重新运行时，可以基于暂停的位置继续执行。</li>
+<li>作为1的补充：可以检测io操作，在遇到io操作的情况下才发生切换</li>
+</ol>
+<h3 id="实现在多个任务之间切换-yield-send"><a href="#实现在多个任务之间切换-yield-send" class="headerlink" title="实现在多个任务之间切换 yield + send"></a>实现在多个任务之间切换 yield + send</h3><ul>
+<li>yield无法做到遇到io阻塞<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进程 : 启动多个进程,进程之间是由操作系统负责调用</span></span><br><span class="line"><span class="comment"># 线程 : 启动多个线程,真正被CPU执行的最小单位实际是线程</span></span><br><span class="line">    <span class="comment"># 开启一个线程 ：创建1个线程,属于线程的内存开销 寄存器和堆栈</span></span><br><span class="line">    <span class="comment"># 关闭一个线程</span></span><br><span class="line">    <span class="comment"># 线程在CPython下，由于全局GLI锁，多线程没有办法同时访问CPU，真正工作只有一个CPU</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 协程 : 本质上是一个线程</span></span><br><span class="line">    <span class="comment"># 在多个任务之间切换，来节省IO时间</span></span><br><span class="line">    <span class="comment"># 无需切换寄存器 和 堆栈，只是正常在程序之间切换</span></span><br><span class="line">    <span class="comment"># ***** 能在多个任务之间切换</span></span><br><span class="line">    <span class="comment"># ***** 协程中任务之间的切换也消耗时间，但是开销，要远远小于进程线程之间的切换。</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 实现并发的手段</span></span><br><span class="line"></span><br><span class="line"><span class="comment">### 实现在多个任务之间切换 yield + send</span></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">consumer</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># print(111111)</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        x = <span class="keyword">yield</span></span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line">        print(<span class="string">'处理了数据: '</span> ,x)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">producer</span><span class="params">()</span>:</span></span><br><span class="line">    c = consumer()  <span class="comment"># 生成器</span></span><br><span class="line">    next(c)         <span class="comment"># 激活生成器,send之前必须next</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line">        print(<span class="string">'生产了数据 %s '</span> %i)</span><br><span class="line">        c.send(i)</span><br><span class="line"></span><br><span class="line">producer()   <span class="comment"># 在producer控制了consumer函数，并且来回切换 即-在两个任务中切换</span></span><br><span class="line"></span><br><span class="line">c = consumer()  <span class="comment"># 生成器</span></span><br><span class="line">print(c)        <span class="comment"># &lt;generator object consumer at 0x00000000021C84C0&gt;</span></span><br><span class="line">c.__next__()</span><br><span class="line">next(c)</span><br><span class="line">c.send(<span class="number">100</span>)</span><br><span class="line">c.send(<span class="number">200</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="greenlet-模块切换执行程序"><a href="#greenlet-模块切换执行程序" class="headerlink" title="greenlet 模块切换执行程序"></a>greenlet 模块切换执行程序</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> greenlet <span class="keyword">import</span> greenlet</span><br><span class="line"><span class="comment"># pip3 install greenlet</span></span><br><span class="line"><span class="comment"># pip3 install gevent</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># greenlet 学习一下 后续不用</span></span><br><span class="line"><span class="comment"># 协程模块</span></span><br><span class="line"><span class="comment"># 切换执行程序</span></span><br><span class="line"><span class="comment"># 真真干的协程模块，就是使用greenlet完成的切换</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'eating start'</span>)</span><br><span class="line">    g2.switch()             <span class="comment"># 第1次切换 在这里switch(切换)，不仅切换还会记录执行的位置</span></span><br><span class="line">    print(<span class="string">'eating end'</span>)</span><br><span class="line">    g2.switch()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">play</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'playing start'</span>)</span><br><span class="line">    g1.switch()</span><br><span class="line">    print(<span class="string">'playing end'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 把执行的方法 交给greenlet</span></span><br><span class="line">g1 = greenlet(eat)</span><br><span class="line">g2 = greenlet(play)</span><br><span class="line">g1.switch() <span class="comment"># 首先让g1执行</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 结果: 出现switch即切换程序</span></span><br><span class="line"><span class="comment"># eating start</span></span><br><span class="line"><span class="comment"># playing start</span></span><br><span class="line"><span class="comment"># eating end</span></span><br><span class="line"><span class="comment"># laying end</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 进程 4c+1 = 5</span></span><br><span class="line"><span class="comment"># 线程 4c*5 = 20</span></span><br><span class="line"><span class="comment"># 协程 每个线程里最多可以启动500个协程</span></span><br><span class="line"><span class="comment"># 并发 1个进程20个线程 5个进程 100个线程  100个线程 = 50000W个协程</span></span><br><span class="line"><span class="comment"># nginx 分发任务,最大承载量 5W</span></span><br><span class="line"><span class="comment"># 在IO等待的时候 切换执行其他任务</span></span><br></pre></td></tr></table></figure>
+<p><img src="/img/greenlet.png" width="50%"></p>
+<h2 id="使用gevent模块实现协程"><a href="#使用gevent模块实现协程" class="headerlink" title="使用gevent模块实现协程"></a>使用gevent模块实现协程</h2><ul>
+<li><p>安装：pip3 install gevent</p>
+</li>
+<li><p>Gevent 是一个第三方库，可以轻松通过gevent实现并发同步或异步编程，在gevent中用到的主要模式是Greenlet, 它是以C扩展模块形式接入Python的轻量级协程。 Greenlet全部运行在主程序操作系统进程的内部，但它们被协作式地调度。</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># g1=gevent.spawn(func,1,,2,3,x=4,y=5)创建一个协程对象g1，spawn括号内第一个参数是函数名，如eat，后面可以有多个参数，可以是位置实参或关键字实参，都是传给函数eat的</span></span><br><span class="line"><span class="comment"># g2=gevent.spawn(func2)</span></span><br><span class="line"><span class="comment"># g1.join() #等待g1结束</span></span><br><span class="line"><span class="comment"># g2.join() #等待g2结束</span></span><br><span class="line"><span class="comment"># 或者上述两步合作一步：gevent.joinall([g1,g2])</span></span><br><span class="line"><span class="comment"># g1.value#拿到func1的返回值</span></span><br></pre></td></tr></table></figure>
+<h3 id="使用gevent实现IO切换"><a href="#使用gevent实现IO切换" class="headerlink" title="使用gevent实现IO切换"></a>使用gevent实现IO切换</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> gevent <span class="keyword">import</span> monkey;monkey.patch_all()</span><br><span class="line"><span class="comment"># 会把后面所有的阻塞操作都打成包，就会认识到time.sleep</span></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> gevent</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"><span class="comment"># 遇到IO切换</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">()</span>:</span></span><br><span class="line">    print(threading.current_thread().getName()) <span class="comment"># DummyThread-1 仿制品线程 虚拟线程 -- 协程</span></span><br><span class="line">    print(<span class="string">'eating start'</span>)</span><br><span class="line">    time.sleep(<span class="number">1</span>)</span><br><span class="line">    <span class="comment"># gevent.sleep(1)</span></span><br><span class="line">    print(<span class="string">'eating end'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">play</span><span class="params">()</span>:</span></span><br><span class="line">    print(threading.current_thread().getName())</span><br><span class="line">    print(<span class="string">'playing start'</span>)</span><br><span class="line">    time.sleep(<span class="number">1</span>)</span><br><span class="line">    <span class="comment"># gevent.sleep(1)</span></span><br><span class="line">    print(<span class="string">'playing end'</span>)</span><br><span class="line"></span><br><span class="line">g1 = gevent.spawn(eat)  <span class="comment"># gevent 遇到IO会自动切换</span></span><br><span class="line">g2 = gevent.spawn(play)</span><br><span class="line">g1.join()   <span class="comment"># 等待g1执行结束</span></span><br><span class="line">g2.join()   <span class="comment"># 等待g2执行结束,不然则异步</span></span><br><span class="line"><span class="comment"># 或者上述两步合作一步：gevent.joinall([g1,g2])</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 结果</span></span><br><span class="line"><span class="comment"># eating start</span></span><br><span class="line"><span class="comment"># playing start  同时开始</span></span><br><span class="line"><span class="comment"># 同时睡一秒</span></span><br><span class="line"><span class="comment"># eating end     同时结束</span></span><br><span class="line"><span class="comment"># playing end</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 总结：</span></span><br><span class="line"><span class="comment"># 1、进程和线程的任务切换 由操作系统完成，而协程任务切换由程序代码完成,只有遇到协程模块能识别的IO操作的时候，程序才会执行任务切换</span></span><br><span class="line"><span class="comment"># 实现并发效果。</span></span><br><span class="line"><span class="comment"># 2、协程是通过greenlet模块的switch()方法控制切换</span></span><br></pre></td></tr></table></figure>
+<p><img src="/img/gevent1.png" width="50%"></p>
+<h3 id="gevent的同步和异步"><a href="#gevent的同步和异步" class="headerlink" title="gevent的同步和异步"></a>gevent的同步和异步</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># gevent.sleep(2)模拟的是gevent可以识别的io阻塞,而time.sleep(2)或其他的阻塞,</span></span><br><span class="line"><span class="comment"># gevent是不能直接识别的需要用下面一行代码,打补丁,就可以识别了</span></span><br><span class="line"><span class="comment"># from gevent import monkey;monkey.patch_all()必须放到被打补丁者的前面，如time，socket模块之前</span></span><br><span class="line"><span class="comment"># 或者我们干脆记忆成：要用gevent，需要将from gevent import monkey;monkey.patch_all()放到文件的开头</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> gevent <span class="keyword">import</span> monkey;monkey.patch_all()</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> gevent</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">task</span><span class="params">()</span>:</span></span><br><span class="line">    time.sleep(<span class="number">1</span>)   <span class="comment"># 模拟IO阻塞</span></span><br><span class="line">    print(<span class="number">12345</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sync</span><span class="params">()</span>:</span>  <span class="comment"># synchronous = sync  同步</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        task()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">async</span><span class="params">()</span>:</span>        <span class="comment"># 异步</span></span><br><span class="line">    g_lst = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        g = gevent.spawn(task)</span><br><span class="line">        g_lst.append(g)</span><br><span class="line">    <span class="comment"># for g in g_lst:g.join()     # 等待所有的协程结束</span></span><br><span class="line">    gevent.joinall(g_lst)         <span class="comment"># 接收可迭代对象 每个g都执行完join</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># sync()  # 同步 睡一秒执行一个</span></span><br><span class="line"><span class="keyword">async</span>() <span class="comment"># 异步 都睡一秒一起执行</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 协程 适合用于网络操作，比如爬虫</span></span><br></pre></td></tr></table></figure>
+<h3 id="协程爬虫小例子"><a href="#协程爬虫小例子" class="headerlink" title="协程爬虫小例子"></a>协程爬虫小例子</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 协程：能够在线程中实现并发效果</span></span><br><span class="line">    <span class="comment"># 能够规避一些在任务中遇到的IO操作</span></span><br><span class="line">    <span class="comment"># 在任务的执行过程中,检测到IO就切换到其他任务</span></span><br><span class="line"></span><br><span class="line"><span class="comment">### 协程 — 爬虫例子</span></span><br><span class="line"><span class="comment"># 正则基础</span></span><br><span class="line"><span class="comment"># 请求过程中的IO等待</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> gevent <span class="keyword">import</span> monkey;monkey.patch_all()</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> gevent</span><br><span class="line">url = <span class="string">'https://maoyan.com/board/4'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># res = requests.get(url)</span></span><br><span class="line"><span class="comment"># print(len(res.content.decode('utf-8')))</span></span><br><span class="line"><span class="comment"># print(len(res.text))</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_url</span><span class="params">(url)</span>:</span></span><br><span class="line">    headers = &#123;</span><br><span class="line">        <span class="string">'User-Agent'</span>:<span class="string">'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '</span></span><br><span class="line">                     <span class="string">'Chrome/71.0.3578.98 Safari/537.36'</span></span><br><span class="line">    &#125;</span><br><span class="line">    res = requests.get(url,headers=headers)</span><br><span class="line">    html = res.content.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">    <span class="keyword">return</span> len(html)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ret = get_url('http://www.baidu.com')</span></span><br><span class="line"></span><br><span class="line">g1 = gevent.spawn(get_url,<span class="string">'http://www.tianmao.com'</span>)</span><br><span class="line">g2 = gevent.spawn(get_url,<span class="string">'http://www.taobao.com'</span>)</span><br><span class="line">g3 = gevent.spawn(get_url,<span class="string">'http://www.jd.com'</span>)</span><br><span class="line">g4 = gevent.spawn(get_url,<span class="string">'https://maoyan.com/board/4'</span>)</span><br><span class="line"></span><br><span class="line">gevent.joinall([g1,g2,g3,g4])</span><br><span class="line">print(g1.value)</span><br><span class="line">print(g2.value)</span><br><span class="line">print(g3.value)</span><br><span class="line">print(g4.value)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 总结：</span></span><br><span class="line"><span class="comment"># 为什么用到协程</span></span><br><span class="line">    <span class="comment"># 多线程在CPython解释器下，存在GIL锁，无法真正的使用多个CPU，多个线程之间的切换就会浪费时间</span></span><br><span class="line">    <span class="comment"># 可以把一个线程的作用发挥到极致 1个线程可以开启500个协程,提高了CPU的利用率</span></span><br><span class="line">    <span class="comment"># 协程相比于多线程的优势 ，切换的效率更快</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/协程/" rel="tag"><i class="fa fa-tag"></i> 协程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/25/thread/" rel="next" title="线程">
+                <i class="fa fa-chevron-left"></i> 线程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/08/io-model/" rel="prev" title="io_model">
+                io_model <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是协程"><span class="nav-number">1.</span> <span class="nav-text">什么是协程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现在多个任务之间切换-yield-send"><span class="nav-number">1.1.</span> <span class="nav-text">实现在多个任务之间切换 yield + send</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#greenlet-模块切换执行程序"><span class="nav-number">1.2.</span> <span class="nav-text">greenlet 模块切换执行程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用gevent模块实现协程"><span class="nav-number">2.</span> <span class="nav-text">使用gevent模块实现协程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用gevent实现IO切换"><span class="nav-number">2.1.</span> <span class="nav-text">使用gevent实现IO切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gevent的同步和异步"><span class="nav-number">2.2.</span> <span class="nav-text">gevent的同步和异步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协程爬虫小例子"><span class="nav-number">2.3.</span> <span class="nav-text">协程爬虫小例子</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
