@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="My Notes">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://touchlixiang.github.io/img/jojo_01.jpg">
-<meta property="og:updated_time" content="2019-07-22T07:12:05.870Z">
+<meta property="og:updated_time" content="2019-07-29T07:53:21.187Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python 爬虫面试题 170 道">
 <meta name="twitter:image" content="https://touchlixiang.github.io/img/jojo_01.jpg">
@@ -380,6 +380,8 @@
 <h3 id="Python3-和-Python2-的区别？"><a href="#Python3-和-Python2-的区别？" class="headerlink" title="Python3 和 Python2 的区别？"></a>Python3 和 Python2 的区别？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">print 在 Python3 中是函数,必须加括号 print(&apos;hello&apos;)，Python2 中 print 为 class,print &apos;Hello, World!&apos;</span><br><span class="line">Python3中 input得到的为str;Python2的input的到的为int型，Python2的raw_input得到的为str类型</span><br><span class="line">Python2中 使用xrange，Python3 使用range。</span><br><span class="line">Python2 中存在老式类和新式类的区别，Python3 统一采用新式类。</span><br><span class="line">Python2 中默认的字符串类型默认是 ASCII，Python3 中默认的字符串类型是 Unicode。</span><br></pre></td></tr></table></figure>
 <h3 id="Python3-和-Python2-中-int-和-long-区别？"><a href="#Python3-和-Python2-中-int-和-long-区别？" class="headerlink" title="Python3 和 Python2 中 int 和 long 区别？"></a>Python3 和 Python2 中 int 和 long 区别？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python2中有long类型</span><br><span class="line">python3中没有long类型，只有int类型</span><br></pre></td></tr></table></figure>
 <h3 id="xrange-和-range-的区别？"><a href="#xrange-和-range-的区别？" class="headerlink" title="xrange 和 range 的区别？"></a>xrange 和 range 的区别？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xrange 是在 Python2 中的用法，Python3 中只有 range。</span><br><span class="line">range 生成的不是一个 list 对象，而是一个生成器。</span><br></pre></td></tr></table></figure>
+<h2 id="编码规范"><a href="#编码规范" class="headerlink" title="编码规范"></a>编码规范</h2><h3 id="什么是-PEP8"><a href="#什么是-PEP8" class="headerlink" title="什么是 PEP8?"></a>什么是 PEP8?</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">《Python Enhancement Proposal #8》（8 号 Python 增强提案）又叫 PEP8，他针对的 Python 代码格式而编订的风格指南。</span><br></pre></td></tr></table></figure>
+<h3 id="了解-Python-之禅么？"><a href="#了解-Python-之禅么？" class="headerlink" title="了解 Python 之禅么？"></a>了解 Python 之禅么？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">通过 import this 语句可以获取其具体的内容。它告诉大家如何写出高效整洁的代码。</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; import this</span><br><span class="line">The Zen of Python, by Tim Peters</span><br><span class="line">Beautiful is better than ugly.</span><br><span class="line"># 优美胜于丑陋（Python以编写优美的代码为目标）</span><br><span class="line">Explicit is better than implicit.</span><br><span class="line"># 明了胜于晦涩（优美的代码应当是明了的，命名规范，风格相似）</span><br><span class="line">Simple is better than complex.</span><br><span class="line"># 简洁胜于复杂（优美的代码应当是简洁的，不要有复杂的内部实现）</span><br><span class="line">Complex is better than complicated.</span><br><span class="line"># 复杂胜于凌乱（如果复杂不可避免，那代码间也不能有难懂的关系，要保持接口简洁）</span><br><span class="line">Flat is better than nested.</span><br><span class="line"># 扁平胜于嵌套（优美的代码应当是扁平的，不能有太多的嵌套）</span><br><span class="line">Sparse is better than dense.</span><br><span class="line"># 间隔胜于紧凑（优美的代码有适当的间隔，不要奢望一行代码解决问题）</span><br><span class="line">Readability counts.</span><br><span class="line"># 可读性很重要（优美的代码是可读的）</span><br><span class="line">Special cases aren&apos;t special enough to break the rules.</span><br><span class="line">Although practicality beats purity.</span><br><span class="line"># 即便假借特例的实用性之名，也不可违背这些规则（这些规则至高无上）</span><br><span class="line">Errors should never pass silently.</span><br><span class="line">Unless explicitly silenced.</span><br><span class="line"># 不要包容所有错误，除非你确定需要这样做（精准地捕获异常，不写except:pass风格的代码）</span><br><span class="line">In the face of ambiguity, refuse the temptation to guess.</span><br><span class="line"># 当存在多种可能，不要尝试去猜测</span><br><span class="line">There should be one-- and preferably only one --obvious way to do it</span><br><span class="line"># 而是尽量找一种，最好是唯一一种明显的解决方案（如果不确定，就用穷举法）</span><br><span class="line">Although that way may not be obvious at first unless you&apos;re Dutch.</span><br><span class="line"># 虽然这并不容易，因为你不是 Python 之父（这里的Dutch是指Guido）</span><br><span class="line">Now is better than never.</span><br><span class="line">Although never is often better than *right* now.</span><br><span class="line"># 做也许好过不做，但不假思索就动手还不如不做（动手之前要细思量）</span><br><span class="line">If the implementation is hard to explain, it&apos;s a bad idea.</span><br><span class="line">If the implementation is easy to explain, it may be a good idea.</span><br><span class="line"># 如果你无法向人描述你的方案，那肯定不是一个好方案；反之亦然（方案测评标准）</span><br><span class="line">Namespaces are one honking great idea -- let&apos;s do more of those!</span><br><span class="line"># 命名空间是一种绝妙的理念，我们应当多加利用（倡导与号召）</span><br></pre></td></tr></table></figure>
       
     </div>
     
@@ -409,8 +411,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/07/11/python-versions/" rel="next" title="Python 在CentOS6下由 2.7 升级到 3.6">
-                <i class="fa fa-chevron-left"></i> Python 在CentOS6下由 2.7 升级到 3.6
+              <a href="/2019/07/11/pro3/" rel="next" title="Python 更新BI服务脚本">
+                <i class="fa fa-chevron-left"></i> Python 更新BI服务脚本
               </a>
             
           </div>
@@ -418,6 +420,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/29/bootstrap/" rel="prev" title="Bootstrap">
+                Bootstrap <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -496,7 +502,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -507,7 +513,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -518,7 +524,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -551,7 +557,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#语言特性"><span class="nav-number">1.</span> <span class="nav-text">语言特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谈谈对-Python-和其他语言的区别"><span class="nav-number">1.1.</span> <span class="nav-text">谈谈对 Python 和其他语言的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简述解释型和编译型编程语言"><span class="nav-number">1.2.</span> <span class="nav-text">简述解释型和编译型编程语言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python-的解释器种类以及相关特点？"><span class="nav-number">1.3.</span> <span class="nav-text">Python 的解释器种类以及相关特点？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python3-和-Python2-的区别？"><span class="nav-number">1.4.</span> <span class="nav-text">Python3 和 Python2 的区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python3-和-Python2-中-int-和-long-区别？"><span class="nav-number">1.5.</span> <span class="nav-text">Python3 和 Python2 中 int 和 long 区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xrange-和-range-的区别？"><span class="nav-number">1.6.</span> <span class="nav-text">xrange 和 range 的区别？</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#语言特性"><span class="nav-number">1.</span> <span class="nav-text">语言特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谈谈对-Python-和其他语言的区别"><span class="nav-number">1.1.</span> <span class="nav-text">谈谈对 Python 和其他语言的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简述解释型和编译型编程语言"><span class="nav-number">1.2.</span> <span class="nav-text">简述解释型和编译型编程语言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python-的解释器种类以及相关特点？"><span class="nav-number">1.3.</span> <span class="nav-text">Python 的解释器种类以及相关特点？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python3-和-Python2-的区别？"><span class="nav-number">1.4.</span> <span class="nav-text">Python3 和 Python2 的区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python3-和-Python2-中-int-和-long-区别？"><span class="nav-number">1.5.</span> <span class="nav-text">Python3 和 Python2 中 int 和 long 区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xrange-和-range-的区别？"><span class="nav-number">1.6.</span> <span class="nav-text">xrange 和 range 的区别？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编码规范"><span class="nav-number">2.</span> <span class="nav-text">编码规范</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是-PEP8"><span class="nav-number">2.1.</span> <span class="nav-text">什么是 PEP8?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#了解-Python-之禅么？"><span class="nav-number">2.2.</span> <span class="nav-text">了解 Python 之禅么？</span></a></li></ol></li></ol></div>
             
 
           </div>
