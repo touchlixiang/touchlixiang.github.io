@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="django,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="django">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django 基础">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/09/03/django-base/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/timg_01.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/django_01.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/django_02.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/django_04.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/django_05.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/django_06.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/django_07.png">
+<meta property="og:updated_time" content="2019-09-08T03:05:39.673Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Django 基础">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/timg_01.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/09/03/django-base/">
+
+
+
+
+
+  <title>Django 基础 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/09/03/django-base/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Django 基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-03T17:18:12+08:00">
+                2019-09-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Django/" itemprop="url" rel="index">
+                    <span itemprop="name">Django</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/timg_01.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="Django-基础使用"><a href="#Django-基础使用" class="headerlink" title="Django 基础使用"></a>Django 基础使用</h2><h3 id="Django-官网下载页面"><a href="#Django-官网下载页面" class="headerlink" title="Django 官网下载页面"></a>Django 官网下载页面</h3><p><a href="https://www.djangoproject.com/download/" target="_blank" rel="noopener">https://www.djangoproject.com/download/</a></p>
+<h3 id="安装方法"><a href="#安装方法" class="headerlink" title="安装方法"></a>安装方法</h3><ol>
+<li><p>命令行安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. pip3 install django==1.1.23</span><br><span class="line">2. pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple/ django==1.1.23   # -i 指定哪个库</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Pycharm安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">安装不要勾选将包安装到指定的地址目录,否则需要将该地址加到环境变量才能使用django-admin命令</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="/img/django_01.png" width="50%"></p>
+<h3 id="创建-Django-项目"><a href="#创建-Django-项目" class="headerlink" title="创建 Django 项目"></a>创建 Django 项目</h3><ol>
+<li><p>命令行:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. cd 要保存Django的目录</span><br><span class="line">2. python django-admin startproject 项目名</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Pycharm 创建</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. File --&gt; new project --&gt; Django</span><br><span class="line">2. 可以配置app名称</span><br><span class="line">3. 不要勾选虚拟环境</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="/img/django_02.png" width="50%"></p>
+<h3 id="配置-Django-项目"><a href="#配置-Django-项目" class="headerlink" title="配置 Django 项目"></a>配置 Django 项目</h3><p>Django的配置文件为 project/<font color="green">settings.py</font>文件,作为初学者要先记住4个需要配置的地方:</p>
+<ol>
+<li><p>templates (存放HTML文件的配置)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">TEMPLATES = [</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="string">'BACKEND'</span>: <span class="string">'django.template.backends.django.DjangoTemplates'</span>,</span><br><span class="line">		 <span class="comment"># 告诉Django 我用到的html文件都去这个目录找</span></span><br><span class="line">		<span class="string">'DIRS'</span>: [os.path.join(BASE_DIR, <span class="string">'templates'</span>),]</span><br><span class="line">		<span class="comment"># ... 列表中多个目录会依次查找</span></span><br><span class="line">	&#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>静态文件:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 静态文件夹的别名(在HTML文件中使用)</span></span><br><span class="line"><span class="comment"># 静态文件保存的文件别名,会依次的查找下面的static1和static2,一直到找不到</span></span><br><span class="line">STATIC_URL = <span class="string">'/static/'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 静态文件夹的真正路径</span></span><br><span class="line"><span class="comment"># 所有静态文件(css/js/图片) 都放在下面配置文件目录中</span></span><br><span class="line">STATICFILES_DIRS = [</span><br><span class="line">    os.path.join(BASE_DIR,<span class="string">'static'</span>)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注释掉 csrf 相关的中间件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># CSRF verification failed. Request aborted. 问题需要注释:大概是:46行</span></span><br><span class="line"><span class="comment"># 'django.middleware.csrf.CsrfViewMiddleware'</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Django项目连接数据库</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">DATABASES = &#123;</span><br><span class="line">    <span class="string">'default'</span>: &#123;</span><br><span class="line">        <span class="string">'ENGINE'</span>: <span class="string">'django.db.backends.mysql'</span>,   <span class="comment"># 连接的数据库类型</span></span><br><span class="line">        <span class="string">'NAME'</span>: <span class="string">'mybook'</span>,</span><br><span class="line">        <span class="string">'HOST'</span>: <span class="string">'10.0.0.200'</span>,</span><br><span class="line">        <span class="string">'PORT'</span>:  <span class="number">3306</span>,</span><br><span class="line">        <span class="string">'USER'</span>: <span class="string">'root'</span>,</span><br><span class="line">        <span class="string">'PASSWORD'</span>: <span class="string">'123456'</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="Django-Web-请求流程"><a href="#Django-Web-请求流程" class="headerlink" title="Django Web 请求流程"></a>Django Web 请求流程</h3><ol>
+<li>启动Django项目，等待用户连接</li>
+<li>浏览器在地址栏输入URL,来连接我的Django项目</li>
+<li>在urls.py中找到路径和函数的对应关系</li>
+<li>执行对应的函数</li>
+<li>返回响应</li>
+</ol>
+<h3 id="urls-py-的配置"><a href="#urls-py-的配置" class="headerlink" title="urls.py 的配置"></a>urls.py 的配置</h3><ol>
+<li>project/<font color="green">urls.py</font> 负责保存路径和函数的对应关系</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">from .views import index,sport,login,baobao		--&gt; 项目中的views 默认从项目使用相对路径找到</span><br><span class="line">from app01 import views                                 --&gt; app中的views,从项目使用绝对路径导</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> app01 <span class="keyword">import</span> views	</span><br><span class="line">urlpatterns = [</span><br><span class="line">    url(<span class="string">r'^admin/'</span>, admin.site.urls),</span><br><span class="line">    url(<span class="string">r'^publisher_list/'</span>, views.publisher_list),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<h3 id="views-py-的配置"><a href="#views-py-的配置" class="headerlink" title="views.py 的配置"></a>views.py 的配置</h3><ol>
+<li>app/<font color="green">views.py</font> 专门用来定义处理请求的函数</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 必备三件套 </span><br><span class="line"># shortcuts(快捷键)</span><br><span class="line">from django.shortcuts import HttpResponse,render,redirect</span><br><span class="line">1. HttpResponse(&quot;要返回的字符串内容&quot;)		    --&gt; 通常用于直接返回数据</span><br><span class="line">2. render(request,&quot;html文件&quot;,&#123;&quot;k1&quot;:v1&#125;)		    --&gt; 返回一个HTML页面或者打开文件进行字符串替换</span><br><span class="line">3. redirect(&quot;URL&quot;)				    --&gt; 告诉用户的浏览器去访问指定的UR</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># request相关:</span><br><span class="line">request.method		--&gt; 查看请求的方法</span><br><span class="line">request.POST		--&gt; 获取POST请求的数</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">publisher_list</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="comment"># 使用ORM获取所有出版社信息</span></span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">"publisher_list.html"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="ORM-的使用"><a href="#ORM-的使用" class="headerlink" title="ORM 的使用"></a>ORM 的使用</h3><ol>
+<li>什么是ORM</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 是一种编程的方法论(模型)，和语言无关，其他的语言也有类似的实现</span><br><span class="line">2. 按照规定的语法写，自动翻译成对应的SQL语</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>ORM的本质</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">类      --&gt;  数据表</span><br><span class="line">对象	--&gt;  数据行</span><br><span class="line">属性	--&gt;  字</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>ORM的功能</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ORM 操作数据表</span><br><span class="line">ORM 操作数据行</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>Django里的ORM使用</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 手动创建数据库</span><br><span class="line">CREATE DATABASE mybook CHARACTER SET utf8;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">2. 在settings.py 里面配置数据库的链接信息</span><br><span class="line">DATABASES = &#123;</span><br><span class="line">	&apos;default&apos;: &#123;</span><br><span class="line">		&apos;ENGINE&apos;: &apos;django.db.backends.mysql&apos;,</span><br><span class="line">		&apos;NAME&apos;: &apos;mybook&apos;,</span><br><span class="line">		&apos;HOST&apos;: &apos;10.0.0.200&apos;,</span><br><span class="line">		&apos;PORT&apos;:  3306,</span><br><span class="line">		&apos;USER&apos;: &apos;root&apos;,</span><br><span class="line">		&apos;PASSWORD&apos;: &apos;123456&apos;,</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 3. 在project/__init__.py 文件中 告诉Django用pymysql模块代替MySQLDB来连接</span></span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line">pymysql.install_as_MySQLdb()</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 4. 在app下的models.py 里面定义类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Publisher</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">	id = models.AutoField(primary_key=<span class="literal">True</span>) <span class="comment"># 自增主键</span></span><br><span class="line">	name = models.CharField(max_length=<span class="number">64</span>,null=<span class="literal">False</span>,unique=<span class="literal">True</span>)   <span class="comment"># 出版社名称,不能为空,唯一</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">5. 执行两个命令:</span><br><span class="line">1. python3 manage.py makemigrations		# 记录我们对文件的改动,放到migrations目录下</span><br><span class="line">2. python3 manage.py makemigrate		# 把改动翻译成sql语句，再去数据库执行</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">6. 创建成功的输出结果</span><br><span class="line">D:\MyProject\day03&gt;python manage.py makemigrations</span><br><span class="line">Migrations for &apos;app01&apos;:</span><br><span class="line">  app01\migrations\0001_initial.py</span><br><span class="line">    - Create model Publisher</span><br><span class="line"></span><br><span class="line">D:\MyProject\day03&gt;python manage.py migrate</span><br><span class="line">Operations to perform:</span><br><span class="line">  Apply all migrations: admin, app01, auth, contenttypes, sessions</span><br><span class="line">Running migrations:</span><br><span class="line">  Applying contenttypes.0001_initial... OK</span><br><span class="line">  Applying auth.0001_initial... OK</span><br><span class="line">  Applying admin.0001_initial... OK</span><br><span class="line">  Applying admin.0002_logentry_remove_auto_add... OK</span><br><span class="line">  Applying app01.0001_initial... OK</span><br><span class="line">  Applying contenttypes.0002_remove_content_type_name... OK</span><br><span class="line">  Applying auth.0002_alter_permission_name_max_length... OK</span><br><span class="line">  Applying auth.0003_alter_user_email_max_length... OK</span><br><span class="line">  Applying auth.0004_alter_user_username_opts... OK</span><br><span class="line">  Applying auth.0005_alter_user_last_login_null... OK</span><br><span class="line">  Applying auth.0006_require_contenttypes_0002... OK</span><br><span class="line">  Applying auth.0007_alter_validators_add_error_messages... OK</span><br><span class="line">  Applying auth.0008_alter_user_username_max_length... OK</span><br><span class="line">  Applying sessions.0001_initial... OK</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">7. 删除表</span><br><span class="line">1. 注释掉在models.py下的类</span><br><span class="line"># class Userinfo(models.Model):</span><br><span class="line">#     id = models.AutoField(primary_key=True)                       # 创建一个自增的主键字段</span><br><span class="line">#     name = models.CharField(null=False,max_length=20)             # 创建varchar类型并且不能为空的字段</span><br><span class="line"></span><br><span class="line">2. 执行命令:</span><br><span class="line">	1. python3 manage.py makemigrations		# 记录我们对文件的改动,放到migrations目录下</span><br><span class="line">	2. python3 manage.py makemigrate			# 把改动翻译成sql语句，再去数据库执行</span><br><span class="line">	</span><br><span class="line">	D:\MyProject\app&gt;python manage.py makemigrations</span><br><span class="line">	Migrations for &apos;app01&apos;:</span><br><span class="line">	  app01\migrations\0002_delete_userinfo.py</span><br><span class="line">		- Delete model Userinfo</span><br><span class="line">		</span><br><span class="line">		</span><br><span class="line">	D:\MyProject\app&gt;python manage.py migrate</span><br><span class="line">	Operations to perform:</span><br><span class="line">	  Apply all migrations: admin, app01, auth, contenttypes, sessions</span><br><span class="line">	Running migrations:</span><br><span class="line">	  Applying app01.0002_delete_userinfo... OK</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">3. migrations目录下的文件 会记录的改</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">8. 修改表</span><br><span class="line"># 修改了name字段的长度 从20修改到32</span><br><span class="line">class Userinfo(models.Model):</span><br><span class="line">	id = models.AutoField(primary_key=True)                       # 创建一个自增的主键字段</span><br><span class="line">	name = models.CharField(null=False,max_length=32)             # 创建varchar类型并且不能为空的字段</span><br><span class="line"></span><br><span class="line">1. python3 manage.py makemigrations		# 记录我们对文件的改动,放到migrations目录下</span><br><span class="line">2. python3 manage.py makemigrate		# 把改动翻译成sql语句，再去数据库执行	</span><br><span class="line"></span><br><span class="line">D:\MyProject\app&gt;python manage.py makemigrations</span><br><span class="line">Migrations for &apos;app01&apos;:</span><br><span class="line">  app01\migrations\0004_auto_20190903_1054.py</span><br><span class="line">	- Alter field name on userinfo</span><br><span class="line"></span><br><span class="line">D:\MyProject\app&gt;python manage.py migrate</span><br><span class="line">Operations to perform:</span><br><span class="line">  Apply all migrations: admin, app01, auth, contenttypes, sessions</span><br><span class="line">Running migrations:</span><br><span class="line">  Applying app01.0004_auto_20190903_1054... O</span><br></pre></td></tr></table></figure>
+<h3 id="刷新数据到展示页面"><a href="#刷新数据到展示页面" class="headerlink" title="刷新数据到展示页面"></a>刷新数据到展示页面</h3><ol>
+<li>完善views中的publisher_list函数,将数据库表中刚建好的数据展示出来</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">publisher_list</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="comment"># 使用ORM去数据库查出所有的出版社，填充到HTML页面中，给用户返回</span></span><br><span class="line">    ret = models.Publisher.objects.all().order_by(<span class="string">"id"</span>) <span class="comment"># 排序</span></span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">"publisher_list.html"</span>,&#123;<span class="string">"publisher_list"</span>:ret&#125;)</span><br><span class="line">    <span class="comment"># http://127.0.0.1:8000/publisher_list/</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>在publisher_list.html中使用模板语言刷新出数据</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>出版社首页<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">table</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">thead</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>序号<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>ID<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>出版社名称<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">thead</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line">        &#123;% for publisher in publisher_list %&#125;</span><br><span class="line">            <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                &#123;#自动序号计数#&#125;</span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; forloop.counter &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; publisher.id &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; publisher.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">        &#123;% endfor %&#125;</span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="启动Django项"><a href="#启动Django项" class="headerlink" title="启动Django项"></a>启动Django项</h3><ol>
+<li><p>命令行启动:<br> D:\MyProject\项目路径&gt;python manage.py runserver 8099</p>
+</li>
+<li><p>Pycharm启动<br> 点绿色的小三角，直接启动Django项目,选择项目名编辑可以修改端口</p>
+</li>
+</ol>
+<h2 id="出版社信息-添加、删除、修改操作"><a href="#出版社信息-添加、删除、修改操作" class="headerlink" title="出版社信息 添加、删除、修改操作"></a>出版社信息 添加、删除、修改操作</h2><h3 id="添加出版社"><a href="#添加出版社" class="headerlink" title="添加出版社"></a>添加出版社</h3><ol>
+<li>首先在urls.py文件中增加函数与访问路径的对应关系</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    url(<span class="string">r'^admin/'</span>, admin.site.urls),</span><br><span class="line">    url(<span class="string">r'^publisher_list/'</span>, views.publisher_list),</span><br><span class="line">    url(<span class="string">r'^add_publisher/'</span>, views.add_publisher),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>在templates路径下添加add_publisher.html页面</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--post提交指向当前页面--&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>添加出版社<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>添加出版社<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/add_publisher/"</span> <span class="attr">method</span>=<span class="string">"POST"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"publisher_name"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">style</span>=<span class="string">"color: red"</span>&gt;</span>&#123;&#123; error_msg &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 在原有的展示页面上添加一个a标签作为入口指向add_publisher.html--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/add_publisher/"</span>&gt;</span>添加出版社<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>在views.py文件写 编写add_publisher函数方法</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 添加出版社</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_publisher</span><span class="params">(request)</span>:</span></span><br><span class="line">    error_msg = <span class="string">""</span></span><br><span class="line">    <span class="comment"># 如果是POST请求 就取到用户提交的数据</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        <span class="comment"># 拿到用户提交的数据</span></span><br><span class="line">        new_name = request.POST.get(<span class="string">"publisher_name"</span>,<span class="literal">None</span>)</span><br><span class="line">        print(new_name )</span><br><span class="line">        <span class="keyword">if</span> new_name:</span><br><span class="line">            <span class="comment"># 通过ORM 将数据入库</span></span><br><span class="line">            models.Publisher.objects.create(name=new_name)</span><br><span class="line">            <span class="comment"># 添加完成后 跳转回展示页面 查看结果</span></span><br><span class="line">            <span class="keyword">return</span> redirect(<span class="string">"/publisher_list/"</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 如果添加的字符为空,那么久直接返回添加页面,并给提示</span></span><br><span class="line">            error_msg = <span class="string">"您填写的数据为空"</span></span><br><span class="line">            <span class="keyword">return</span> render(request, <span class="string">"add_publisher.html"</span>,&#123;<span class="string">"error_msg"</span>:error_msg&#125;)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># GET请求放回添加页面</span></span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">"add_publisher.html"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="删除出版社"><a href="#删除出版社" class="headerlink" title="删除出版社"></a>删除出版社</h3><ol>
+<li>在urls.py文件中添加对应关系</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    url(<span class="string">r'^admin/'</span>, admin.site.urls),</span><br><span class="line">    url(<span class="string">r'^publisher_list/'</span>, views.publisher_list),</span><br><span class="line">    url(<span class="string">r'^add_publisher/'</span>, views.add_publisher),</span><br><span class="line">    url(<span class="string">r'^del_publisher/'</span>, views.del_publisher),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>定义删除按钮</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line">    &#123;% for publisher in publisher_list %&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">            &#123;#自动序号计数#&#125;</span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; forloop.counter &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; publisher.id &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; publisher.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/del_publisher/?id=&#123;&#123; publisher.id &#125;&#125;"</span>&gt;</span>删除<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>编写del_publisher函数方法</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 删除出版社</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">del_publisher</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="comment"># 当在页面上点击删除的时候,首先应该通过ID获取用户想删除那条数据</span></span><br><span class="line">    <span class="comment"># 页面上会通过/del_publisher/?id=&#123;&#123; publisher.id &#125;&#125; 在get的时候传过来id</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 从GET请求的参数里面拿到将要删除的数据的ID值</span></span><br><span class="line">    del_id = request.GET.get(<span class="string">"id"</span>,<span class="literal">None</span>)</span><br><span class="line">    <span class="keyword">if</span> del_id:</span><br><span class="line">        <span class="comment"># 通过ORM删除指定数据</span></span><br><span class="line">        del_obj = models.Publisher.objects.get(id=del_id).delete()</span><br><span class="line">        <span class="comment"># 删除后返回出版社页面，查看是否成功</span></span><br><span class="line">        <span class="keyword">return</span> redirect(<span class="string">"/publisher_list/"</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        HttpResponse(<span class="string">"您要删除的数据不存在"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="编辑出版社"><a href="#编辑出版社" class="headerlink" title="编辑出版社"></a>编辑出版社</h3><ol>
+<li>在urls.py文件中添加对应关系</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    url(<span class="string">r'^admin/'</span>, admin.site.urls),</span><br><span class="line">    url(<span class="string">r'^publisher_list/'</span>, views.publisher_list),</span><br><span class="line">    url(<span class="string">r'^add_publisher/'</span>, views.add_publisher),</span><br><span class="line">    url(<span class="string">r'^del_publisher/'</span>, views.del_publisher),</span><br><span class="line">    url(<span class="string">r'^edit_publisher/'</span>, views.edit_publisher),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>定义编辑按钮</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line">    &#123;% for publisher in publisher_list %&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">            &#123;#自动序号计数#&#125;</span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; forloop.counter &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; publisher.id &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; publisher.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/del_publisher/?id=&#123;&#123; publisher.id &#125;&#125;"</span>&gt;</span>删除<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/edit_publisher/?id=&#123;&#123; publisher.id &#125;&#125;"</span>&gt;</span>编辑<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>创建edit_publisher.html页面</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--1. id 将要编辑的数据id放在页面中，但是不显示--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--2. 将查询出来的要编辑的数据对象的名字刷新到编辑页面中--&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>编辑出版社<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>编辑出版社<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/edit_publisher/"</span> <span class="attr">method</span>=<span class="string">"POST"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"id"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; publisher_obj.id &#125;&#125;"</span> <span class="attr">style</span>=<span class="string">"display: none"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"publisher_name"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; publisher_obj.name &#125;&#125;"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">style</span>=<span class="string">"color: red"</span>&gt;</span>&#123;&#123; error_msg &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>编写edit_publisher函数方法<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 编辑出版社</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit_publisher</span><span class="params">(request)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 如果是POST提交,将用户从编辑页面修改的数据刷新到数据库中</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        edit_id = request.POST.get(<span class="string">"id"</span>,<span class="literal">None</span>)</span><br><span class="line">        new_name = request.POST.get(<span class="string">"publisher_name"</span>,<span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 更新出版社</span></span><br><span class="line">        <span class="comment"># 根据ID取到编辑的是哪个出版社</span></span><br><span class="line">        edit_publisher_obj = models.Publisher.objects.get(id=edit_id)</span><br><span class="line">        edit_publisher_obj.name = new_name</span><br><span class="line">        <span class="comment"># 把修改后的数据提交到数据</span></span><br><span class="line">        edit_publisher_obj.save()</span><br><span class="line">        <span class="comment"># 去出版社列表页面展示，查看是否更新成功</span></span><br><span class="line">        <span class="keyword">return</span> redirect(<span class="string">"/publisher_list/"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 返回编辑的是哪个出版社对象</span></span><br><span class="line">    <span class="comment"># 从GET请求中取到要编辑的ID</span></span><br><span class="line">    <span class="comment"># 当用户从展示页点击编辑按钮,需要获取用户点击的数据ID,然后得到数据对象传给编辑页面</span></span><br><span class="line">    edit_id = request.GET.get(<span class="string">"id"</span>,<span class="literal">None</span>)</span><br><span class="line">    <span class="keyword">if</span> edit_id:</span><br><span class="line">        publisher_obj = models.Publisher.objects.get(id=edit_id)</span><br><span class="line">        <span class="keyword">return</span> render(request,<span class="string">"edit_publisher.html"</span>,&#123;<span class="string">"publisher_obj"</span>:publisher_obj&#125;)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> HttpResponse(<span class="string">"您要编辑的数据不存在"</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="图书信息-添加、删除、修改"><a href="#图书信息-添加、删除、修改" class="headerlink" title="图书信息 添加、删除、修改"></a>图书信息 添加、删除、修改</h2><h3 id="一对多关系表的建立"><a href="#一对多关系表的建立" class="headerlink" title="一对多关系表的建立"></a>一对多关系表的建立</h3><p><img src="/img/django_04.png" width="50%"></p>
+<h3 id="ORM添加外键关联-models-ForeignKey"><a href="#ORM添加外键关联-models-ForeignKey" class="headerlink" title="ORM添加外键关联 models.ForeignKey"></a>ORM添加外键关联 models.ForeignKey</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Book</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    id = models.AutoField(primary_key=<span class="literal">True</span>)  <span class="comment"># 自增主键</span></span><br><span class="line">    title = models.CharField(max_length=<span class="number">64</span>, null=<span class="literal">False</span>, unique=<span class="literal">True</span>)  <span class="comment"># 书籍名称,不能为空,唯一</span></span><br><span class="line">    <span class="comment"># ForeignKey会自动加_id , 在数据库就叫做publisher_id_id, 所以只要写publisher就可以</span></span><br><span class="line">    publisher = models.ForeignKey(to=Publisher)     <span class="comment"># ForeignKey外键</span></span><br></pre></td></tr></table></figure>
+<h3 id="展示所有书籍"><a href="#展示所有书籍" class="headerlink" title="展示所有书籍"></a>展示所有书籍</h3><ol>
+<li><p>在urls.py文件中添加对应关系</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 书籍所有相关</span></span><br><span class="line">url(<span class="string">r'^book_list/'</span>, views.book_list),</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在book_list.html中使用模板语言刷新出数据</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>书籍列表<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>书籍列表<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/add_book/"</span>&gt;</span>添加书籍<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">table</span> <span class="attr">border</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">thead</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>序号<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>ID<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>书名<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">th</span>&gt;</span>出版社<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">thead</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line">        &#123;% for book in book_list %&#125;</span><br><span class="line">            <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; forloop.counter &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; book.id &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; book.title &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; book.publisher.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">        &#123;% endfor %&#125;</span><br><span class="line">        &#123;#book.publisher 得到的是出版社对象,继续.出属性#&#125;</span><br><span class="line">        &#123;#book                --&gt; 书对象#&#125;</span><br><span class="line">        &#123;#book.publisher      --&gt; book对应的出版社对象#&#125;</span><br><span class="line">        &#123;#book.publisher_id   --&gt; 数据库表中实际保存的外键值#&#125;</span><br><span class="line">        &#123;#book.publisher.name --&gt; book对应的出版社对象的属性#&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>views.py文件中添加展示书籍函数 book_list</p>
+</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">book_list</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="comment"># ORM去数据库中查询所有的数据</span></span><br><span class="line">    all_book = models.Book.objects.all().order_by(<span class="string">"id"</span>)</span><br><span class="line">    <span class="comment"># 去HTMK页面渲染数据</span></span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">"book_list.html"</span>,&#123;<span class="string">"book_list"</span>:all_book&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="添加书籍"><a href="#添加书籍" class="headerlink" title="添加书籍"></a>添加书籍</h3><ol>
+<li>在urls.py文件中添加对应关系</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 书籍所有相关</span></span><br><span class="line">url(<span class="string">r'^book_list/'</span>, views.book_list),</span><br><span class="line">url(<span class="string">r'^add_book/'</span>, views.add_book),</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>别忘记添加入口</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/add_book/"</span>&gt;</span>添加书籍<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>编写add_book函数</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 添加书籍</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_book</span><span class="params">(request)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        <span class="comment"># &#123;"book_title":"css","publisher":1&#125;</span></span><br><span class="line">        new_book_title = request.POST.get(<span class="string">"book_title"</span>,<span class="literal">None</span>)</span><br><span class="line">        new_publisher = request.POST.get(<span class="string">"publusher"</span>,<span class="literal">None</span>)</span><br><span class="line">        print(new_book_title)</span><br><span class="line">        print(new_publisher)</span><br><span class="line">        <span class="comment"># 创建新书,添加新数据</span></span><br><span class="line">        models.Book.objects.create(</span><br><span class="line">            title=new_book_title,</span><br><span class="line">            publisher_id = new_publisher</span><br><span class="line">                                   )</span><br><span class="line">        <span class="comment"># 返回书籍列表页面</span></span><br><span class="line">        <span class="keyword">return</span> redirect(<span class="string">"/book_list/"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 取到所有的出版社，给添加页面的select</span></span><br><span class="line">    all_publisher = models.Publisher.objects.all()</span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">"add_book.html"</span>,&#123;<span class="string">"all_publisher"</span>:all_publisher&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>添加add_book.html页面</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>添加书籍<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>添加书籍<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/add_book/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"book_title"</span>&gt;</span></span><br><span class="line">    &#123;#&#123;"publisher":pid&#125;#&#125;</span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">name</span>=<span class="string">"publusher"</span> <span class="attr">id</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">        &#123;% for publisher in all_publisher %&#125;</span><br><span class="line">            <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; publisher.id &#125;&#125;"</span>&gt;</span>&#123;&#123; publisher.name &#125;&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">        &#123;% endfor %&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="删除书籍"><a href="#删除书籍" class="headerlink" title="删除书籍"></a>删除书籍</h3><ol>
+<li><p>在urls.py文件中添加对应关系</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 书籍所有相关</span></span><br><span class="line">url(<span class="string">r'^book_list/'</span>, views.book_list),</span><br><span class="line">url(<span class="string">r'^add_book/'</span>, views.add_book),</span><br><span class="line">url(<span class="string">r'^del_book/'</span>, views.del_book),</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>定义删除按钮</p>
+</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line">    &#123;% for book in book_list %&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; forloop.counter &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; book.id &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; book.title &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; book.publisher.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/del_book/?id=&#123;&#123; book.id &#125;&#125;"</span>&gt;</span>删除<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/edit_book/?id=&#123;&#123; book.id &#125;&#125;"</span>&gt;</span>编辑<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>编写del_book方法</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">del_book</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="comment"># 获取要删除的书籍的ID</span></span><br><span class="line">    del_id = request.GET.get(<span class="string">"id"</span>)</span><br><span class="line">    <span class="comment"># 去数据库根据del_id查找要删除的书籍对象,然后直接删除</span></span><br><span class="line">    models.Book.objects.get(id=del_id).delete()</span><br><span class="line">    <span class="comment"># 返回书籍展示页面</span></span><br><span class="line">    <span class="keyword">return</span> redirect(<span class="string">"/book_list/"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="编辑书籍"><a href="#编辑书籍" class="headerlink" title="编辑书籍"></a>编辑书籍</h3><ol>
+<li><p>在urls.py文件中添加对应关系</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 书籍所有相关</span></span><br><span class="line">url(<span class="string">r'^book_list/'</span>, views.book_list),</span><br><span class="line">url(<span class="string">r'^add_book/'</span>, views.add_book),</span><br><span class="line">url(<span class="string">r'^del_book/'</span>, views.del_book),</span><br><span class="line">url(<span class="string">r'^edit_book/'</span>, views.edit_book)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编写edit_book方法</p>
+</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit_book</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="comment"># 从POST提交的数据中取出id、书名和书关联的出版社</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        edit_id = request.POST.get(<span class="string">"id"</span>)</span><br><span class="line">        edit_book_title = request.POST.get(<span class="string">"book_title"</span>)</span><br><span class="line">        edit_publusher_id = request.POST.get(<span class="string">"publusher"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 根据edit_id得到要修改的书籍对象,然后更新数据并提交</span></span><br><span class="line">        edit_obj = models.Book.objects.get(id=edit_id)</span><br><span class="line">        edit_obj.title = edit_book_title</span><br><span class="line">        edit_obj.publisher_id = edit_publusher_id</span><br><span class="line">        <span class="comment"># 将修改提交到数据</span></span><br><span class="line">        edit_obj.save()</span><br><span class="line">        <span class="comment"># 返回书籍列表页面</span></span><br><span class="line">        <span class="keyword">return</span> redirect(<span class="string">"/book_list/"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 通过Get获取ID 将要修改的书籍对象传给页面</span></span><br><span class="line">    edit_id = request.GET.get(<span class="string">"id"</span>,<span class="literal">None</span>)</span><br><span class="line">    edit_obj = models.Book.objects.get(id=edit_id)</span><br><span class="line">    <span class="comment"># 获取所有出版社对象,传给页面的select</span></span><br><span class="line">    all_publisher = models.Publisher.objects.all()</span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">"edit_book.html"</span>,&#123;<span class="string">"all_publisher"</span>:all_publisher,<span class="string">"edit_obj"</span>:edit_obj&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>编写edit_book.html页面</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>编辑书籍<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>编辑书籍<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/edit_book/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">    &#123;#提交数据的时候拿到书籍的ID#&#125;</span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"id"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; edit_obj.id &#125;&#125;"</span> <span class="attr">style</span>=<span class="string">"display: none"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"book_title"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; edit_obj.title &#125;&#125;"</span>&gt;</span></span><br><span class="line">    &#123;#select默认选中编辑书籍的出版社#&#125;</span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">name</span>=<span class="string">"publusher"</span>&gt;</span></span><br><span class="line">      &#123;# 当前书籍关联的出版社才默认选中，其他的出版社不选中 #&#125;</span><br><span class="line">      &#123;# 如果书的出版社的id值 &#123;&#123; book_obj.publisher.id &#125;&#125; 等于 publisher.id#&#125;</span><br><span class="line">        &#123;% for publisher in all_publisher %&#125;</span><br><span class="line">                &#123;% if edit_obj.publisher.id == publisher.id  %&#125;</span><br><span class="line">                    <span class="tag">&lt;<span class="name">option</span> <span class="attr">selected</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; publisher.id &#125;&#125;"</span>&gt;</span>&#123;&#123; publisher.name &#125;&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">                &#123;#否则不选中#&#125;</span><br><span class="line">                &#123;% else %&#125;</span><br><span class="line">                    <span class="tag">&lt;<span class="name">option</span>  <span class="attr">value</span>=<span class="string">"&#123;&#123; publisher.id &#125;&#125;"</span>&gt;</span>&#123;&#123; publisher.name &#125;&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">            &#123;% endif %&#125;</span><br><span class="line">        &#123;% endfor %&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="作者信息-添加、删除、修改"><a href="#作者信息-添加、删除、修改" class="headerlink" title="作者信息 添加、删除、修改"></a>作者信息 添加、删除、修改</h2><h3 id="多对多关系表的建立"><a href="#多对多关系表的建立" class="headerlink" title="多对多关系表的建立"></a>多对多关系表的建立</h3><p><img src="/img/django_05.png" width="50%"><br><img src="/img/django_06.png" width="50%"></p>
+<h3 id="ORM添加多对多的关联关系-models-ManyToManyField"><a href="#ORM添加多对多的关联关系-models-ManyToManyField" class="headerlink" title="ORM添加多对多的关联关系 models.ManyToManyField"></a>ORM添加多对多的关联关系 models.ManyToManyField</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Author</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    id = models.AutoField(primary_key=<span class="literal">True</span>)  <span class="comment"># 自增主键</span></span><br><span class="line">    name = models.CharField(max_length=<span class="number">64</span>,null=<span class="literal">False</span>,unique=<span class="literal">True</span>)   <span class="comment"># 作者名字,不能为空,唯一</span></span><br><span class="line">    <span class="comment"># 告诉ORM 这张表与book表是多对多的关联关系，ORM自动帮我们生成第三张关联表 名字是author_book</span></span><br><span class="line">    book = models.ManyToManyField(to=<span class="string">'Book'</span>)    <span class="comment"># ManyToManyField 关联Book表 会创建第三张关联表</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'&lt;Author 名字&#123;&#125;&gt;'</span>.format(self.name)</span><br></pre></td></tr></table></figure>
+<h3 id="urls-py预先定义所有方法函数和路径的对应关系"><a href="#urls-py预先定义所有方法函数和路径的对应关系" class="headerlink" title="urls.py预先定义所有方法函数和路径的对应关系"></a>urls.py预先定义所有方法函数和路径的对应关系</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 作者所有相关</span></span><br><span class="line">url(<span class="string">r'^author_list/'</span>, views.author_list),</span><br><span class="line">url(<span class="string">r'^add_author/'</span>, views.add_author),</span><br><span class="line">url(<span class="string">r'^del_author/'</span>, views.del_author),</span><br><span class="line">url(<span class="string">r'^edit_author/'</span>, views.edit_author),</span><br></pre></td></tr></table></figure>
+<h3 id="展示所有作者"><a href="#展示所有作者" class="headerlink" title="展示所有作者"></a>展示所有作者</h3><ol>
+<li>author_list函数</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">author_list</span><span class="params">(request)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 查询出所有作家信息</span></span><br><span class="line">    all_author = models.Author.objects.all().order_by(<span class="string">"id"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 单取一个作者对象,查看他的book属性</span></span><br><span class="line">    <span class="comment"># 作者对象里的book</span></span><br><span class="line">    <span class="comment"># author_obj = all_author[0]</span></span><br><span class="line">    author_obj = models.Author.objects.get(id=<span class="number">1</span>)</span><br><span class="line">    print(author_obj.book.all())  <span class="comment"># &lt;QuerySet [&lt;Book: Java&gt;, &lt;Book: Python&gt;]&gt; 当前作者.所有的书籍对象</span></span><br><span class="line">    print(<span class="string">"="</span> * <span class="number">120</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">"author_list.html"</span>,&#123;<span class="string">"author_list"</span>:all_author&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>展示作者页面 author_list.html</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>作家信息<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>作家信息<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/add_author/"</span>&gt;</span>添加新作者<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">table</span> <span class="attr">border</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">thead</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">th</span>&gt;</span>序号<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">th</span>&gt;</span>ID<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">th</span>&gt;</span>作家姓名<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">th</span>&gt;</span>书籍<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">th</span>&gt;</span>操作<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">thead</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line">    &#123;% for author in author_list %&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; forloop.counter &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; author.id &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; author.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span></span><br><span class="line">                &#123;#循环作者所有书籍对象 判断最后一个加上|分割#&#125;</span><br><span class="line">                &#123;% for book in author.book.all %&#125;</span><br><span class="line">                    &#123;% if forloop.last %&#125;</span><br><span class="line">                        &#123;&#123; book.title &#125;&#125; &amp;nbsp;</span><br><span class="line">                    &#123;% else %&#125;</span><br><span class="line">                        &#123;&#123; book.title &#125;&#125; |</span><br><span class="line">                    &#123;% endif %&#125;</span><br><span class="line">                &#123;% endfor %&#125;</span><br><span class="line">            <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/del_author/?id=&#123;&#123; author.id &#125;&#125;"</span>&gt;</span>删除<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/edit_author/?id=&#123;&#123; author.id &#125;&#125;"</span>&gt;</span>编辑<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="添加作者"><a href="#添加作者" class="headerlink" title="添加作者"></a>添加作者</h3><ol>
+<li>add_author函数</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">* 要将所有书籍传给添加页面的select</span><br><span class="line">* 先创建新作者,使用set添加新作者与书的对应关系</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 添加作者</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_author</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="comment"># 取到提交数据</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        new_name = request.POST.get(<span class="string">"author_name"</span>)</span><br><span class="line">        <span class="comment"># POST 提交的数据是多个值的时候,要用getlist,如多选的checkbox和多选的select</span></span><br><span class="line">        new_author_book = request.POST.getlist(<span class="string">"author_book"</span>)</span><br><span class="line">        print(new_name,new_author_book)</span><br><span class="line">        print(<span class="string">"*"</span> * <span class="number">150</span>)</span><br><span class="line">        <span class="comment"># 创建新作者</span></span><br><span class="line">        new_author_obj = models.Author.objects.create(name=new_name)</span><br><span class="line">        <span class="comment"># 使用set添加新作者与书的对应关系</span></span><br><span class="line">        new_author_obj.book.set(new_author_book)</span><br><span class="line">        <span class="comment"># 返回作者列表页面</span></span><br><span class="line">        <span class="keyword">return</span> redirect(<span class="string">"/author_list/"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 要将所有书籍传给添加页面的select</span></span><br><span class="line">    all_book = models.Book.objects.all().order_by(<span class="string">"id"</span>)</span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">"add_author.html"</span>,&#123;<span class="string">"book_list"</span>:all_book&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>添加add_author.html页面</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>添加作者<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>添加作者<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/add_author/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>作者姓名:</span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"author_name"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>选择作品:</span><br><span class="line">        &#123;#多选,将所有图书放入多选框中#&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">select</span> <span class="attr">multiple</span> <span class="attr">name</span>=<span class="string">"author_book"</span>&gt;</span></span><br><span class="line">            &#123;% for book in book_list %&#125;</span><br><span class="line">                <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; book.id &#125;&#125;"</span>&gt;</span>&#123;&#123; book.title &#125;&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">            &#123;% endfor %&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="删除作者"><a href="#删除作者" class="headerlink" title="删除作者"></a>删除作者</h3><ol>
+<li>del_author函数:</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 删除作者</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">del_author</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="comment"># 从GET里获取要删除的作者ID，然后直接删除</span></span><br><span class="line">    del_id = request.GET.get(<span class="string">"id"</span>,<span class="literal">None</span>)</span><br><span class="line">    models.Author.objects.get(id=del_id).delete()</span><br><span class="line">    <span class="comment"># 返回作者列表页面</span></span><br><span class="line">    <span class="keyword">return</span> redirect(<span class="string">"/author_list/"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="编辑作者"><a href="#编辑作者" class="headerlink" title="编辑作者"></a>编辑作者</h3><ol>
+<li>edit_author函数</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 注意获取页面上的select或者checkbox多个值需要使用getlist接收</span><br><span class="line">2. 页面条件判断 当书在作者对象.book.all里时，才默认选中该书,否则不选中</span><br><span class="line">3. edit_obj.book.all()在函数中得到对象所有的书籍对象,但是在页面中无法使用()方法</span><br><span class="line">4. 更新数据需要使用对象.save()方法</span><br><span class="line">5. 更新作者对象的书籍,edit_obj.book.set(edit_books)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit_author</span><span class="params">(request)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        <span class="comment"># 从POST里取得编辑作者的id、姓名、作品</span></span><br><span class="line">        edit_id = request.POST.get(<span class="string">"id"</span>)</span><br><span class="line">        edit_name = request.POST.get(<span class="string">"author_name"</span>)</span><br><span class="line">        edit_books = request.POST.getlist(<span class="string">"author_books"</span>)</span><br><span class="line">        print(edit_books)</span><br><span class="line">        print(edit_name)</span><br><span class="line">        print(<span class="string">"*"</span> * <span class="number">100</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 根据ID找到编辑的是哪个作者对象, 最后提交更新数据</span></span><br><span class="line">        edit_obj = models.Author.objects.get(id=edit_id)</span><br><span class="line">        <span class="comment"># 更新数据</span></span><br><span class="line">        edit_obj.name = edit_name</span><br><span class="line">        <span class="comment"># 更新作者关联书籍的对应关系</span></span><br><span class="line">        edit_obj.book.set(edit_books)</span><br><span class="line">        <span class="comment"># 将所有的修改提交</span></span><br><span class="line">        edit_obj.save()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 返回作者列表页面</span></span><br><span class="line">        <span class="keyword">return</span> redirect(<span class="string">"/author_list/"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 通过GET获取用户编辑的作者ID，找到要编辑的作者对象,返回给edit_author.html</span></span><br><span class="line">    edit_id = request.GET.get(<span class="string">"id"</span>,<span class="literal">None</span>)</span><br><span class="line">    edit_obj = models.Author.objects.get(id=edit_id)</span><br><span class="line">    print(edit_obj.book.all())  <span class="comment"># &lt;QuerySet [&lt;Book: &lt;object book_title=Python&gt;&gt;, &lt;Book: &lt;object book_title=GO&gt;&gt;]&gt;</span></span><br><span class="line">    <span class="comment"># 返回所有书籍返回给页面的select</span></span><br><span class="line">    all_book = models.Book.objects.all()</span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">'edit_author.html'</span>,&#123;<span class="string">"book_list"</span>:all_book,<span class="string">"edit_obj"</span>:edit_obj&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>添加edit_author.html页面</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>编辑作者<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>编辑作者<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/edit_author/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"id"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; edit_obj.id &#125;&#125;"</span> <span class="attr">style</span>=<span class="string">"display: none"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>作者姓名:</span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"author_name"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; edit_obj.name &#125;&#125;"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>作者作品:</span><br><span class="line">        <span class="tag">&lt;<span class="name">select</span> <span class="attr">name</span>=<span class="string">"author_books"</span> <span class="attr">multiple</span>&gt;</span></span><br><span class="line">            &#123;% for book in book_list %&#125;</span><br><span class="line">                &#123;#判断,如果当前这本书 在 当前作者关联的书列表里  edit_id_obj.book.all #&#125;</span><br><span class="line">                &#123;% if book in edit_obj.book.all %&#125;</span><br><span class="line">                    <span class="tag">&lt;<span class="name">option</span> <span class="attr">selected</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; book.id &#125;&#125;"</span>&gt;</span>&#123;&#123; book.title &#125;&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">                &#123;#否则，不选中#&#125;</span><br><span class="line">                &#123;% else %&#125;</span><br><span class="line">                    <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; book.id &#125;&#125;"</span>&gt;</span>&#123;&#123; book.title &#125;&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">                &#123;% endif %&#125;</span><br><span class="line">            &#123;% endfor %&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="使用-Bootstrap模板-和-Font-Awesome图标字体库"><a href="#使用-Bootstrap模板-和-Font-Awesome图标字体库" class="headerlink" title="使用 Bootstrap模板 和 Font Awesome图标字体库"></a>使用 Bootstrap模板 和 Font Awesome图标字体库</h2><h3 id="去Bootstrap下载想要的模板"><a href="#去Bootstrap下载想要的模板" class="headerlink" title="去Bootstrap下载想要的模板"></a>去Bootstrap下载想要的模板</h3><ol>
+<li>选择控制台模板<a href="https://v3.bootcss.com/examples/dashboard/" target="_blank" rel="noopener">https://v3.bootcss.com/examples/dashboard/</a></li>
+<li>右键另存为桌面,会下载两个文件:<br> Dashboard Template for Bootstrap_files  目录:只保留dashboard.css即可<br> Dashboard Template for Bootstrap.html   html文件</li>
+</ol>
+<h3 id="去Font-Awesome官网下载图标字体库和CSS框架"><a href="#去Font-Awesome官网下载图标字体库和CSS框架" class="headerlink" title="去Font Awesome官网下载图标字体库和CSS框架"></a>去Font Awesome官网下载图标字体库和CSS框架</h3><ol>
+<li><a href="http://fontawesome.dashgame.com" target="_blank" rel="noopener">http://fontawesome.dashgame.com</a></li>
+</ol>
+<h3 id="将下载好的文件放入static目录"><a href="#将下载好的文件放入static目录" class="headerlink" title="将下载好的文件放入static目录"></a>将下载好的文件放入static目录</h3><p><img src="/img/django_07.png" width="50%"></p>
+<h3 id="套用首页模板"><a href="#套用首页模板" class="headerlink" title="套用首页模板"></a>套用首页模板</h3><ol>
+<li>修改publisher_list 为old_publisher_list</li>
+<li>修改Dashboard Template for Bootstrap.html 为publisher_list</li>
+<li>替换首页的css引入:</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- saved from url=(0042)https://v3.bootcss.com/examples/dashboard/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"zh-CN"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Content-Type"</span> <span class="attr">content</span>=<span class="string">"text/html; charset=UTF-8"</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"X-UA-Compatible"</span> <span class="attr">content</span>=<span class="string">"IE=edge"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"description"</span> <span class="attr">content</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"author"</span> <span class="attr">content</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"icon"</span> <span class="attr">href</span>=<span class="string">"https://v3.bootcss.com/favicon.ico"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>添加作者<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Bootstrap core CSS --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/static/bootstrap/css/bootstrap.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Custom styles for this template --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/static/dashboard.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/static/fontawesome/css/font-awesome.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>替换首页的jQuery引入:</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/static/jquery-3.3.1.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/static/bootstrap/js/bootstrap.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>Bootstrap和fontawesome的使用</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container-fluid"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"row"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-sm-3 col-md-2 sidebar"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">ul</span> <span class="attr">class</span>=<span class="string">"nav nav-sidebar"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">li</span> <span class="attr">class</span>=<span class="string">"active"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/publisher_list/"</span>&gt;</span>出版社列表<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/book_list/"</span>&gt;</span>书籍列表<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/author_list/"</span>&gt;</span>作者列表<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">h1</span> <span class="attr">class</span>=<span class="string">"page-header"</span>&gt;</span>出版社管理页面<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">            &#123;#面板#&#125;</span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel panel-primary"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-heading"</span>&gt;</span>书籍列表<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-body"</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"row"</span> <span class="attr">style</span>=<span class="string">"margin-bottom: 20px"</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-4"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"input-group"</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">class</span>=<span class="string">"form-control"</span> <span class="attr">placeholder</span>=<span class="string">"Search for..."</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"input-group-btn"</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">"btn btn-default"</span> <span class="attr">type</span>=<span class="string">"button"</span>&gt;</span>搜索<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">                                     <span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="comment">&lt;!-- /input-group --&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="comment">&lt;!-- /.col-md-4 --&gt;</span></span><br><span class="line"></span><br><span class="line">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-2 pull-right"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/add_publisher/"</span> <span class="attr">class</span>=<span class="string">"btn btn-success"</span>&gt;</span>新页面添加<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">"btn btn-success"</span> <span class="attr">data-toggle</span>=<span class="string">"modal"</span> <span class="attr">data-target</span>=<span class="string">"#myModal"</span>&gt;</span>新增<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="comment">&lt;!-- /.row --&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">table</span> <span class="attr">class</span>=<span class="string">"table table-bordered "</span> &gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">thead</span> &gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">th</span> <span class="attr">class</span>=<span class="string">"text-center"</span>&gt;</span>序号<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">th</span> <span class="attr">class</span>=<span class="string">"text-center"</span>&gt;</span>ID<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">th</span> <span class="attr">class</span>=<span class="string">"text-center"</span>&gt;</span>出版社<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">th</span> <span class="attr">class</span>=<span class="string">"text-center"</span>&gt;</span>操作<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">thead</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">tbody</span> <span class="attr">class</span>=<span class="string">"text-center"</span>&gt;</span></span><br><span class="line">                        &#123;% for publisher in all_publisher %&#125;</span><br><span class="line">                            <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; forloop.counter &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; publisher.id &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; publisher.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">td</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">"btn btn-danger"</span> <span class="attr">href</span>=<span class="string">"/del_publisher/?id=&#123;&#123; publisher.id &#125;&#125;"</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">"fa fa-trash-o fa-fw"</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span>删除<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">"btn btn-primary"</span> <span class="attr">href</span>=<span class="string">"/edit_publisher/?id=&#123;&#123; publisher.id &#125;&#125;"</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">"fa fa-pencil fa-fw"</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span>编辑<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">                        &#123;% endfor %&#125;</span><br><span class="line">                        <span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>简单的写一个add_book.html</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- saved from url=(0042)https://v3.bootcss.com/examples/dashboard/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"zh-CN"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Content-Type"</span> <span class="attr">content</span>=<span class="string">"text/html; charset=UTF-8"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"X-UA-Compatible"</span> <span class="attr">content</span>=<span class="string">"IE=edge"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"description"</span> <span class="attr">content</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"author"</span> <span class="attr">content</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"icon"</span> <span class="attr">href</span>=<span class="string">"https://v3.bootcss.com/favicon.ico"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>添加作者<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Bootstrap core CSS --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/static/bootstrap/css/bootstrap.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Custom styles for this template --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/static/dashboard.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/static/fontawesome/css/font-awesome.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"row"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-6 col-md-offset-3"</span>&gt;</span></span><br><span class="line">            &#123;#页头#&#125;</span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"page-header"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">h1</span>&gt;</span>添加页面<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel panel-primary"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-heading"</span>&gt;</span>添加出版社<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-body"</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">form</span> <span class="attr">class</span>=<span class="string">"form-horizontal"</span> <span class="attr">action</span>=<span class="string">"/add_publisher/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"publisher_name"</span> <span class="attr">class</span>=<span class="string">"col-sm-3 control-label"</span>&gt;</span>出版社名称<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-sm-9"</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"publisher_name"</span> <span class="attr">class</span>=<span class="string">"form-control"</span> <span class="attr">id</span>=<span class="string">"publisher_name"</span> <span class="attr">placeholder</span>=<span class="string">"出版社名称"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-sm-offset-3 col-sm-9"</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">class</span>=<span class="string">"btn btn-default"</span>&gt;</span>提交<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/static/jquery-3.3.1.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/static/bootstrap/js/bootstrap.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>简单的写一个edit_book.html</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- saved from url=(0042)https://v3.bootcss.com/examples/dashboard/ --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"zh-CN"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Content-Type"</span> <span class="attr">content</span>=<span class="string">"text/html; charset=UTF-8"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"X-UA-Compatible"</span> <span class="attr">content</span>=<span class="string">"IE=edge"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"description"</span> <span class="attr">content</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"author"</span> <span class="attr">content</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"icon"</span> <span class="attr">href</span>=<span class="string">"https://v3.bootcss.com/favicon.ico"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>编辑出版社<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Bootstrap core CSS --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/static/bootstrap/css/bootstrap.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Custom styles for this template --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/static/dashboard.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"/static/fontawesome/css/font-awesome.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"row"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-6 col-md-offset-3"</span>&gt;</span></span><br><span class="line">            &#123;#页头#&#125;</span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"page-header"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">h1</span>&gt;</span>编辑页面<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel panel-primary"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-heading"</span>&gt;</span>编辑出版社<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-body"</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">form</span> <span class="attr">class</span>=<span class="string">"form-horizontal"</span> <span class="attr">action</span>=<span class="string">"/edit_publisher/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"edit_id"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; edit_obj.id &#125;&#125;"</span> <span class="attr">style</span>=<span class="string">"display: none"</span> &gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"publisher_name"</span> <span class="attr">class</span>=<span class="string">"col-sm-3 control-label"</span>&gt;</span>出版社名称<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-sm-9"</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"publisher_name"</span> <span class="attr">class</span>=<span class="string">"form-control"</span> <span class="attr">id</span>=<span class="string">"publisher_name"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; edit_obj.name &#125;&#125;"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-sm-offset-3 col-sm-9"</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">class</span>=<span class="string">"btn btn-default"</span>&gt;</span>提交<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/static/jquery-3.3.1.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/static/bootstrap/js/bootstrap.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/django/" rel="tag"><i class="fa fa-tag"></i> django</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/20/pymysql/" rel="next" title="PyMySQL">
+                <i class="fa fa-chevron-left"></i> PyMySQL
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/08/django-plus/" rel="prev" title="Django 进阶">
+                Django 进阶 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Django-基础使用"><span class="nav-number">1.</span> <span class="nav-text">Django 基础使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Django-官网下载页面"><span class="nav-number">1.1.</span> <span class="nav-text">Django 官网下载页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装方法"><span class="nav-number">1.2.</span> <span class="nav-text">安装方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Django-项目"><span class="nav-number">1.3.</span> <span class="nav-text">创建 Django 项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-Django-项目"><span class="nav-number">1.4.</span> <span class="nav-text">配置 Django 项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Django-Web-请求流程"><span class="nav-number">1.5.</span> <span class="nav-text">Django Web 请求流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#urls-py-的配置"><span class="nav-number">1.6.</span> <span class="nav-text">urls.py 的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#views-py-的配置"><span class="nav-number">1.7.</span> <span class="nav-text">views.py 的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ORM-的使用"><span class="nav-number">1.8.</span> <span class="nav-text">ORM 的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#刷新数据到展示页面"><span class="nav-number">1.9.</span> <span class="nav-text">刷新数据到展示页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动Django项"><span class="nav-number">1.10.</span> <span class="nav-text">启动Django项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#出版社信息-添加、删除、修改操作"><span class="nav-number">2.</span> <span class="nav-text">出版社信息 添加、删除、修改操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加出版社"><span class="nav-number">2.1.</span> <span class="nav-text">添加出版社</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除出版社"><span class="nav-number">2.2.</span> <span class="nav-text">删除出版社</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑出版社"><span class="nav-number">2.3.</span> <span class="nav-text">编辑出版社</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图书信息-添加、删除、修改"><span class="nav-number">3.</span> <span class="nav-text">图书信息 添加、删除、修改</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一对多关系表的建立"><span class="nav-number">3.1.</span> <span class="nav-text">一对多关系表的建立</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ORM添加外键关联-models-ForeignKey"><span class="nav-number">3.2.</span> <span class="nav-text">ORM添加外键关联 models.ForeignKey</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#展示所有书籍"><span class="nav-number">3.3.</span> <span class="nav-text">展示所有书籍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加书籍"><span class="nav-number">3.4.</span> <span class="nav-text">添加书籍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除书籍"><span class="nav-number">3.5.</span> <span class="nav-text">删除书籍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑书籍"><span class="nav-number">3.6.</span> <span class="nav-text">编辑书籍</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#作者信息-添加、删除、修改"><span class="nav-number">4.</span> <span class="nav-text">作者信息 添加、删除、修改</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多对多关系表的建立"><span class="nav-number">4.1.</span> <span class="nav-text">多对多关系表的建立</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ORM添加多对多的关联关系-models-ManyToManyField"><span class="nav-number">4.2.</span> <span class="nav-text">ORM添加多对多的关联关系 models.ManyToManyField</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#urls-py预先定义所有方法函数和路径的对应关系"><span class="nav-number">4.3.</span> <span class="nav-text">urls.py预先定义所有方法函数和路径的对应关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#展示所有作者"><span class="nav-number">4.4.</span> <span class="nav-text">展示所有作者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加作者"><span class="nav-number">4.5.</span> <span class="nav-text">添加作者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除作者"><span class="nav-number">4.6.</span> <span class="nav-text">删除作者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑作者"><span class="nav-number">4.7.</span> <span class="nav-text">编辑作者</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Bootstrap模板-和-Font-Awesome图标字体库"><span class="nav-number">5.</span> <span class="nav-text">使用 Bootstrap模板 和 Font Awesome图标字体库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#去Bootstrap下载想要的模板"><span class="nav-number">5.1.</span> <span class="nav-text">去Bootstrap下载想要的模板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#去Font-Awesome官网下载图标字体库和CSS框架"><span class="nav-number">5.2.</span> <span class="nav-text">去Font Awesome官网下载图标字体库和CSS框架</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将下载好的文件放入static目录"><span class="nav-number">5.3.</span> <span class="nav-text">将下载好的文件放入static目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#套用首页模板"><span class="nav-number">5.4.</span> <span class="nav-text">套用首页模板</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
