@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="docker,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="04 Docker 容器管理">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/10/10/docker-base03/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_12.png">
+<meta property="og:updated_time" content="2019-10-10T03:51:24.995Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="04 Docker 容器管理">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/10/10/docker-base03/">
+
+
+
+
+
+  <title>04 Docker 容器管理 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/10/10/docker-base03/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">04 Docker 容器管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-10T08:50:26+08:00">
+                2019-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="启动容器-docker-run"><a href="#启动容器-docker-run" class="headerlink" title="启动容器 docker run"></a>启动容器 docker run</h2><ol>
+<li>docker 的容器是镜像的一个运行实例。</li>
+<li>docker 镜像是只读文件，而容器则带有运行时的可读写层，而且容器中的应用进程处于运行状态。</li>
+</ol>
+<ul>
+<li>docker run ：创建一个新的容器并运行一个命令</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">docker run [OPTIONS] IMAGE [COMMAND] [ARG...]</span><br><span class="line"></span><br><span class="line">-t ：打开一个终端，像使用交换机一样使用容器</span><br><span class="line">-i：交互式访问</span><br><span class="line">--name：容器名字</span><br><span class="line">--network：指定网络</span><br><span class="line">--rm：容器一停，自动删除</span><br><span class="line">-d：剥离与当前终端的关系；否则会一直占据着终端</span><br><span class="line">-p：端口映射，将容器内服务的端口映射在宿主机的指定端口</span><br><span class="line">-p &lt;container port&gt;</span><br><span class="line">-p &lt;hostport&gt;:&lt;container port&gt;</span><br><span class="line">-p &lt;hostip&gt;:&lt;hostport&gt;:&lt;container port&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 如果不执行命令,那么容器使用的镜像名 在最后</span><br><span class="line"># 如果docker run 本地没有镜像，那么他会帮你pull下来 	</span><br><span class="line"></span><br><span class="line">1. 下载 centos:7镜像</span><br><span class="line">[root@linux-node1 ~]# docker pull centos:7</span><br><span class="line"></span><br><span class="line">2. 运行centos:7 镜像</span><br><span class="line">[root@linux-node1 ~]# docker run -it  --rm --name mycentos centos:7 /bin/bash</span><br><span class="line">[root@593621d0b6cc /]# cat /etc/redhat-release </span><br><span class="line">CentOS Linux release 7.6.1810 (Core) </span><br><span class="line">[root@593621d0b6cc /]# uname -r</span><br><span class="line">3.10.0-327.el7.x86_64</span><br></pre></td></tr></table></figure>
+<h2 id="查看运行的容器-docker-ps"><a href="#查看运行的容器-docker-ps" class="headerlink" title="查看运行的容器 docker ps"></a>查看运行的容器 docker ps</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker ps</span><br><span class="line">CONTAINER ID     IMAGE       COMMAND      CREATED          STATUS       PORTS  NAMES</span><br><span class="line">d9ba7d5f9d22     centos:7    &quot;/bin/bash&quot;  8 seconds ago    Up 7 seconds        mycentos</span><br></pre></td></tr></table></figure>
+<h3 id="显示所有-a"><a href="#显示所有-a" class="headerlink" title="显示所有 -a"></a>显示所有 -a</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 现在执行exit 就退出bash  容器也跟着退出了,因为进程结束了,容器也结束了</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# docker run -it  --name mycentos centos:7 /bin/bash</span><br><span class="line">[root@0dc9c214c2c9 /]# exit</span><br><span class="line">exit</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# docker ps -a</span><br><span class="line">CONTAINER ID IMAGE      COMMAND      CREATED         STATUS                     PORTS    NAMES</span><br><span class="line">0dc9c214c2c9 centos:7   &quot;/bin/bash&quot;  5 seconds ago   Exited (0) 2 seconds ago            mycentos</span><br></pre></td></tr></table></figure>
+<h3 id="显示ID-q"><a href="#显示ID-q" class="headerlink" title="显示ID -q"></a>显示ID -q</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker ps -aq</span><br><span class="line">0dc9c214c2c9</span><br></pre></td></tr></table></figure>
+<h2 id="启动容器-docker-start"><a href="#启动容器-docker-start" class="headerlink" title="启动容器 docker start"></a>启动容器 docker start</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker ps -a</span><br><span class="line">CONTAINER ID IMAGE      COMMAND      CREATED         STATUS                     PORTS    NAMES</span><br><span class="line">0dc9c214c2c9 centos:7   &quot;/bin/bash&quot;  5 seconds ago   Exited (0) 2 seconds ago            mycentos</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# docker start mycentos</span><br><span class="line">mycentos</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE          COMMAND         CREATED             STATUS        PORTS    NAMES</span><br><span class="line">0dc9c214c2c9        centos:7       &quot;/bin/bash&quot;     11 minutes ago      Up 2 seconds           mycentos</span><br></pre></td></tr></table></figure>
+<h2 id="查看容器的详细信息-docker-inspect"><a href="#查看容器的详细信息-docker-inspect" class="headerlink" title="查看容器的详细信息 docker inspect"></a>查看容器的详细信息 docker inspect</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 查看所有</span><br><span class="line">[root@linux-node1 ~]# docker inspect mycentos</span><br><span class="line">[root@linux-node1 ~]# docker inspect mycentos|grep IPAddress</span><br><span class="line"></span><br><span class="line"># 查看容器的pid 可以用于nsenter进入容器</span><br><span class="line">[root@linux-node1 ~]# docker inspect -f &quot;&#123;&#123; .State.Pid &#125;&#125;&quot; 0dc9c214c2c9</span><br><span class="line">2525</span><br></pre></td></tr></table></figure>
+<h2 id="查看容器运行情况-docker-top"><a href="#查看容器运行情况-docker-top" class="headerlink" title="查看容器运行情况 docker top"></a>查看容器运行情况 docker top</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker top 0dc9c214c2c9</span><br><span class="line">UID    PID     PPID   C    STIME     TTY    TIME       CMD</span><br><span class="line">root   2525    2508   0    10:30     pts/0  00:00:00   /bin/bas</span><br></pre></td></tr></table></figure>
+<h2 id="停止容器-docker-stop"><a href="#停止容器-docker-stop" class="headerlink" title="停止容器 docker stop"></a>停止容器 docker stop</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker ps -a</span><br><span class="line">CONTAINER ID    IMAGE      COMMAND       CREATED           STATUS            PORTS   NAMES</span><br><span class="line">0dc9c214c2c9    centos:7   &quot;/bin/bash&quot;   27 minutes ago    Up 16 minutes             mycentos</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# docker stop mycento</span><br><span class="line">mycentos</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# docker ps -a</span><br><span class="line">CONTAINER ID    IMGE      COMMAND      CREATED             STATUS                       PORTS  NAMES</span><br><span class="line">0dc9c214c2c9    centos:7   &quot;/bin/bash&quot;  27 minutes ago     Exited (137) 4 seconds ago          mycento</span><br></pre></td></tr></table></figure>
+<h2 id="删除容器-docker-rm"><a href="#删除容器-docker-rm" class="headerlink" title="删除容器 docker rm"></a>删除容器 docker rm</h2><font size="3" color="red">先关闭容器，再删除容器</font>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker stop mycentos</span><br><span class="line">[root@linux-node1 ~]# docker rm mycentos</span><br><span class="line">[root@linux-node1 ~]# docker ps -a</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 强制删除容器</span><br><span class="line">[root@linux-node1 ~]# docker rm -f mycentos</span><br></pre></td></tr></table></figure>
+<h3 id="批量删除容器"><a href="#批量删除容器" class="headerlink" title="批量删除容器"></a>批量删除容器</h3><font size="3" color="red">生产环境谨慎使用</font>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 只删除关闭状态的</span><br><span class="line">[root@linux-node1 ~]# docker rm $(docker ps -qa)</span><br><span class="line"></span><br><span class="line"># #强制删除全部，包括启动中的</span><br><span class="line">[root@linux-node1 ~]# docker rm -f $(docker ps -aq)</span><br></pre></td></tr></table></figure>
+<h2 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h2><ul>
+<li>进入容器的三种方法:attach(不推荐)、exec、</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">* 和虚拟机不同 你不能进去 再执行新的东西,因为docker的理念和虚拟机不同</span><br><span class="line">* docker的理念是 再创建一个容器 也不能修改一个容器 </span><br><span class="line">* 不可变基础环境  --&gt; 环境必须一致</span><br></pre></td></tr></table></figure>
+<h3 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h3><ol>
+<li>进入到存活的容器中</li>
+<li>如果再开一个窗口进来，操作是同步的，就像远程控制，单用户模式</li>
+<li>exit 就会推出, 生产不会使用这个命令</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker start mycentos</span><br><span class="line">mycentos</span><br><span class="line">[root@linux-node1 ~]# docker attach mycentos</span><br><span class="line">[root@45fce97e86cc /]#</span><br></pre></td></tr></table></figure>
+<h3 id="exec"><a href="#exec" class="headerlink" title="exec"></a>exec</h3><ol>
+<li>对运行的容器执行指定命令</li>
+<li>不想进入,让容器执行命令并返回结果</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> -d：在后台运行命令</span><br><span class="line"> -e：设置环境变量</span><br><span class="line"> -i：交互式</span><br><span class="line"> -t：打开一个终端</span><br><span class="line"> -u：用户名或UID</span><br><span class="line">暂时退出容器：ctrl+p，ctrl+q</span><br><span class="line">回到容器：docker attach id或name</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker exec mycentos ps -aux</span><br><span class="line">USER        PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND</span><br><span class="line">root          1  0.1  0.0  11824  1700 pts/0    Ss+  03:02   0:00 /bin/bash</span><br><span class="line">root         14  0.0  0.0  51744  1724 ?        Rs   03:02   0:00 ps -aux</span><br></pre></td></tr></table></figure>
+<h3 id="退出并不停止-docker"><a href="#退出并不停止-docker" class="headerlink" title="退出并不停止 docker"></a>退出并不停止 docker</h3><ol>
+<li><font size="3" color="red"> crtl 先p 再q</font>
+
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 交互式进入容器 -it</span><br><span class="line">[root@linux-node1 ~]# docker exec -it mycentos  /bin/bash</span><br><span class="line"># 如果不想退出 就结束容器</span><br><span class="line">&gt;&gt;&gt; crtl 先p 再q</span><br><span class="line">[root@linux-node1 ~]# docker ps</span><br><span class="line">CONTAINER ID   IMAGE     COMMAND             CREATED             STATUS         PORTS    NAMES</span><br><span class="line">45fce97e86cc   centos:7  &quot;/bin/bash&quot;         6 minutes ago       Up 3 minutes            mycentos</span><br></pre></td></tr></table></figure>
+<h3 id="nsenter"><a href="#nsenter" class="headerlink" title="nsenter"></a>nsenter</h3><ol>
+<li><font size="3" color="green"> nsenter 生产使用 </font></li>
+<li>即使exit 也不会关闭容器 </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">1. 安装</span><br><span class="line">[root@linux-node1 ~]# yum install -y util-linux</span><br><span class="line">    - nsenter : ns (namespace)  进入到命名空间</span><br><span class="line">    - docker 的实现 :  Docker利用Linux核心中的资源分离机制，例如cgroups，以及Linux核心命名空间（namespaces）</span><br><span class="line">    - 需要容器进程的pid</span><br><span class="line"></span><br><span class="line">2. 获取容器的PID,容器需要是启动状态,否则获取为0</span><br><span class="line">[root@linux-node1 ~]# docker inspect -f &quot;&#123;&#123; .State.Pid &#125;&#125;&quot; mycentos</span><br><span class="line">3665</span><br><span class="line"></span><br><span class="line">3. nsenter 进入</span><br><span class="line">[root@linux-node1 ~]# nsenter -t 3665 -m -u -i -n -p /bin/bash</span><br><span class="line">[root@45fce97e86cc /]# ps -aux</span><br><span class="line">USER        PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND</span><br><span class="line">root          1  0.0  0.0  11824  1700 pts/0    Ss+  03:02   0:00 /bin/bash</span><br><span class="line">root         24  0.0  0.0  11824  1696 pts/1    Ss+  03:04   0:00 /bin/bash</span><br><span class="line">root        118  0.0  0.0  15256  2020 pts/0    S    03:20   0:00 /bin/bash</span><br><span class="line">root        127  0.0  0.0  55176  1872 pts/0    R+   03:20   0:00 ps -aux</span><br><span class="line"></span><br><span class="line">4. 进入容器脚本</span><br><span class="line">[root@linux-node1 ~]# vim docker_in.sh </span><br><span class="line"></span><br><span class="line">#!/bin/bash</span><br><span class="line"># Use nsenter to access docker</span><br><span class="line"></span><br><span class="line">docker_in()&#123;</span><br><span class="line">  NAME_ID=$1</span><br><span class="line">  PID=$(docker inspect -f &quot;&#123;&#123; .State.Pid &#125;&#125;&quot; $NAME_ID)</span><br><span class="line">  nsenter -t $PID -m -u -i -n -p /bin/bash</span><br><span class="line">  echo $PID</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">docker_in $1</span><br><span class="line"></span><br><span class="line">5. 脚本权限并执行</span><br><span class="line">[root@linux-node1 ~]# chmod +x docker_in.sh </span><br><span class="line">[root@linux-node1 ~]# ./docker_in.sh mycentos</span><br><span class="line">[root@45fce97e86cc /]#</span><br></pre></td></tr></table></figure>
+<h2 id="查看日志-docker-logs"><a href="#查看日志-docker-logs" class="headerlink" title="查看日志 docker logs"></a>查看日志 docker logs</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1. 启动一个nginx:1.4的容器</span><br><span class="line"># 根据镜像名称（tag指定版本）拉取镜像</span><br><span class="line"># alpine版本：构建容器小镜像的发型版本</span><br><span class="line">[root@linux-node1 ~]# docker pull nginx:1.14-alpine</span><br><span class="line"></span><br><span class="line">2. 启动nginx容器</span><br><span class="line">[root@linux-node1 ~]# docker run --name web1 -d -p 80:80 nginx:1.14-alpine</span><br><span class="line">16ced725c5f998f7a59b98731ba74305f2e3adc96449410ecfef20b8c5174944</span><br><span class="line"></span><br><span class="line">3. 浏览器访问</span><br><span class="line">访问 http://10.0.0.100</span><br><span class="line"></span><br><span class="line">4. curl访问</span><br><span class="line">[root@linux-node1 ~]# docker logs web1</span><br><span class="line"></span><br><span class="line">5. 查看日志</span><br><span class="line">[root@linux-node1 ~]# docker logs web1</span><br></pre></td></tr></table></figure>
+<h2 id="copy容器文件-docker-cp"><a href="#copy容器文件-docker-cp" class="headerlink" title="copy容器文件 docker cp"></a>copy容器文件 docker cp</h2><ul>
+<li>该命令支持在容器和主机之间复制文件。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-a， -archive： 打包模式， 复制⽂件会带有原始的uid/gid信息；</span><br><span class="line">-L， -follow-link： 跟随软连接。 当原路径为软连接时， 默认只复制链接信息， 使⽤该选项会复制链接的⽬标内容。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 服务器向容器copy文件</span><br><span class="line">[root@linux-node1 ~]# docker cp /root/docker_in.sh mycentos:/tmp</span><br><span class="line">[root@linux-node1 ~]# ./docker_in.sh mycentos</span><br><span class="line">[root@45fce97e86cc /]# cd /tmp/</span><br><span class="line">[root@45fce97e86cc tmp]# ls</span><br><span class="line">docker_in.sh  ks-script-rnBCJB  yum.log</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># copy容器的文件下来</span><br><span class="line">[root@linux-node1 ~]# docker cp web1:/etc/nginx/nginx.conf .</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# ls -l</span><br><span class="line">total 126796</span><br><span class="line">-rw-------. 1 root root      1239 Sep 30 17:27 anaconda-ks.cfg</span><br><span class="line">-rwxr-xr-x. 1 root root       196 Oct  9 14:01 docker_in.sh</span><br><span class="line">-rw-------. 1 root root 129824768 Oct 10 08:34 nginx:1.16.tar</span><br><span class="line">-rw-rw-r--. 1 root root       643 Apr 10  2019 nginx.co</span><br></pre></td></tr></table></figure>
+<h2 id="查看端口映射-docker-port"><a href="#查看端口映射-docker-port" class="headerlink" title="查看端口映射 docker port"></a>查看端口映射 docker port</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker port web1</span><br><span class="line">80/tcp -&gt; 0.0.0.0:80</span><br></pre></td></tr></table></figure>
+<h2 id="容器的导入和导出"><a href="#容器的导入和导出" class="headerlink" title="容器的导入和导出"></a>容器的导入和导出</h2><h3 id="导出容器"><a href="#导出容器" class="headerlink" title="导出容器"></a>导出容器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 导出后的容器就可以直接复制到其他机器上导入运行了</span><br><span class="line">[root@linux-node1 ~]# docker export -o web1.tar web1</span><br><span class="line">[root@linux-node1 ~]# ls -lh web1.tar </span><br><span class="line">-rw-------. 1 root root 17M Oct 10 11:46 web1.tar</span><br></pre></td></tr></table></figure>
+<h3 id="导入容器"><a href="#导入容器" class="headerlink" title="导入容器"></a>导入容器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker import web1.tar test/nginx:1.6.test</span><br><span class="line">sha256:482793b910f56b65c0dbb36c4424cca923765ecd3d052c30a0db70c185bd6571</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# docker ps -a</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES</span><br><span class="line">16ced725c5f9        nginx:1.14-alpine   &quot;nginx -g &apos;daemon of…&quot;   15 minutes ago      Up 15 minutes       0.0.0.0:80-&gt;80/tcp   web1</span><br><span class="line">45fce97e86cc        centos:7            &quot;/bin/bash&quot;              47 minutes ago      Up 45 minutes                            mycentos</span><br></pre></td></tr></table></figure>
+<h2 id="总结容器的使用操作"><a href="#总结容器的使用操作" class="headerlink" title="总结容器的使用操作"></a>总结容器的使用操作</h2><ol>
+<li>docker run 参数 镜像名 执行命令</li>
+<li>进入容器的三种方</li>
+<li>一图总结对容器的操作命令:</li>
+</ol>
+<p><img src="/img/docker_12.png"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/09/docker-base02/" rel="next" title="03 Docker 镜像管理">
+                <i class="fa fa-chevron-left"></i> 03 Docker 镜像管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/10/docker-base05/" rel="prev" title="05 Docker 容器的端口映射">
+                05 Docker 容器的端口映射 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#启动容器-docker-run"><span class="nav-number">1.</span> <span class="nav-text">启动容器 docker run</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看运行的容器-docker-ps"><span class="nav-number">2.</span> <span class="nav-text">查看运行的容器 docker ps</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#显示所有-a"><span class="nav-number">2.1.</span> <span class="nav-text">显示所有 -a</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示ID-q"><span class="nav-number">2.2.</span> <span class="nav-text">显示ID -q</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动容器-docker-start"><span class="nav-number">3.</span> <span class="nav-text">启动容器 docker start</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看容器的详细信息-docker-inspect"><span class="nav-number">4.</span> <span class="nav-text">查看容器的详细信息 docker inspect</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看容器运行情况-docker-top"><span class="nav-number">5.</span> <span class="nav-text">查看容器运行情况 docker top</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#停止容器-docker-stop"><span class="nav-number">6.</span> <span class="nav-text">停止容器 docker stop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除容器-docker-rm"><span class="nav-number">7.</span> <span class="nav-text">删除容器 docker rm</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#批量删除容器"><span class="nav-number">7.1.</span> <span class="nav-text">批量删除容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进入容器"><span class="nav-number">8.</span> <span class="nav-text">进入容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#attach"><span class="nav-number">8.1.</span> <span class="nav-text">attach</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exec"><span class="nav-number">8.2.</span> <span class="nav-text">exec</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#退出并不停止-docker"><span class="nav-number">8.3.</span> <span class="nav-text">退出并不停止 docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nsenter"><span class="nav-number">8.4.</span> <span class="nav-text">nsenter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看日志-docker-logs"><span class="nav-number">9.</span> <span class="nav-text">查看日志 docker logs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#copy容器文件-docker-cp"><span class="nav-number">10.</span> <span class="nav-text">copy容器文件 docker cp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看端口映射-docker-port"><span class="nav-number">11.</span> <span class="nav-text">查看端口映射 docker port</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器的导入和导出"><span class="nav-number">12.</span> <span class="nav-text">容器的导入和导出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#导出容器"><span class="nav-number">12.1.</span> <span class="nav-text">导出容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#导入容器"><span class="nav-number">12.2.</span> <span class="nav-text">导入容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结容器的使用操作"><span class="nav-number">13.</span> <span class="nav-text">总结容器的使用操作</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

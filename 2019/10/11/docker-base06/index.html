@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="docker,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="06 Docker 数据管理">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/10/11/docker-base06/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_13.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_16.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_17.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_18.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_19.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_20.png">
+<meta property="og:updated_time" content="2019-10-11T07:41:38.325Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="06 Docker 数据管理">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/10/11/docker-base06/">
+
+
+
+
+
+  <title>06 Docker 数据管理 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/10/11/docker-base06/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">06 Docker 数据管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-11T09:46:59+08:00">
+                2019-10-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<ol>
+<li><p>生产环境中使用Docker的过程中，往往需要对<font size="3" color="green">数据进行持久化</font>，或者需要在多个容器之间进行<font size="3" color="orange">数据共享</font>，<br>这必然涉及容器的数据管理操作。</p>
+</li>
+<li><p>容器中管理数据主要有两种方式:</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">数据卷（Data Volumes）：</span><br><span class="line">    - 容器内数据直接映射到本地主机环境；</span><br><span class="line">    - 如何在容器内创建数据卷，并且把本地的目录或文件挂载到容器内的数据卷中。</span><br><span class="line">数据卷容器（Data Volume Containers）：</span><br><span class="line">    - 使用特定容器维护数据卷。</span><br><span class="line">    - 如何使用数据卷容器在容器和主机、容器和容器之间共享数据，并实现数据的备份和恢复。</span><br></pre></td></tr></table></figure>
+<h2 id="数据卷的使用"><a href="#数据卷的使用" class="headerlink" title="数据卷的使用"></a>数据卷的使用</h2><ol>
+<li>数据卷是一个可供容器使用的特殊目录，它将主机操作系统目录直接映射进容器，类似Linux 的mount挂载</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">数据卷的特性:</span><br><span class="line">    - 数据卷可以在容器之间共享和重用，容器间传递数据将变得高效方便；</span><br><span class="line">    - 对数据卷内数据的修改会立马生效，无论是容器内操作还是本地操作；</span><br><span class="line">    - 对数据卷的更新不会影响镜像，解耦了应用和数据；</span><br><span class="line">    - 卷会一直存在，直到没有容器使用，可以安全地卸载它。</span><br></pre></td></tr></table></figure>
+<h3 id="创建数据卷"><a href="#创建数据卷" class="headerlink" title="创建数据卷"></a>创建数据卷</h3><ol>
+<li>在用docker run 命令的时候，使用 -v 标记可以在容器内创建一个数据卷。多次重复使用 -v 标记可以创建多个数据卷。</li>
+<li>用户可以将一些程序或数据放到本地目录中，然后在容器内运行和使用。</li>
+<li>另外，本地目录的路径必须是绝对路径，如果目录不存在,Docker会自动创建。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-v /data </span><br><span class="line">-v src:dst  # 挂载本地目录到容器上</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">1. 准备好host挂载目录和里面的文件</span><br><span class="line">[root@linux-node1 tools]# mkdir -p /data/tools</span><br><span class="line">[root@linux-node1 tools]# ls -l</span><br><span class="line">total 232</span><br><span class="line">-rw-r--r--. 1 root root 15329 Nov  8  2018 2000.png</span><br><span class="line">-rw-r--r--. 1 root root 51562 Nov  8  2018 21.js</span><br><span class="line">-rw-r--r--. 1 root root   254 Nov  8  2018 icon.png</span><br><span class="line">drwxr-xr-x. 2 root root    96 Nov  8  2018 img</span><br><span class="line">-rw-r--r--. 1 root root  3049 Nov  8  2018 index.html</span><br><span class="line">-rw-r--r--. 1 root root 63008 Nov  8  2018 sound1.mp3</span><br><span class="line">-rw-r--r--. 1 root root 91725 Oct 11 10:22 xiaoniaofeifei.zip</span><br><span class="line"></span><br><span class="line">2. 开始挂载</span><br><span class="line">[root@linux-node1 tools]# docker run -it --name mycentos -v /data/tools/:/data/tools centos:7</span><br><span class="line">[root@ec7228193572 /]# cd /data/tools/</span><br><span class="line">[root@ec7228193572 tools]# ls</span><br><span class="line">2000.png  21.js  icon.png  img  index.html  sound1.mp3  xiaoniaofeifei.zip</span><br><span class="line"></span><br><span class="line">3. 测试host添加一个文件</span><br><span class="line">[root@linux-node1 tools]# echo &quot;hello leo&quot; &gt;&gt; leo.html</span><br><span class="line">[root@ec7228193572 tools]# ls -l</span><br><span class="line">...</span><br><span class="line">-rw-r--r--. 1 root root    10 Oct 11 02:28 leo.html</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">4. 测试在容器上删除该文件</span><br><span class="line">[root@ec7228193572 tools]# rm -f leo.html </span><br><span class="line">[root@linux-node1 tools]# ls -l leo.html     # 已删除</span><br><span class="line"></span><br><span class="line">5. 如果我们删除了本地的tools 那么容器上的tools里面的数据将不存在</span><br><span class="line">[root@linux-node1 data]# rm -rf tools/</span><br></pre></td></tr></table></figure>
+<ol>
+<li>很方便的在你进行数据修改的时候，直接修改本地文件就行了，容器直接就会同步了</li>
+<li>提前都建好目录，再挂载上去，容器down没关系，数据都在指定的目录下</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1. docker 挂载数据卷的默认权限是读写(rw) ,我们也可以改权限</span><br><span class="line">[root@linux-node1 data]# docker run -it --name mycentos2 -v /data/tools/:/data/tools/:ro centos:7</span><br><span class="line">[root@d45deb896445 /]# cd /data/tools/</span><br><span class="line">[root@d45deb896445 tools]# touch hehe</span><br><span class="line">touch: cannot touch &apos;hehe&apos;: Read-only file system</span><br><span class="line"></span><br><span class="line">2. 也可以只挂载本地主机的单个文件到容器中作为数据卷(强烈不推荐，生产也很少用，可忽略)</span><br><span class="line">[root@linux-node1 ~]# docker run --rm -it -v /root/.bash_history:/.bash_history centos:7 /bin/bash</span><br><span class="line">root@3ac18de44b62:/# cat .bash_history</span><br></pre></td></tr></table></figure>
+<h2 id="Docker-安装-Nginx-并使用数据卷管理"><a href="#Docker-安装-Nginx-并使用数据卷管理" class="headerlink" title="Docker 安装 Nginx 并使用数据卷管理"></a>Docker 安装 Nginx 并使用数据卷管理</h2><h3 id="拉取官方镜像1-16-1"><a href="#拉取官方镜像1-16-1" class="headerlink" title="拉取官方镜像1.16.1"></a>拉取官方镜像1.16.1</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 data]# docker pull nginx:1.16.1</span><br></pre></td></tr></table></figure>
+<h3 id="查看镜像"><a href="#查看镜像" class="headerlink" title="查看镜像"></a>查看镜像</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 data]# docker images nginx:1.16.1</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">nginx               1.16.1              0dac5b41d811        4 weeks ago         126MB</span><br></pre></td></tr></table></figure>
+<h3 id="使用-NGINX-默认的配置来启动一个-Nginx-容器实例"><a href="#使用-NGINX-默认的配置来启动一个-Nginx-容器实例" class="headerlink" title="使用 NGINX 默认的配置来启动一个 Nginx 容器实例"></a>使用 NGINX 默认的配置来启动一个 Nginx 容器实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 data]# docker run -d -p 8000:80 --name web1 nginx:1.16.1</span><br><span class="line">- --name: 容器名web1</span><br><span class="line">- -p: 端口映射80</span><br><span class="line">- -d: 容器在后台运行</span><br><span class="line">- nginx:</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 data]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE          COMMAND                  CREATED             STATUS              PORTS                NAMES</span><br><span class="line">a41b970bfceb        nginx1.16.1   &quot;nginx -g &apos;daemon of…&quot;   5 seconds ago       Up 3 seconds        0.0.0.0:80-&gt;80/tcp   web1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在浏览器中打开 <a href="http://10.0.0.100:8000/" target="_blank" rel="noopener">http://10.0.0.100:8000/</a></li>
+</ul>
+<p><img src="/img/docker_13.png" width="50%"></p>
+<h3 id="使用容器卷管理-nginx"><a href="#使用容器卷管理-nginx" class="headerlink" title="使用容器卷管理 nginx"></a>使用容器卷管理 nginx</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 创建目录</span><br><span class="line">[root@linux-node1 data]# mkdir -p /data/nginx/&#123;log,conf,www&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">2. 拷贝容器内 Nginx 默认配置文件到本地当前目录下的 conf 目录</span><br><span class="line">[root@linux-node1 data]# docker cp web1:/etc/nginx/nginx.conf /data/nginx/conf</span><br><span class="line">[root@linux-node1 data]# cd /data/nginx/</span><br><span class="line">-rw-r--r--. 1 root root 643 Sep 24 22:49 nginx.conf</span><br><span class="line"></span><br><span class="line">    - www: 目录将映射为 nginx 容器配置的虚拟目录。</span><br><span class="line">    - logs: 目录将映射为 nginx 容器的日志目录。</span><br><span class="line">    - conf: 目录里的配置文件将映射为 nginx 容器的配置文件。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">3. 启动挂载目录</span><br><span class="line">[root@linux-node1 nginx]# docker run -d -p 80:80 --name web2 -v /data/nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf -v /data/nginx/www:/usr/share/nginx/html -v /data/nginx/log/:/var/log/nginx nginx1.16.1</span><br><span class="line"></span><br><span class="line">- nginx文件 /data/nginx/conf/nginx.conf --&gt; /etc/nginx/conf/nginx.conf</span><br><span class="line">- nginx目录 /data/nginx/www --&gt; /usr/share/nginx/html</span><br><span class="line">- nginx日志 /data/nginx/log/ --&gt; /var/log/nginx</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">4. 进入host的首页目录 上传测试文件</span><br><span class="line">[root@linux-node1 www]# ls -l</span><br><span class="line">total 232</span><br><span class="line">-rw-r--r--. 1 root root 15329 Nov  8  2018 2000.png</span><br><span class="line">-rw-r--r--. 1 root root 51562 Nov  8  2018 21.js</span><br><span class="line">-rw-r--r--. 1 root root   254 Nov  8  2018 icon.png</span><br><span class="line">drwxr-xr-x. 2 root root    96 Nov  8  2018 img</span><br><span class="line">-rw-r--r--. 1 root root  3049 Nov  8  2018 index.html</span><br><span class="line">-rw-r--r--. 1 root root 63008 Nov  8  2018 sound1.mp3</span><br><span class="line">-rw-r--r--. 1 root root 91725 Oct 11 11:16 xiaoniaofeifei.zip</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">5. 测试访问页面</span><br></pre></td></tr></table></figure>
+<p><img src="/img/docker_16.png" width="50%"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">6. 相关命令</span><br><span class="line">- 如果要重新载入 NGINX 可以使用以下命令发送 HUP 信号到容器：</span><br><span class="line">docker kill -s HUP container-name</span><br><span class="line">[root@linux-node1 www]# docker kill -s HUP web2</span><br><span class="line"></span><br><span class="line">- 重启 NGINX 容器命令：</span><br><span class="line">docker restart container-name</span><br><span class="line">[root@linux-node1 www]# docker restart web2</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">7. 查看日志 </span><br><span class="line"># 可以去看host的log目录下的日志</span><br><span class="line">[root@linux-node1 log]# ls -l</span><br><span class="line">total 8</span><br><span class="line">-rw-r--r--. 1 root root 3224 Oct 11 11:20 access.log</span><br><span class="line">-rw-r--r--. 1 root root  732 Oct 11 11:20 error.log</span><br></pre></td></tr></table></figure>
+<h3 id="测试修改代码"><a href="#测试修改代码" class="headerlink" title="测试修改代码"></a>测试修改代码</h3><ul>
+<li>修改host上首页的title标题</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 www]# vim index.html </span><br><span class="line">    &lt;title&gt;docker-nginx-test&lt;/title&gt;</span><br></pre></td></tr></table></figure>
+<p><img src="/img/docker_17.png" width="50%"></p>
+<h3 id="多端口映射"><a href="#多端口映射" class="headerlink" title="多端口映射"></a>多端口映射</h3><ul>
+<li>基于多端口多站点</li>
+<li>80是主页，81端口是游戏，在host上写一个81的配置文件挂载上去</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 conf]# pwd</span><br><span class="line">/data/nginx/conf</span><br><span class="line"></span><br><span class="line">[root@linux-node1 conf]# cat 81.game.conf</span><br><span class="line">server&#123;</span><br><span class="line">    root /opt;</span><br><span class="line">    listen 81;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@linux-node1 conf]# ls -l</span><br><span class="line">total 8</span><br><span class="line">-rw-r--r--. 1 root root  40 Oct 11 11:39 81.game.conf</span><br><span class="line">-rw-r--r--. 1 root root 643 Sep 24 22:49 nginx.conf</span><br></pre></td></tr></table></figure>
+<p><img src="/img/docker_18.png" width="50%"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 启动容器并挂载配置</span><br><span class="line"># 挂载81的配置文件到 /etc/nginx/conf.d/下让主配置文件iinclude</span><br><span class="line"></span><br><span class="line">docker run -d -p 80:80 -p 81:81 --name web3</span><br><span class="line">-v /data/nginx/conf/81.game.conf:/etc/nginx/conf.d/81.game.conf</span><br><span class="line">-v /data/nginx/www/:/opt </span><br><span class="line">-v /data/nginx/log/:/var/log/nginx nginx:1.16.1</span><br><span class="line"></span><br><span class="line">[root@linux-node1 conf]# docker run -d -p 80:80 -p 81:81 --name web3 -v /data/nginx/conf/81.game.conf:/etc/nginx/conf.d/81.game.conf -v /data/nginx/www/:/opt -v /data/nginx/log/:/var/log/nginx nginx:1.16.1</span><br></pre></td></tr></table></figure>
+<p><img src="/img/docker_19.png" width="50%"></p>
+<p><img src="/img/docker_20.png" width="50%"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 日志查看</span><br><span class="line">[root@linux-node1 log]# tailf access.log </span><br><span class="line"></span><br><span class="line">10.0.0.1 - - [11/Oct/2019:04:00:40 +0000] &quot;GET / HTTP/1.1&quot; 304 0 &quot;-&quot; &quot;Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36&quot; &quot;-&quot;</span><br><span class="line">10.0.0.1 - - [11/Oct/2019:04:00:41 +0000] &quot;GET /img/p2l.jpg HTTP/1.1&quot; 404 555 &quot;http://10.0.0.100:81/&quot; &quot;Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36&quot; &quot;-&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="数据卷容器"><a href="#数据卷容器" class="headerlink" title="数据卷容器"></a>数据卷容器</h2><ol>
+<li>如果数据在需要在多个容器之间共享，最简单的方式是使用数据卷容器。</li>
+<li>数据卷容器也是一个容器，但是它的目的是专门用来提供数据卷供其他容器挂载。</li>
+<li>不管数据卷容器是否运行 都可以访问到</li>
+<li>–volumes-from </li>
+</ol>
+<h3 id="volumes-from"><a href="#volumes-from" class="headerlink" title="volumes-from"></a>volumes-from</h3><ol>
+<li>启动一个容器挂载一个目录,其他的容器都不用挂载了,直接–volumes-from 这个容器</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# docker run -it --name volume_test -v /data/tools/:/data/tools centos:7</span><br><span class="line"># 新建的容器 --volumes-from  volume_test</span><br><span class="line"># 即使数据卷容器没有运行,数据也可以被访问</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# docker run -it --name game_test --volumes-from volume_test centos:7 /bin/bash</span><br><span class="line">[root@9b7b28b2f5a5 /]# cd /data/tools/</span><br><span class="line">[root@9b7b28b2f5a5 tools]# ls</span><br><span class="line">web1.tar</span><br><span class="line"></span><br><span class="line">[root@9b7b28b2f5a5 tools]# touch game_test.log</span><br><span class="line">[root@linux-node1 tools]# ls</span><br><span class="line">game_test.log  web1.tar</span><br><span class="line"></span><br><span class="line"># 有些数据在多个容器之间共享,就可以使用数据卷容器</span><br><span class="line"># 单个容器挂载 然后其他的都用容器卷</span><br><span class="line"># 只要有容器卷使用这个目录就无法删除</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li><p>现在我们有数据层（镜像层和容器层）和 volume 都可以用来存放数据，具体使用的时候要怎样选择呢？</p>
+</li>
+<li><p>考虑下面几个场景：</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- Database 软件 vs Database 数据</span><br><span class="line"></span><br><span class="line">- Web 应用 vs 应用产生的日志</span><br><span class="line"></span><br><span class="line">- 数据分析软件 vs input/output 数据</span><br><span class="line"></span><br><span class="line">- Apache Server vs 静态 HTML 文件</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>相信大家会做出这样的选择：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">前者放在数据层中。因为这部分内容是无状态的，应该作为镜像的一部分。</span><br><span class="line"></span><br><span class="line">后者放在 Data Volume 中。这是需要持久化的数据，并且应该与镜像分开存放。</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>如何使用</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-v /data/nginx/www:/usr/share/nginx/html</span><br><span class="line">这与 linux mount 命令的行为是一致的</span><br><span class="line">-v 的格式为 &lt;host path&gt;:&lt;container path&gt;。</span><br><span class="line">/usr/share/nginx/html 就是 nginx 存放静态文件的地方。</span><br><span class="line">原有数据会被隐藏起来，取而代之的是 /data/nginx/www 中的数据</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">即使容器销毁,数据也还在，mount的是 host 文件系统中的数据，只是借给容器用用，哪能随便就删了啊</span><br><span class="line">mount 时还可以指定数据的读写权限，默认是可读可写，可指定为只读</span><br><span class="line">除了mount 目录，还可以单独指定一个文件</span><br><span class="line">使用mount 单个文件的场景是：只需要向容器添加文件，不希望覆盖整个目录。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">使用场景:</span><br><span class="line">1. 可以将源代码目录 mount 到容器中，在 host 中修改代码就能看到应用的实时效果</span><br><span class="line">2. mysql 容器的数据放在 共享目录 里，这样 host 可以方便地备份和迁移数据</span><br><span class="line">3. 实现了容器与 host 的解耦</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/10/docker-base05/" rel="next" title="05 Docker 容器的端口映射">
+                <i class="fa fa-chevron-left"></i> 05 Docker 容器的端口映射
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/11/write-images/" rel="prev" title="07 Docker 手动构建镜像">
+                07 Docker 手动构建镜像 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据卷的使用"><span class="nav-number">1.</span> <span class="nav-text">数据卷的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建数据卷"><span class="nav-number">1.1.</span> <span class="nav-text">创建数据卷</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-安装-Nginx-并使用数据卷管理"><span class="nav-number">2.</span> <span class="nav-text">Docker 安装 Nginx 并使用数据卷管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#拉取官方镜像1-16-1"><span class="nav-number">2.1.</span> <span class="nav-text">拉取官方镜像1.16.1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看镜像"><span class="nav-number">2.2.</span> <span class="nav-text">查看镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-NGINX-默认的配置来启动一个-Nginx-容器实例"><span class="nav-number">2.3.</span> <span class="nav-text">使用 NGINX 默认的配置来启动一个 Nginx 容器实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用容器卷管理-nginx"><span class="nav-number">2.4.</span> <span class="nav-text">使用容器卷管理 nginx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试修改代码"><span class="nav-number">2.5.</span> <span class="nav-text">测试修改代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多端口映射"><span class="nav-number">2.6.</span> <span class="nav-text">多端口映射</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据卷容器"><span class="nav-number">3.</span> <span class="nav-text">数据卷容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#volumes-from"><span class="nav-number">3.1.</span> <span class="nav-text">volumes-from</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

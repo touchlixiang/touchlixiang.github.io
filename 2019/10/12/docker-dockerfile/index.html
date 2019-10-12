@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="docker,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="08 Dockerfile 构建镜像">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/10/12/docker-dockerfile/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_22.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_23.png">
+<meta property="og:updated_time" content="2019-10-12T07:15:17.353Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="08 Dockerfile 构建镜像">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/10/12/docker-dockerfile/">
+
+
+
+
+
+  <title>08 Dockerfile 构建镜像 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/10/12/docker-dockerfile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">08 Dockerfile 构建镜像</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-12T10:02:13+08:00">
+                2019-10-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h2><p>Dockerfile 是一个文本文件，记录了镜像构建的所有步骤。</p>
+<h3 id="构建镜像"><a href="#构建镜像" class="headerlink" title="构建镜像"></a>构建镜像</h3><ol>
+<li><p>由于官方提供的centos镜像有很多基础命令没有安装，所有我们自己来构建一个基础base</p>
+</li>
+<li><p>生产环境也可参照这种分层目录</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 opt]# mkdir -p /opt/Game/&#123;system,app,runtime&#125;</span><br><span class="line">[root@linux-node1 opt]# mkdir -p /opt/Game/system/centos</span><br><span class="line"></span><br><span class="line">[root@linux-node1 opt]# tree Game/</span><br><span class="line">Game/               # 项目目录</span><br><span class="line">├── app             # 程序</span><br><span class="line">├── runtime         # 运行环境</span><br><span class="line">└── system          # 基础环境</span><br><span class="line">    └── centos      # centos的基础环境</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>使用Dockerfile 创建自定义基础环境镜像</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 centos]# vim Dockerfile </span><br><span class="line"></span><br><span class="line"># BASE </span><br><span class="line">FROM centos:7</span><br><span class="line"></span><br><span class="line"># WHO</span><br><span class="line">MAINTAINER leo 365042337@qq.com</span><br><span class="line"></span><br><span class="line"># EPEL</span><br><span class="line">ADD epel.repo /etc/yum.repos.d/</span><br><span class="line"></span><br><span class="line"># PKG</span><br><span class="line">RUN yum install -y wget supervisor tree net-tools sudo vim &amp;&amp; yum clean all</span><br><span class="line"></span><br><span class="line">[root@linux-node1 centos]# ls -l</span><br><span class="line">total 8</span><br><span class="line">-rw-r--r--. 1 root root 183 Oct 12 10:30 Dockerfile</span><br><span class="line">-rw-r--r--. 1 root root 664 Oct 12 10:30 epel.repo</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>docker build 构建镜像</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 centos]# docker build -t game/centos:7 .</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>镜像生成分析:</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 centos]# docker build -t game/centos:7 .</span><br><span class="line">Sending build context to Docker daemon  3.584kB</span><br><span class="line">Step 1/4 : FROM centos:7</span><br><span class="line"> ---&gt; 67fa590cfc1c</span><br><span class="line">Step 2/4 : MAINTAINER leo 365042337@qq.com</span><br><span class="line"> ---&gt; Running in c7cd314eb180</span><br><span class="line">Removing intermediate container c7cd314eb180</span><br><span class="line"> ---&gt; 9023eddfd98c</span><br><span class="line">Step 3/4 : ADD epel.repo /etc/yum.repos.d/</span><br><span class="line"> ---&gt; fffbe0882202</span><br><span class="line">Step 4/4 : RUN yum install -y wget supervisor tree net-tools sudo vim &amp;&amp; yum clean all</span><br><span class="line"> ---&gt; Running in 17e580d1346d</span><br><span class="line"></span><br><span class="line">... </span><br><span class="line"></span><br><span class="line">Complete!</span><br><span class="line">Loaded plugins: fastestmirror, ovl</span><br><span class="line">Cleaning repos: base epel extras updates</span><br><span class="line">Cleaning up list of fastest mirrors</span><br><span class="line">Removing intermediate container 17e580d1346d</span><br><span class="line"> ---&gt; ea065b022d5b</span><br><span class="line">Successfully built ea065b022d5b</span><br><span class="line">Successfully tagged game/centos:7</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">1. 运行 docker build 命令，-t 将新镜像命名为 game/centos:7，</span><br><span class="line">命令末尾的 . 指明 build context 为当前目录。</span><br><span class="line">Docker 默认会从 build context 中查找 Dockerfile 文件，我们也可以通过 -f 参数指定 Dockerfile 的位置。</span><br><span class="line"></span><br><span class="line">2. 首先 Docker 将 build context 中的所有文件发送给 Docker daemon。</span><br><span class="line">build context 为镜像构建提供所需要的文件或目录</span><br><span class="line">Dockerfile 中的 ADD、COPY 等命令可以将 build context 中的文件添加到镜像。</span><br><span class="line">build context 为当前目录,该目录下的所有文件和子目录都会被发送给 Docker daemon</span><br><span class="line">不要将多余文件放到 build context，特别不要把 /、/usr 作为 build context，否则构建过程会相当缓慢甚至失败。</span><br><span class="line"></span><br><span class="line">3. Step 1：执行 FROM，将 centos:7 作为 base 镜像,镜像 ID 为  67fa590cfc1c。</span><br><span class="line"></span><br><span class="line">4. Step 2-4 一直执行各种配置, 包括配置文件传送,安装</span><br><span class="line"></span><br><span class="line">5. 安装成功后，将容器保存为镜像，其 ID 为 ea065b022d5b。这一步底层使用的是类似 docker commit 的命令</span><br><span class="line"></span><br><span class="line">6. 删除临时容器 17e580d1346d。</span><br><span class="line"></span><br><span class="line">7. 镜像构建成功。</span><br><span class="line"></span><br><span class="line"># 查看镜像ID 最后的镜像ID一致</span><br><span class="line">[root@linux-node1 centos]# docker images</span><br><span class="line">REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">game/centos          7                   ea065b022d5b        12 minutes ago      287MB</span><br><span class="line">centos               7                   67fa590cfc1c        7 weeks ago         202MB</span><br></pre></td></tr></table></figure>
+<h3 id="查看镜像分层结构"><a href="#查看镜像分层结构" class="headerlink" title="查看镜像分层结构"></a>查看镜像分层结构</h3><ol>
+<li>docker history 会显示镜像的构建历史，也就是 Dockerfile 的执行过程,每一层由上至下排列</li>
+<li>game/centos:7 镜像 是经过一层层形成的,他的最初层就是centos:7</li>
+<li>注： 表示无法获取 IMAGE ID，通常从 Docker Hub 下载的镜像会有这个问题。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 centos]#  docker history  game/centos:7</span><br><span class="line">IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT</span><br><span class="line">ea065b022d5b        15 minutes ago      /bin/sh -c yum install -y wget supervisor tr…   84.7MB              </span><br><span class="line">fffbe0882202        15 minutes ago      /bin/sh -c #(nop) ADD file:4dab183e1e0e545b2…   664B                </span><br><span class="line">9023eddfd98c        15 minutes ago      /bin/sh -c #(nop)  MAINTAINER leo 365042337@…   0B                  </span><br><span class="line">67fa590cfc1c        7 weeks ago         /bin/sh -c #(nop)  CMD [&quot;/bin/bash&quot;]            0B                  </span><br><span class="line">&lt;missing&gt;           7 weeks ago         /bin/sh -c #(nop)  LABEL org.label-schema.sc…   0B                  </span><br><span class="line">&lt;missing&gt;           7 weeks ago         /bin/sh -c #(nop) ADD file:4e7247c06de9ad117…   202MB</span><br></pre></td></tr></table></figure>
+<h2 id="Dockerfile-常用指令"><a href="#Dockerfile-常用指令" class="headerlink" title="Dockerfile 常用指令"></a>Dockerfile 常用指令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">FROM                    # 指定基础镜像FROM centos</span><br><span class="line">MAINTAINER              # 指定维护者信息，可以没有</span><br><span class="line">RUN                     # 在命令前面加上RUN即可 RUN yum install httpd -y</span><br><span class="line">ADD                     # 复制文件，与COPY不同的是,如果 src 是归档文件（tar, zip, tgz, xz 等），文件会被自动解压到 dest</span><br><span class="line">WORKDIR                 # 设置当前工作目录</span><br><span class="line">VOLUME                  # 设置卷，挂载主机目录</span><br><span class="line">EXPOSE                  # 指定对外的端口</span><br><span class="line">CMD                     # 容器启动时执行的命令CMD [“/bin/bash”],只有最后一个生效。CMD 可以被 docker run 之后的参数替换。</span><br><span class="line"></span><br><span class="line">COPY                    # 将文件从 build context 复制到镜像。COPY src dest</span><br><span class="line">ENV                     # 环境变量</span><br><span class="line">ENTRYPOINT              # 容器启动后执行的命令,只有最后一个生效（无法被替换，CMD 或 docker run 之后的参数会被当做参数传递给 ENTRYPOINT)</span><br></pre></td></tr></table></figure>
+<h3 id="运行更多的指令"><a href="#运行更多的指令" class="headerlink" title="运行更多的指令"></a>运行更多的指令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 test]# vim Dockerfile </span><br><span class="line"></span><br><span class="line"># Mybusybox images</span><br><span class="line"></span><br><span class="line">FROM busybox</span><br><span class="line"></span><br><span class="line">MAINTAINER leo 365042337@qq.com</span><br><span class="line"></span><br><span class="line">WORKDIR /data/test</span><br><span class="line"></span><br><span class="line">RUN touch tmpfile1</span><br><span class="line"></span><br><span class="line">COPY [&quot;tmpfile2&quot;,&quot;/data/test/&quot;]</span><br><span class="line"></span><br><span class="line">ADD [&quot;test_add.tar.gz&quot;,&quot;/data/test/&quot;]</span><br><span class="line"></span><br><span class="line">ENV WELCOME &quot;hello,welcome!&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 构建前确保 build context 中存在需要的文件。</span><br><span class="line">[root@linux-node1 test]# echo &quot;test2&quot; &gt;&gt;tmpfile2</span><br><span class="line">[root@linux-node1 test]# ls -l</span><br><span class="line">total 12</span><br><span class="line">-rw-r--r--. 1 root root 211 Oct 12 11:14 Dockerfile</span><br><span class="line">-rw-r--r--. 1 root root 113 Oct 12 11:09 test_add.tar.gz</span><br><span class="line">-rw-r--r--. 1 root root   6 Oct 12 11:15 tmpfile2</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># 构建镜像</span><br><span class="line">[root@linux-node1 test]# docker build -t test/mybusybox:v1 .</span><br><span class="line"></span><br><span class="line">Sending build context to Docker daemon  4.096kB</span><br><span class="line">Step 1/7 : FROM busybox</span><br><span class="line"> ---&gt; 19485c79a9bb</span><br><span class="line">Step 2/7 : MAINTAINER leo 365042337@qq.com</span><br><span class="line"> ---&gt; Running in 59c22052d1fd</span><br><span class="line">Removing intermediate container 59c22052d1fd</span><br><span class="line"> ---&gt; 2346b2c44a91</span><br><span class="line">Step 3/7 : WORKDIR /data/test</span><br><span class="line"> ---&gt; Running in c5c969afa0fb</span><br><span class="line">Removing intermediate container c5c969afa0fb</span><br><span class="line"> ---&gt; 594b22c7a7ec</span><br><span class="line">Step 4/7 : RUN touch tmpfile1</span><br><span class="line"> ---&gt; Running in a074aa6c9484</span><br><span class="line">Removing intermediate container a074aa6c9484</span><br><span class="line"> ---&gt; d127444b2188</span><br><span class="line">Step 5/7 : COPY [&quot;tmpfile2&quot;,&quot;/data/test/&quot;]</span><br><span class="line"> ---&gt; 69e842587b9f</span><br><span class="line">Step 6/7 : ADD [&quot;test_add.tar.gz&quot;,&quot;/data/test/&quot;]</span><br><span class="line"> ---&gt; 5d0318483d64</span><br><span class="line">Step 7/7 : ENV WELCOME &quot;hello,welcome!&quot;</span><br><span class="line"> ---&gt; Running in 86c30e33c390</span><br><span class="line">Removing intermediate container 86c30e33c390</span><br><span class="line"> ---&gt; 9c531ea5e5d5</span><br><span class="line">Successfully built 9c531ea5e5d5</span><br><span class="line">Successfully tagged test/mybusybox:v1</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 运行容器，验证镜像内容:</span><br><span class="line">[root@linux-node1 test]# docker run -it --rm test/mybusybox:v1</span><br><span class="line"></span><br><span class="line">/data/test # ls</span><br><span class="line">test_add  tmpfile1  tmpfile2</span><br><span class="line">/data/test # echo $WELCOME</span><br><span class="line">hello,welcome!</span><br><span class="line"></span><br><span class="line">1. 进入容器，当前目录即为 WORKDIR。如果 WORKDIR 不存在，Docker 会自动为我们创建。</span><br><span class="line">2. WORKDIR 中保存了我们希望的文件和目录:</span><br><span class="line">    - 目录 test_add：由 ADD 指令从 build context 复制的归档文件 test_add.tar.gz，已经自动解压。</span><br><span class="line">    - 文件 tmpfile1：由 RUN 指令创建。</span><br><span class="line">    - 文件 tmpfile2：由 COPY 指令从 build context 复制。</span><br><span class="line">3. ENV 指令定义的环境变量已经生效。</span><br></pre></td></tr></table></figure>
+<h2 id="镜像命名的最佳实践"><a href="#镜像命名的最佳实践" class="headerlink" title="镜像命名的最佳实践"></a>镜像命名的最佳实践</h2><ol>
+<li>如何在多个 Docker Host 上使用镜像?</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 用相同的 Dockerfile 在其他 host 构建镜像。</span><br><span class="line"></span><br><span class="line">2. 将镜像上传到公共 Registry（比如 Docker Hub），Host 直接下载使用。</span><br><span class="line"></span><br><span class="line">3. 搭建私有的 Registry 供本地 Host 使用。</span><br></pre></td></tr></table></figure>
+<h3 id="为镜像命名"><a href="#为镜像命名" class="headerlink" title="为镜像命名"></a>为镜像命名</h3><ol>
+<li>REPOSITORY</li>
+<li>TAG</li>
+<li>实际上一个特定镜像的名字由两部分组成：repository 和 tag , [image name] = [repository]:[tag]</li>
+<li>如果执行 docker build 时没有指定 tag，会使用默认值 latest</li>
+<li>tag 常用于描述镜像的版本信息，可以是任意字符串</li>
+<li>latest 其实并没有什么特殊的含义。当没指明镜像 tag 时，Docker 会使用默认值 latest，仅此而已。<ul>
+<li>虽然 Docker Hub 上很多 repository 将 latest 作为最新稳定版本的别名，但这只是一种约定，而不是强制规定。</li>
+<li>所以我们在使用镜像时最好还是避免使用 latest，明确指定某个 tag，比如 httpd:2.3，ubuntu:xenial。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 test]# docker images</span><br><span class="line">REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">test/mybusybox       v1                  9c531ea5e5d5        7 minutes ago       1.22MB</span><br><span class="line">game/centos          7                   ea065b022d5b        51 minutes ago      287MB</span><br><span class="line">nginx                latest              f949e7d76d63        2 weeks ago         126MB</span><br></pre></td></tr></table></figure>
+<h3 id="多个-tag-可能对应的是同一个镜像"><a href="#多个-tag-可能对应的是同一个镜像" class="headerlink" title="多个 tag 可能对应的是同一个镜像"></a>多个 tag 可能对应的是同一个镜像</h3><ol>
+<li>多个 tag 可能对应的是同一个镜像</li>
+<li>假设我们现在发布了一个镜像 myimage，版本为 v1.9.1。那么我们可以给镜像打上四个 tag：1.9.1、1.9、1 和 latest。</li>
+</ol>
+<p><img src="/img/docker_22.png" width="50%"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 通过 docker tag 命令方便地给镜像打 tag</span><br><span class="line">docker tag myimage-v1.9.1 myimage:1</span><br><span class="line"></span><br><span class="line">docker tag myimage-v1.9.1 myimage:1.9</span><br><span class="line"></span><br><span class="line">docker tag myimage-v1.9.1 myimage:1.9.1</span><br><span class="line"></span><br><span class="line">docker tag myimage-v1.9.1 myimage:latest</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>过了一段时间，我们发布了 v1.9.2。这时可以打上 1.9.2 的 tag，并将 1.9、1 和 latest 从 v1.9.1 移到 v1.9.2。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker tag myimage-v1.9.2 myimage:1</span><br><span class="line"></span><br><span class="line">docker tag myimage-v1.9.2 myimage:1.9</span><br><span class="line"></span><br><span class="line">docker tag myimage-v1.9.2 myimage:1.9.2</span><br><span class="line"></span><br><span class="line">docker tag myimage-v1.9.2 myimage:latest</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>这种 tag 方案使镜像的版本很直观，用户在选择非常灵活：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">myimage:1 始终指向 1 这个分支中最新的镜像。</span><br><span class="line"></span><br><span class="line">myimage:1.9 始终指向 1.9.x 中最新的镜像。</span><br><span class="line"></span><br><span class="line">myimage:latest 始终指向所有版本中最新的镜像。</span><br><span class="line"></span><br><span class="line">如果想使用特定版本，可以选择 myimage:1.9.1、myimage:1.9.2 或 myimage:2.0.0。</span><br></pre></td></tr></table></figure>
+<h2 id="Dockerfile-的生产实践"><a href="#Dockerfile-的生产实践" class="headerlink" title="Dockerfile 的生产实践"></a>Dockerfile 的生产实践</h2><h3 id="使用-game-centos-7-镜像为base镜像-搭建-python-运行环境镜像"><a href="#使用-game-centos-7-镜像为base镜像-搭建-python-运行环境镜像" class="headerlink" title="使用 game/centos:7 镜像为base镜像 搭建 python 运行环境镜像"></a>使用 game/centos:7 镜像为base镜像 搭建 python 运行环境镜像</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 runtime]# mkdir -p /opt/Game/runtime/python-ssh</span><br><span class="line"></span><br><span class="line">[root@linux-node1 runtime]# tree /opt/Game/</span><br><span class="line">/opt/Game/</span><br><span class="line">├── app</span><br><span class="line">├── runtime</span><br><span class="line">│   └── python-ssh</span><br><span class="line">└── system</span><br><span class="line">    ├── centos</span><br><span class="line">    │   ├── Dockerfile</span><br><span class="line">    │   └── epel.repo</span><br><span class="line">    └── test</span><br><span class="line">        ├── Dockerfile</span><br><span class="line">        ├── test_add.tar.gz</span><br><span class="line">        └── tmpfile2</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># python + ssh</span><br><span class="line"># python运行环境镜像需要安装 python-devel python-pip openssh-clients openssl-devel openssh-server</span><br><span class="line"></span><br><span class="line">[root@linux-node1 python-ssh]# vim Dockerfile </span><br><span class="line"></span><br><span class="line"># BASE</span><br><span class="line">FROM game/centos:7</span><br><span class="line"></span><br><span class="line"># WHO</span><br><span class="line">MAINTAINER leo 365042337@qq.com</span><br><span class="line"></span><br><span class="line"># PKG</span><br><span class="line">RUN yum install -y python-devel python-pip openssh-clients openssl-devel openssh-server &amp;&amp; yum clean all</span><br><span class="line"></span><br><span class="line"># FOR SSHD</span><br><span class="line">RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key</span><br><span class="line">RUN ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key</span><br><span class="line">RUN echo &quot;root:222222&quot; | chpasswd</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 构建</span><br><span class="line">[root@linux-node1 python-ssh]# docker build -t game/centos7-python-ssh .</span><br><span class="line"></span><br><span class="line">[root@linux-node1 python-ssh]# docker images</span><br><span class="line">REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">game/centos7-python-ssh   latest              9b0a64f83274        14 seconds ago      357MB</span><br><span class="line">game/centos               7                   ea065b022d5b        2 hours ago         287MB</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h3 id="在本地测试-python"><a href="#在本地测试-python" class="headerlink" title="在本地测试 python"></a>在本地测试 python</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 测试程序 flask</span><br><span class="line">[root@linux-node1 python-ssh]# mkdir -p /opt/Game/app/shop-api</span><br><span class="line">[root@linux-node1 python-ssh]# cd /opt/Game/app/shop-api</span><br><span class="line">[root@linux-node1 shop-api]# vim app.py</span><br><span class="line"></span><br><span class="line">from flask import Flask</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">@app.route(&apos;/&apos;)</span><br><span class="line">def hello():</span><br><span class="line">        return &apos;Hello World!&apos; </span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">        app.run(host=&quot;0.0.0.0&quot;, debug=True)</span><br><span class="line"></span><br><span class="line"># 安装python,运行测试程序</span><br><span class="line">yum install python-pip -y</span><br><span class="line">pip install flask</span><br><span class="line">python app.py</span><br><span class="line">访问:http://10.0.0.100:5000/</span><br></pre></td></tr></table></figure>
+<p><img src="/img/docker_23.png" width="50%"></p>
+<h3 id="添加python-服务的依赖文件"><a href="#添加python-服务的依赖文件" class="headerlink" title="添加python 服务的依赖文件"></a>添加python 服务的依赖文件</h3><figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># python pip 将会去安装包</span><br><span class="line">[root@linux-node1 shop-api]# vim requirements.txt</span><br><span class="line">flask</span><br><span class="line">requests</span><br></pre></td></tr></table></figure>
+<h3 id="supervisor-管理进程文件"><a href="#supervisor-管理进程文件" class="headerlink" title="supervisor 管理进程文件"></a>supervisor 管理进程文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">注意:</span><br><span class="line">1. 照着案例文件写 案例文件:</span><br><span class="line">2. 在配置文件中的 必须配置为前台启动 ***** supervisorctl 必须要在前提启动</span><br><span class="line">nodaemon=true              ; (start in foreground if true;default false)</span><br><span class="line"></span><br><span class="line"># 本地测试</span><br><span class="line">[root@linux-node1 shop-api]# yum install supervisor</span><br><span class="line"></span><br><span class="line"># 定义了两个服务 启动/opt/app.py 和 sshd</span><br><span class="line">[root@linux-node1 shop-api]# vim app-supervisor.ini </span><br><span class="line"></span><br><span class="line">[program:shop-api]</span><br><span class="line">command=/usr/bin/python2.7 /opt/app.py</span><br><span class="line">process_name=%(program_name)s</span><br><span class="line">autostart=true</span><br><span class="line">user=www</span><br><span class="line">stdout_logfile=/tmp/app.log</span><br><span class="line">stderr_logfile=/tmp/app.error</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[program:sshd]</span><br><span class="line">command=/usr/sbin/sshd -D</span><br><span class="line">process_name=%(program_name)s</span><br><span class="line">autostart=true</span><br><span class="line"></span><br><span class="line"># 将配置文件放到本地去测试执行</span><br><span class="line"># 添加本地www账户</span><br><span class="line">[root@linux-node1 shop-api]# cp app-supervisor.ini /etc/supervisord.d/</span><br><span class="line">[root@linux-node1 shop-api]# cp app.py /opt/</span><br><span class="line">[root@linux-node1 shop-api]# useradd -s /sbin/nologin -M www</span><br><span class="line"></span><br><span class="line"># 测试执行</span><br><span class="line">[root@linux-node1 shop-api]# supervisord -c /etc/supervisord.conf</span><br><span class="line">[root@linux-node1 ~]# supervisorctl status</span><br><span class="line">shop-api                         RUNNING   pid 3975, uptime 0:00:43</span><br><span class="line">sshd                             FATAL     Exited too quickly (process log may have details)</span><br><span class="line"></span><br><span class="line"># 本地的sshd是存在的,shop-api正常即可,后续还需要继续学习supervisor的配置</span><br></pre></td></tr></table></figure>
+<h3 id="shop-api-的Dockerfile"><a href="#shop-api-的Dockerfile" class="headerlink" title="shop-api 的Dockerfile"></a>shop-api 的Dockerfile</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 添加启动用户</span><br><span class="line">2. pip安装依赖</span><br><span class="line">3. supervisord.conf 如果有变更也要传</span><br><span class="line">4. CMD 需要启动supervisord服务</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 shop-api]# vim Dockerfile</span><br><span class="line"></span><br><span class="line"># BASE IMAGES</span><br><span class="line">FROM game/centos7-python-ssh</span><br><span class="line"></span><br><span class="line"># WHO</span><br><span class="line">MAINTAINER leo 365042337@qq.com</span><br><span class="line"></span><br><span class="line"># USER ADD</span><br><span class="line">RUN useradd -s /sbin/nologin -M www</span><br><span class="line"></span><br><span class="line"># ADD FILE</span><br><span class="line">ADD app.py /opt/app.py</span><br><span class="line">ADD app-supervisor.ini /etc/supervisord.d/</span><br><span class="line">ADD requirements.txt /opt/</span><br><span class="line">ADD supervisord.conf /etc/supervisord.conf</span><br><span class="line"></span><br><span class="line"># PIP</span><br><span class="line">RUN /usr/bin/pip2.7 install -r /opt/requirements.txt</span><br><span class="line"></span><br><span class="line"># PORT</span><br><span class="line">EXPOSE 22 5000</span><br><span class="line"></span><br><span class="line"># CMD</span><br><span class="line">CMD [&quot;/usr/bin/supervisord&quot;,&quot;-c&quot;,&quot;/etc/supervisord.conf&quot;]</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 shop-api]# docker build -t game/shop-api .</span><br><span class="line"></span><br><span class="line">[root@linux-node1 shop-api]# docker images</span><br><span class="line">REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">game/shop-api             latest              950dfdaa7360        23 seconds ago      365MB</span><br><span class="line">game/centos7-python-ssh   latest              9b0a64f83274        3 hours ago         357MB</span><br><span class="line">game/centos               7                   ea065b022d5b        4 hours ago         287MB</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 shop-api]# docker run -d -p 80:5000 -p 8022:22 --name myshop-ssh game/shop-api </span><br><span class="line"></span><br><span class="line">[root@linux-node1 .ssh]# ssh 10.0.0.100 -p8022</span><br><span class="line">浏览器访问: http://10.0.0.100/</span><br></pre></td></tr></table></figure>
+<h3 id="需要理解"><a href="#需要理解" class="headerlink" title="需要理解"></a>需要理解</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">1. 如果没有起来的测试步骤</span><br><span class="line">- 在构建一个镜像 不要执行CMD</span><br><span class="line">[root@linux-node1 shop-api]# pwd</span><br><span class="line">/opt/docker/app/shop-api</span><br><span class="line"># CMD</span><br><span class="line"># CMD [&quot;/usr/bin/supervisord&quot;,&quot;-c&quot;,&quot;/etc/supervisord.conf&quot;]</span><br><span class="line"> </span><br><span class="line">- 进到容器里查看服务</span><br><span class="line">[root@linux-node1 shop-api]# docker build -t oldboy/shop-api:v2 .</span><br><span class="line">[root@linux-node1 shop-api]# docker run -it --name shop-api-v2 -p 88:5000 -p 8022:22 oldboy/shop-api:v2 /bin/bash</span><br><span class="line">[root@3f1e55eb826d /]# supervisord -c /etc/supervisord.conf </span><br><span class="line">[root@3f1e55eb826d /]# supervisorctl status</span><br><span class="line">shop-api                         RUNNING   pid 19, uptime 0:00:03</span><br><span class="line">sshd                             RUNNING   pid 18, uptime 0:00:03</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2. 在配置文件中的 必须配置为前台启动 改好之后重新构建</span><br><span class="line">nodaemon=true              ; (start in foreground if true;default false)</span><br><span class="line">	</span><br><span class="line">3. 分层的好处</span><br><span class="line">    1. 更快速的构建</span><br><span class="line">        1. 系统</span><br><span class="line">        2. 运行环境</span><br><span class="line">        3. app</span><br><span class="line">    </span><br><span class="line">    2. 使用supervisor启动和管理进程</span><br><span class="line">    </span><br><span class="line">    3. python 的依赖requirements.txt</span><br><span class="line">    </span><br><span class="line">    4. 先尝试 把应用 用docker跑起来 再去写Dockerfile</span><br><span class="line">    </span><br><span class="line">    5. 去看开源项目的 Dockerfile</span><br><span class="line">    </span><br><span class="line">    6. 生产 之前一定先到虚拟机或者物理机跑一遍,然后再去 把配置文件copy过来 再去写 dockerfile</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/11/write-images/" rel="next" title="07 Docker 手动构建镜像">
+                <i class="fa fa-chevron-left"></i> 07 Docker 手动构建镜像
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/12/docker-harbor/" rel="prev" title="09 Dockerfile 私有仓库 harbor">
+                09 Dockerfile 私有仓库 harbor <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile"><span class="nav-number">1.</span> <span class="nav-text">Dockerfile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#构建镜像"><span class="nav-number">1.1.</span> <span class="nav-text">构建镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看镜像分层结构"><span class="nav-number">1.2.</span> <span class="nav-text">查看镜像分层结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile-常用指令"><span class="nav-number">2.</span> <span class="nav-text">Dockerfile 常用指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#运行更多的指令"><span class="nav-number">2.1.</span> <span class="nav-text">运行更多的指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像命名的最佳实践"><span class="nav-number">3.</span> <span class="nav-text">镜像命名的最佳实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为镜像命名"><span class="nav-number">3.1.</span> <span class="nav-text">为镜像命名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多个-tag-可能对应的是同一个镜像"><span class="nav-number">3.2.</span> <span class="nav-text">多个 tag 可能对应的是同一个镜像</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile-的生产实践"><span class="nav-number">4.</span> <span class="nav-text">Dockerfile 的生产实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-game-centos-7-镜像为base镜像-搭建-python-运行环境镜像"><span class="nav-number">4.1.</span> <span class="nav-text">使用 game/centos:7 镜像为base镜像 搭建 python 运行环境镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在本地测试-python"><span class="nav-number">4.2.</span> <span class="nav-text">在本地测试 python</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加python-服务的依赖文件"><span class="nav-number">4.3.</span> <span class="nav-text">添加python 服务的依赖文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#supervisor-管理进程文件"><span class="nav-number">4.4.</span> <span class="nav-text">supervisor 管理进程文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shop-api-的Dockerfile"><span class="nav-number">4.5.</span> <span class="nav-text">shop-api 的Dockerfile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#需要理解"><span class="nav-number">4.6.</span> <span class="nav-text">需要理解</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

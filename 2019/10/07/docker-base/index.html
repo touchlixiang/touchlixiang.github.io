@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="docker,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="容器技术简介">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/10/07/docker-base/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/timg_01.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_02.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_03.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/docker_05.png">
+<meta property="og:updated_time" content="2019-10-10T00:51:54.780Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="容器技术简介">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/timg_01.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/10/07/docker-base/">
+
+
+
+
+
+  <title>容器技术简介 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/10/07/docker-base/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">容器技术简介</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-07T08:42:27+08:00">
+                2019-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/timg_01.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="容器简介"><a href="#容器简介" class="headerlink" title="容器简介"></a>容器简介</h2><ol>
+<li>容器是在隔离的环境运行的一个进程，如果进程停止，容器就会销毁。隔离的环境拥有自己的文件系统，ip地址，主机名等。</li>
+<li>容器是一种轻量级操作系统层面的虚拟机，它为应用软件及其依赖组件提供了一个资源独立的运行环境。<br>应用软件所依赖的组件会被打包成一个可重用的镜像，镜像运行环境并不会与主操作系统共享内存、CPU和硬盘空间，由此也保证了容器内部的进程与容器外部进程的独立关系。</li>
+</ol>
+<h2 id="容器与虚拟化的区别"><a href="#容器与虚拟化的区别" class="headerlink" title="容器与虚拟化的区别"></a>容器与虚拟化的区别</h2><p><img src="/img/docker_02.png" width="50%"></p>
+<ol>
+<li>管理程序虚拟化(hypervisor virtualization,HV) 通过中间层将一台或多台独立懂得虚拟机运行于物理硬件之上。</li>
+<li>容器(Containers) 运行在操作系统内核之上的用户空间。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">简单解释，虚拟机运行在操作系统上，而docker是直接运行在应用上。</span><br><span class="line">所以docker无法提供一个像VMware那样完全的隔离，甚至到很多地方都没有进行隔离，比如说用户空间。</span><br><span class="line">这里可以解释一下,如果你用的是centos5版本那你就别想安装docker了，如果是centos6的你可以看一眼。</span><br><span class="line">因为内核版本比较低，但是如果使用乌班图就可以，因为乌班图的内核更新的比较快。</span><br><span class="line">如果公司服务器是centos5和centos6 用docker就需要升级内核，相对比较麻烦.</span><br></pre></td></tr></table></figure>
+<h3 id="Docker-和-KVM-的对比"><a href="#Docker-和-KVM-的对比" class="headerlink" title="Docker 和 KVM 的对比"></a>Docker 和 KVM 的对比</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">KVM 和 Docker 的对比:</span><br><span class="line">https://www.qstack.com.cn/archives/148.html</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">1. 虚拟化技术对比：</span><br><span class="line">    - KVM全虚拟化,需要模拟各种硬件,跑在宿主机之上。</span><br><span class="line">    - Xen, VMware半虚拟化,直接跑在硬件上。</span><br><span class="line">    - docker严格来说不算是虚拟化技术(操作系统虚拟化),只是进程隔离和资源限制。</span><br><span class="line">    </span><br><span class="line">2. 占用内容资源对比:</span><br><span class="line">    - KVM虚拟机一般会独占一段内存，即使闲置，其他虚拟机也无法使用。</span><br><span class="line">    - 容器可以只有一个内存上限，没有下限。如果它只使用1MB内存，那么它只占用宿主机1MB内存。宿主机可以将富余内存作为他用。</span><br><span class="line"></span><br><span class="line">3. 实例的内核对比:</span><br><span class="line">    - kvm虚拟机内核 无需与宿主机一致</span><br><span class="line">    - docker实例内核和宿主机 内核一致</span><br><span class="line">    </span><br><span class="line">4. 操作系统支持度对比:</span><br><span class="line">    - kvm支持多种操作系统，除了linux，还支持windows，uninx、solaris等</span><br><span class="line">    - docker只支持linux</span><br><span class="line">    </span><br><span class="line">5. 启动一个实例需要的时间对比:</span><br><span class="line">    # lxc容器技术将操作系统抽象到了一个新的高度。</span><br><span class="line">    # 直接从init启动，省去了硬件自检、grub引导、加载内核、加载驱动等传统启动项目，因此启动飞速。</span><br><span class="line">    - docker:秒级</span><br><span class="line">    - kvm:分钟级别</span><br><span class="line">    </span><br><span class="line">6. 镜像模板占用空间对比:</span><br><span class="line">    - kvm:占用空间大,G级别</span><br><span class="line">    - docker:占用空间小,M级别</span><br><span class="line"></span><br><span class="line">综合来说:</span><br><span class="line">    - kvm资源隔离比docker更高,kvm支持的操作系统类型更多</span><br><span class="line">    - docker比kvm更省资源,可以提供非常接近宿主机的性能</span><br></pre></td></tr></table></figure>
+<h4 id="容器更省资源"><a href="#容器更省资源" class="headerlink" title="容器更省资源"></a>容器更省资源</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. 容器由于省去了操作系统,整个层级更简化,容器可以在单台服务器上运行更多的应用。</span><br><span class="line">2. 虚拟化技术针对每个虚拟机的资源分配是固定的。</span><br><span class="line">    - 如下图,三个虚拟机在一台计算机上运行，该计算机配备48 GB内存、12核处理器和3TB磁盘存储空间，</span><br><span class="line">    - 每个虚拟机被分配了16 GB内存、4核和1TB存储空间，如果其中一个虚拟机使用的内存从不超过1GB，只存储100MB的文件系统，</span><br><span class="line">    - 该虚拟机仍占用4GB内存和整整1TB的存储空间，仍是造成了大量的资源浪费。</span><br><span class="line">    - 而容器则是以共享方式使用主机上的内存、处理器和存储空间。</span><br></pre></td></tr></table></figure>
+<p><img src="/img/docker_03.png" width="50%"></p>
+<h4 id="容器实现秒级启动"><a href="#容器实现秒级启动" class="headerlink" title="容器实现秒级启动"></a>容器实现秒级启动</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 虚拟机包含了完整的操作系统环境,同时还提供了对操作系统的控制支持。因此，虚拟机的规模较大，通常会达到数个G。</span><br><span class="line">2. 在运行应用前,虚拟机需要预先花费几分钟来引导操作系统,然后才能初始化和运行应用程序。</span><br><span class="line">3. 容器则规模较小，一般只有数个M，容器通常可以实现秒级启动。</span><br></pre></td></tr></table></figure>
+<h3 id="Docker-与-OpenStack区别"><a href="#Docker-与-OpenStack区别" class="headerlink" title="Docker 与 OpenStack区别"></a>Docker 与 OpenStack区别</h3><p><img src="/img/docker_05.png" width="50%"></p>
+<h2 id="百花齐放的容器技术"><a href="#百花齐放的容器技术" class="headerlink" title="百花齐放的容器技术"></a>百花齐放的容器技术</h2><ol>
+<li>虽然 docker 把容器技术推向了巅峰，但容器技术却不是从 docker 诞生的。</li>
+<li>实际上，容器技术连新技术都算不上，因为它的诞生和使用确实有些年头了。</li>
+<li>下面的一串名称肯能有的你都没有听说过，但它们的确都是容器技术的应用：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Chroot Jail</span><br><span class="line">FreeBSD Jails</span><br><span class="line">Linux VServer</span><br><span class="line">Solaris Containers</span><br><span class="line">OpenVZ</span><br><span class="line">Process Containers</span><br><span class="line">LXC</span><br><span class="line">Warden</span><br><span class="line">LMCTFY</span><br><span class="line">Docker</span><br><span class="line">RKT</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">1、Chroot Jail</span><br><span class="line">就是我们常见的 chroot 命令的用法。它在 1979 年的时候就出现了，被认为是最早的容器化技术之一。它可以把一个进程的文件系统隔离起来。</span><br><span class="line"></span><br><span class="line">2、The FreeBSD Jail</span><br><span class="line">Freebsd Jail 实现了操作系统级别的虚拟化，它是操作系统级别虚拟化技术的先驱之一。</span><br><span class="line"></span><br><span class="line">3、Linux VServer</span><br><span class="line">使用添加到 Linux 内核的系统级别的虚拟化功能实现的专用虚拟服务器。</span><br><span class="line"></span><br><span class="line">4、Solaris Containers</span><br><span class="line">它也是操作系统级别的虚拟化技术，专为 X86 和 SPARC 系统设计。Solaris 容器是系统资源控制和通过 &quot;区域&quot; 提供边界隔离的组合。</span><br><span class="line"></span><br><span class="line">5、OpenVZ</span><br><span class="line">OpenVZ 是一种 Linux 中操作系统级别的虚拟化技术。 它允许创建多个安全隔离的 Linux 容器，即 VPS。</span><br><span class="line"></span><br><span class="line">6、Process Containers</span><br><span class="line">Process 容器由 Google 的工程师开发，一般被称为 cgroups。</span><br><span class="line"></span><br><span class="line">7、LXC</span><br><span class="line">LXC 又叫 Linux 容器，这也是一种操作系统级别的虚拟化技术，允许使用单个 Linux 内核在宿主机上运行多个独立的系统。</span><br><span class="line"></span><br><span class="line">8、Warden</span><br><span class="line">在最初阶段，Warden 使用 LXC 作为容器运行时。 如今已被 CloudFoundy 取代。</span><br><span class="line"></span><br><span class="line">9、LMCTFY</span><br><span class="line">LMCTY 是 Let me contain that for you 的缩写。它是 Google 的容器技术栈的开源版本。</span><br><span class="line">Google 的工程师一直在与 docker 的 libertainer 团队合作，并将 libertainer 的核心概念进行抽象并移植到此项目中。</span><br><span class="line">该项目的进展不明，估计会被 libcontainer 取代。</span><br><span class="line"></span><br><span class="line">10、Docker</span><br><span class="line">Docker 是一个可以将应用程序及其依赖打包到几乎可以在任何服务器上运行的容器的工具。</span><br><span class="line"></span><br><span class="line">11、RKT</span><br><span class="line">RKT 是 Rocket 的缩写，它是一个专注于安全和开放标准的应用程序容器引擎。</span><br></pre></td></tr></table></figure>
+<h2 id="在什么场景需要容器"><a href="#在什么场景需要容器" class="headerlink" title="在什么场景需要容器"></a>在什么场景需要容器</h2><ol>
+<li>如果你遇到以下场景，推荐使用容器：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">1. 部署无状态服务，同虚拟机互补使用，实现隔离性</span><br><span class="line"></span><br><span class="line">2. 如果要部署有状态服务，需要对里面的应用十分的了解</span><br><span class="line"></span><br><span class="line">3. 作为持续集成的重要工具，可以顺利在开发，测试，生产之间迁移</span><br><span class="line"></span><br><span class="line">4. 适合部署跨云，跨Region，跨数据中心，混合云场景下的应用部署和弹性伸缩</span><br><span class="line"></span><br><span class="line">5. 以容器作为应用的交付物，保持环境一致性，树立不可变更基础设施的理念</span><br><span class="line"></span><br><span class="line">6. 运行进程基本的任务类型的程序</span><br><span class="line"></span><br><span class="line">7. 用于管理变更，变更频繁的应用使用容器镜像和版本号，轻量级方便的多</span><br><span class="line"></span><br><span class="line">8. 使用容器一定要管理好应用，进行health check和容错的设计</span><br></pre></td></tr></table></figure>
+<h2 id="容器有哪些优点"><a href="#容器有哪些优点" class="headerlink" title="容器有哪些优点"></a>容器有哪些优点</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">1. 敏捷开发：容器技术最大的优势在于其快速的生成效率，轻量级的打包方式使其具有更好的性能和更小的规模。</span><br><span class="line"></span><br><span class="line">2. 快速开发：容器解决了应用程序的平台依赖和平台冲突问题，从而帮助开发人员更快地开发程序。</span><br><span class="line">每个容器可被看作为一个微服务，因而可以单独进行升级，而不必担心同步问题。</span><br><span class="line"></span><br><span class="line">3. 版本管理：容器中的镜像可被单独管理，由此可以追踪、记录、生成不同的容器版本，进而分析容器版本的差异。</span><br><span class="line"></span><br><span class="line">4. 计算环境可移植：容器封装了与应用相关的依赖组件及操作系统信息，由此减轻了应用在不同计算环境下的配置需求。</span><br><span class="line">例如，同一个镜像可应用于Windows或Linux环境，并适用于开发、测试、部署等阶段。</span><br><span class="line"></span><br><span class="line">5. 标准化：容器通常基于开放标准而设计，因而容器在主流Linux系统及Windows系统上都是适用的。</span><br><span class="line"></span><br><span class="line">6. 安全性：容器间的进程以及容器内外的进程是相互独立的。因此，每个容器的升级或修改对其它容器都是没有影响的。</span><br><span class="line"></span><br><span class="line">7. 弹性伸缩：由于容器单元间相互独立，由统一的编排工具管理，且编排工具具备发现容器节点的功能，</span><br><span class="line">所以容器的弹性扩容可以在短时间内自动完成；</span><br><span class="line">同时，由于每个容器均为独立的个体，容器调用的资源和容器的使用由编排工具管理，所以减少某一容器节点不影响整个容器系统的使用。</span><br><span class="line"></span><br><span class="line">8. 高可用：与弹性伸缩类似，在某一容器节点出现故障时，容器编排工具能够及时发现节点的变化，并根据外部请求情况及时作出调整，</span><br><span class="line">不影响整个容器系统的使用，实现系统的高可用。</span><br><span class="line"></span><br><span class="line">9. 管理便利：容器技术可通过简单的命令行，完成对单一容器的管理，完成对镜像的快速打包和迁移；</span><br><span class="line">同时也能通过Kubernetes、Swarm等工具，实现对大规模容器集群的管理。</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/30/saltstack-base/" rel="next" title="SaltStack 基础">
+                <i class="fa fa-chevron-left"></i> SaltStack 基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/07/docker-base01/" rel="prev" title="01 Docker 简介">
+                01 Docker 简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#容器简介"><span class="nav-number">1.</span> <span class="nav-text">容器简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器与虚拟化的区别"><span class="nav-number">2.</span> <span class="nav-text">容器与虚拟化的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-和-KVM-的对比"><span class="nav-number">2.1.</span> <span class="nav-text">Docker 和 KVM 的对比</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#容器更省资源"><span class="nav-number">2.1.1.</span> <span class="nav-text">容器更省资源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#容器实现秒级启动"><span class="nav-number">2.1.2.</span> <span class="nav-text">容器实现秒级启动</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-与-OpenStack区别"><span class="nav-number">2.2.</span> <span class="nav-text">Docker 与 OpenStack区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#百花齐放的容器技术"><span class="nav-number">3.</span> <span class="nav-text">百花齐放的容器技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在什么场景需要容器"><span class="nav-number">4.</span> <span class="nav-text">在什么场景需要容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器有哪些优点"><span class="nav-number">5.</span> <span class="nav-text">容器有哪些优点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
