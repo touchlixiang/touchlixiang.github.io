@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="kubernetes,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="04 Pod 介绍与容器分类">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/11/07/k8s-04/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_26.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_72.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_27.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_28.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_29.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_31.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_32.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_33.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_34.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_35.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_36.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_37.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_38.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_39.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_40.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_41.png">
+<meta property="og:updated_time" content="2019-11-29T01:46:54.613Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="04 Pod 介绍与容器分类">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/11/07/k8s-04/">
+
+
+
+
+
+  <title>04 Pod 介绍与容器分类 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/11/07/k8s-04/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">04 Pod 介绍与容器分类</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-07T12:08:25+08:00">
+                2019-11-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="Pod-简介"><a href="#Pod-简介" class="headerlink" title="Pod 简介"></a>Pod 简介</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">• 最小部署单元 </span><br><span class="line">• 一组容器的集合  紧密的服务</span><br><span class="line">• 一个Pod中的容器共享网络命名空间,可以使用127.0.0.1访问服务</span><br><span class="line">• Pod是短暂的</span><br></pre></td></tr></table></figure>
+<h3 id="Pod容器分类"><a href="#Pod容器分类" class="headerlink" title="Pod容器分类"></a>Pod容器分类</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">• Infrastructure Container：基础容器</span><br><span class="line">    • 维护整个Pod网络空间</span><br><span class="line">• InitContainers：初始化容器，在部署之前做一些初始化操作</span><br><span class="line">    • 先于业务容器开始执行</span><br><span class="line">• Containers：业务容器  主要使用这个    </span><br><span class="line">    • 并行启动</span><br></pre></td></tr></table></figure>
+<ol>
+<li>基础容器会启动,他是透明的但是可以在node节点使用docker images查看到</li>
+<li>应该把pause-amd64:3.0下载下来保存到私有仓库,将地址替换成私有仓库地址</li>
+<li>每次创建一个pod,都会创建一个这个容器,他的作用是将pod里面的所有容器放到一个命名空间</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-node1 cfg]# cat /opt/kubernetes/cfg/kubelet.conf </span><br><span class="line">--pod-infra-container-image=lizhenliang/pause-amd64:3.0"</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_26.png"></p>
+<h2 id="Pod-实现机制"><a href="#Pod-实现机制" class="headerlink" title="Pod 实现机制"></a>Pod 实现机制</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 共享网络</span><br><span class="line">2. 共享存储</span><br></pre></td></tr></table></figure>
+<h3 id="共享网络"><a href="#共享网络" class="headerlink" title="共享网络"></a>共享网络</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 1. 创建pod后在创建业务容器之前会先创建基础容器pause-amd64:3.0</span><br><span class="line"># 2. 创建的业务容器会加入到 pause-amd64:3.0的 network-namespace里  </span><br><span class="line"># 3. pod的IP 绑定的是 pause-amd64:3.0 容器里,让其他的容器使用一个 namespace</span><br><span class="line"></span><br><span class="line">[root@k8s-node1 ~]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE                                COMMAND                  CREATED             STATUS              PORTS               NAMES</span><br><span class="line">8e6be9e3476c        b50b08c36b60                         "nginx -g 'daemon of…"   4 seconds ago       Up 3 seconds                            k8s_nginx_nginx-deployment-594cc45b78-dzmcw_default_77001f39-25e7-4e5d-b279-f06aa3c17382_0</span><br><span class="line">c4383d31c17a        b50b08c36b60                         "nginx -g 'daemon of…"   4 seconds ago       Up 3 seconds                            k8s_nginx_nginx-deployment-594cc45b78-pm688_default_f8f84530-abc1-4c8c-83f3-8d8caab08217_0</span><br><span class="line">d0eea8a485bf        172.17.70.252/base/pause-amd64:3.0   "/pause"                 4 seconds ago       Up 3 seconds                            k8s_POD_nginx-deployment-594cc45b78-pm688_default_f8f84530-abc1-4c8c-83f3-8d8caab08217_0</span><br><span class="line">102650cf1d5e        172.17.70.252/base/pause-amd64:3.0   "/pause"                 4 seconds ago       Up 3 seconds                            k8s_POD_nginx-deployment-594cc45b78-dzmcw_default_77001f39-25e7-4e5d-b279-f06aa3c17382_0</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 1个POD里面有多个容器 他们共享一个网络命名空间</span><br><span class="line">POD </span><br><span class="line">容器1 Java</span><br><span class="line">容器2 Nginx</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># 导出一个正在运行的Pod修改</span><br><span class="line">[root@k8s-master1 java-demo]# kubectl get pod java-demo-7746bb968c-4hj9k -o yaml &gt; pod.yaml</span><br><span class="line"></span><br><span class="line"># 1个Pod运行多个容器,容器使用-name 分割</span><br><span class="line">[root@k8s-master1 java-demo]# vim pod.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    app: my-pod</span><br><span class="line">  name: my-pod</span><br><span class="line">  namespace: default</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: my-nginx</span><br><span class="line">    image: nginx:1.7.9</span><br><span class="line">  - name: my-java</span><br><span class="line">    image: 172.17.70.252/project/java-demo:latest</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"># 创建</span><br><span class="line">[root@k8s-master1 java-demo]# kubectl apply -f pod.yaml </span><br><span class="line">pod/my-pod created</span><br><span class="line"># READY 运行个数为2个</span><br><span class="line">[root@k8s-master1 java-demo]# kubectl get pods,deploy -o wide</span><br><span class="line">NAME         READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">pod/my-pod   2/2     Running   0          19s   10.244.1.30   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 看下事件</span><br><span class="line">[root@k8s-master1 java-demo]# kubectl describe pod my-pod</span><br><span class="line">Events:</span><br><span class="line">  Type    Reason     Age        From                Message</span><br><span class="line">  ----    ------     ----       ----                -------</span><br><span class="line">  Normal  Scheduled  <span class="tag">&lt;<span class="name">unknown</span>&gt;</span>  default-scheduler   Successfully assigned default/my-pod to k8s-node2</span><br><span class="line">  Normal  Pulling    2m21s      kubelet, k8s-node2  Pulling image "nginx:1.7.9"</span><br><span class="line">  Normal  Pulled     2m14s      kubelet, k8s-node2  Successfully pulled image "nginx:1.7.9"</span><br><span class="line">  Normal  Created    2m14s      kubelet, k8s-node2  Created container my-nginx</span><br><span class="line">  Normal  Started    2m14s      kubelet, k8s-node2  Started container my-nginx</span><br><span class="line">  Normal  Pulling    2m14s      kubelet, k8s-node2  Pulling image "172.17.70.252/project/java-demo:latest"</span><br><span class="line">  Normal  Pulled     2m14s      kubelet, k8s-node2  Successfully pulled image "172.17.70.252/project/java-demo:latest"</span><br><span class="line">  Normal  Created    2m14s      kubelet, k8s-node2  Created container my-java</span><br><span class="line">  Normal  Started    2m14s      kubelet, k8s-node2  Started container my-java</span><br><span class="line"></span><br><span class="line"># 查看node2容器 只启动使用了一个基础镜像,那么就是说 新建的两个容器会加入这一个pause容器的命名空间</span><br><span class="line">[root@k8s-node2 ~]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE                                COMMAND                  CREATED             STATUS              PORTS               NAMES</span><br><span class="line">5701076efaf9        172.17.70.252/project/java-demo      "catalina.sh run"        3 minutes ago       Up 3 minutes                            k8s_my-java_my-pod_default_363d3a86-4892-4e5b-bb09-8a421cbb7ad8_0</span><br><span class="line">013fd701fbeb        nginx                                "nginx -g 'daemon of…"   3 minutes ago       Up 3 minutes                            k8s_my-nginx_my-pod_default_363d3a86-4892-4e5b-bb09-8a421cbb7ad8_0</span><br><span class="line">0208eacccdce        172.17.70.252/base/pause-amd64:3.0   "/pause"                 3 minutes ago       Up 3 minutes                            k8s_POD_my-pod_default_363d3a86-4892-4e5b-bb09-8a421cbb7ad8_0</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 验证是否同一个网络命名空间</span><br><span class="line"># 在一个pod中启动多个容器,那么他们是共享同一网络命名空间,IP、prot、mac</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 java-demo]# kubectl exec -it my-pod bash</span><br><span class="line">Defaulting container name to my-nginx.</span><br><span class="line">Use 'kubectl describe pod/my-pod -n default' to see all of the containers in this pod.</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 java-demo]# kubectl exec -it my-pod -c my-nginx bash</span><br><span class="line">[root@k8s-master1 java-demo]# kubectl exec -it my-pod -c my-java bash</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_72.png" width="75%"></p>
+<h3 id="共享存储"><a href="#共享存储" class="headerlink" title="共享存储"></a>共享存储</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. Pod 为亲密性应用而存在</span><br><span class="line">亲密性应用场景:</span><br><span class="line">    - 两个应用之间发生交互</span><br><span class="line">    - 两个应用需要通过127.0.0.1 或者 socket通信</span><br><span class="line">    - 两个应用需要发生频繁的调用</span><br><span class="line">    - 常用的有 nginx 代理 tomcat应用 127.0.0.1:8080</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 共享存储不能使用 同一个存储的命名空间</span><br><span class="line">2. 因为镜像中的操作系统不太相同,违背了容器的概念</span><br><span class="line">3. 存储使用数据卷,将应用数据持久化</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1. POD 持久化数据:</span><br><span class="line">    - 临时数据</span><br><span class="line">    - 日志</span><br><span class="line">    - 业务数据 重要的 mysql的/data目录  </span><br><span class="line"></span><br><span class="line">2. 有状态的需要存储数据的应用程序能够在多个节点之间相互漂移</span><br><span class="line"></span><br><span class="line">node1 pod1 挂掉了,数据不能存储在本地,需要使用存储数据卷</span><br><span class="line">node2 pod2 重新拉起一个pod,使用node1上的pod1同一个数据卷,数据不会丢失,接着用</span><br><span class="line">node3 </span><br><span class="line"></span><br><span class="line">node1  node2  node3</span><br><span class="line">      Volumes</span><br><span class="line">      共享存储</span><br></pre></td></tr></table></figure>
+<h3 id="同一Pod下的容器共享数据"><a href="#同一Pod下的容器共享数据" class="headerlink" title="同一Pod下的容器共享数据"></a>同一Pod下的容器共享数据</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"># 1. emptyDir</span><br><span class="line"># 2. 创建一个空卷，挂载到Pod中的容器。</span><br><span class="line"># 3. Pod删除该卷也会被删除。</span><br><span class="line">$ .4 应用场景：Pod中容器之间数据共享</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo2]# vim emptydir.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: my-pod2</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: write</span><br><span class="line">    image: centos:7</span><br><span class="line">    command: ["bash","-c","for i in &#123;1..100&#125;;do echo $i &gt;&gt; /data/hello;sleep 1;done"]</span><br><span class="line">    volumeMounts:</span><br><span class="line">      - name: data</span><br><span class="line">        mountPath: /data</span><br><span class="line"></span><br><span class="line">  - name: read</span><br><span class="line">    image: centos:7</span><br><span class="line">    command: ["bash","-c","tail -f /data/hello"]</span><br><span class="line">    volumeMounts:</span><br><span class="line">      - name: data</span><br><span class="line">        mountPath: /data</span><br><span class="line"></span><br><span class="line">  volumes:</span><br><span class="line">  - name: data</span><br><span class="line">    emptyDir: &#123;&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># 创建了两个容器 read 和 write</span><br><span class="line"># 一个Pod里的多个容器会被分配到一个Node节点上</span><br><span class="line"># 会在当前的节点创建一个空目录 /data,然后两个容器都挂载这个目录 </span><br><span class="line">[root@k8s-master1 java-demo]# kubectl apply -f emptydir.yaml </span><br><span class="line">pod/my-pod2 created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 java-demo]# kubectl get pods -o wide</span><br><span class="line">NAME      READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">my-pod    2/2     Running   0          35m   10.244.1.30   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">my-pod2   2/2     Running   0          34s   10.244.0.33   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 进入写容器查看</span><br><span class="line">[root@k8s-master1 java-demo]# kubectl exec -it my-pod2 -c write bash</span><br><span class="line">[root@my-pod2 /]# cd /data/</span><br><span class="line">[root@my-pod2 data]# tailf hello </span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line"></span><br><span class="line"># 进入读容器查看</span><br><span class="line">[root@k8s-master1 java-demo]# kubectl exec -it my-pod2 -c read bash</span><br><span class="line">[root@my-pod2 data]# tailf hello </span><br><span class="line"></span><br><span class="line"># 看read的日志 他后台运行的就是tailf </span><br><span class="line">[root@k8s-master1 java-demo]# kubectl logs my-pod2 -c read</span><br></pre></td></tr></table></figure>
+<h2 id="Pod-存在的意义"><a href="#Pod-存在的意义" class="headerlink" title="Pod 存在的意义"></a>Pod 存在的意义</h2><h2 id="Pod-镜像拉取策略"><a href="#Pod-镜像拉取策略" class="headerlink" title="Pod 镜像拉取策略"></a>Pod 镜像拉取策略</h2><ol>
+<li>imagePullPolicy </li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">• IfNotPresent：默认值，镜像在宿主机上不存在时才拉取</span><br><span class="line">• Always：每次创建 Pod 都会重新拉取一次镜像</span><br><span class="line">• Never： Pod 永远不会主动拉取这个镜像</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 导出的yaml文件中 默认值就是IfNotPresent</span><br><span class="line"> containers:</span><br><span class="line">      - image: nginx:1.16</span><br><span class="line">        imagePullPolicy: IfNotPresent</span><br><span class="line">        name: nginx</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 80</span><br><span class="line">          protocol: TCP</span><br></pre></td></tr></table></figure>
+<h2 id="拉取私有仓库镜像-harbord的认证凭据"><a href="#拉取私有仓库镜像-harbord的认证凭据" class="headerlink" title="拉取私有仓库镜像 harbord的认证凭据"></a>拉取私有仓库镜像 harbord的认证凭据</h2><h3 id="配置可信任"><a href="#配置可信任" class="headerlink" title="配置可信任"></a>配置可信任</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-node1 ~]# cat /etc/docker/daemon.json </span><br><span class="line">&#123;</span><br><span class="line">    "registry-mirrors": ["http://bc437cce.m.daocloud.io"],</span><br><span class="line">    "insecure-registries": ["172.17.70.245"]</span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"># 添加或者修改 需要重启docker</span><br><span class="line">systemctl restart docker.service</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 镜像仓库 上传一个镜像</span><br><span class="line">[root@k8s-node1 ~]# docker login 172.17.70.245</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 上传一个tomcat镜像</span><br><span class="line">[root@k8s-node1 ~]# docker pull tomcat</span><br><span class="line"># docker tag SOURCE_IMAGE[:TAG] 172.17.70.245/project/IMAGE[:TAG]</span><br><span class="line"># docker push 172.17.70.245/project/IMAGE[:TAG]</span><br><span class="line"></span><br><span class="line">[root@k8s-node1 ~]# docker push 172.17.70.245/project/tomcat</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_27.png" width="75%"></p>
+<p><img src="/img/k8s/k8s_28.png" width="75%"></p>
+<h3 id="配置k8s认证"><a href="#配置k8s认证" class="headerlink" title="配置k8s认证"></a>配置k8s认证</h3><ol>
+<li>docker主机虽然login 但是不代表k8s也是通过认证的,她不是登录的状态</li>
+<li>因为私有仓库下载需要凭证</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 参考文档 </span><br><span class="line">https://kubernetes.io/zh/docs/concepts/containers/images/</span><br></pre></td></tr></table></figure>
+<h3 id="测试k8s无凭证拉取私有仓库镜像"><a href="#测试k8s无凭证拉取私有仓库镜像" class="headerlink" title="测试k8s无凭证拉取私有仓库镜像"></a>测试k8s无凭证拉取私有仓库镜像</h3><ol>
+<li>docker 与 k8s 登录私有仓库的凭证 不是一套</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"># 创建一个tomcat.yaml</span><br><span class="line"># 由于本地有镜像了 所以改下拉取策略 一直会去重新拉取</span><br><span class="line">[root@k8s-master demo]# cp mynginx.yaml tomcat-deployment.yaml</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# vim tomcat-deployment.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    app: tomcat</span><br><span class="line">  name: tomcat</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: tomcat</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: tomcat</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.17.70.245/project/tomcat      # 私有镜像仓库</span><br><span class="line">        imagePullPolicy: Always                  # 拉取策略</span><br><span class="line">        name: tomcat</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 8080                    # 容器端口</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: tomcat-service</span><br><span class="line">  labels:</span><br><span class="line">    app: tomcat</span><br><span class="line">spec:</span><br><span class="line">  type: NodePort        # 随机分配</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80            # service负载端口</span><br><span class="line">    targetPort: 8080    # 容器端口</span><br><span class="line">  selector:</span><br><span class="line">    app: tomcat</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl apply -f tomcat-deployment.yaml </span><br><span class="line">deployment.apps/tomcat created</span><br><span class="line">service/tomcat-service unchanged</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 镜像无法拉取</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl get pods,svc,deploy</span><br><span class="line">NAME                         READY   STATUS             RESTARTS   AGE</span><br><span class="line">pod/tomcat-d54b746dc-f5pht   0/1     ImagePullBackOff   0          54s</span><br><span class="line">pod/tomcat-d54b746dc-kz9vj   0/1     ImagePullBackOff   0          54s</span><br><span class="line">pod/tomcat-d54b746dc-tqstj   0/1     ImagePullBackOff   0          54s</span><br><span class="line"></span><br><span class="line">NAME                     TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">service/kubernetes       ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        24h</span><br><span class="line">service/tomcat-service   NodePort    10.0.0.126   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:31882/TCP   2m9s</span><br><span class="line"></span><br><span class="line">NAME                     READY   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">deployment.apps/tomcat   0/3     3            0           54s</span><br></pre></td></tr></table></figure>
+<h3 id="查看pod事件"><a href="#查看pod事件" class="headerlink" title="查看pod事件"></a>查看pod事件</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl describe pod tomcat-d54b746dc-f5pht</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_29.png" width="75%"></p>
+<h3 id="配置凭据"><a href="#配置凭据" class="headerlink" title="配置凭据"></a>配置凭据</h3><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 获取docker的认证信息</span></span><br><span class="line"><span class="meta"># node节点上登录都存在一致的</span></span><br><span class="line"><span class="meta"># 保存登录harbor的认证信息</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root<span class="symbol">@k8s</span>-node1 ~]<span class="meta"># cat .docker/config.json </span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="string">"auths"</span>: &#123;</span><br><span class="line">		<span class="string">"172.17.70.245"</span>: &#123;</span><br><span class="line">			<span class="string">"auth"</span>: <span class="string">"YWRtaW46bHg2ODMyODE1Mw=="</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="string">"HttpHeaders"</span>: &#123;</span><br><span class="line">		<span class="string">"User-Agent"</span>: <span class="string">"Docker-Client/18.09.6 (linux)"</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta"># 编码 base64 不换行</span></span><br><span class="line">[root<span class="symbol">@k8s</span>-node1 ~]<span class="meta">#  cat .docker/config.json|base64 -w 0</span></span><br><span class="line">ewoJImF1dGhzIjogewoJCSIxNzIuMTcuNzAuMjQ1IjogewoJCQkiYXV0aCI6ICJZV1J0YVc0NmJIZzJPRE15T0RFMU13PT0iCgkJfQoJfSwKCSJIdHRwSGVhZGVycyI6IHsKCQkiVXNlci1BZ2VudCI6ICJEb2NrZXItQ2xpZW50LzE4LjA5LjYgKGxpbnV4KSIKCX0KfQ==</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># Secret 配置</span><br><span class="line"># Pod只能引用和它相同namespace的ImagePullSecrets， 所以需要为每一个namespace做配置</span><br><span class="line"># 使用 Secret 来保存认证信息</span><br><span class="line"># registry-pull-secret 就是拉取镜像的策略</span><br><span class="line"></span><br><span class="line">[root@k8s-master ~]# vim registry-pull-secret.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Secret</span><br><span class="line">metadata:</span><br><span class="line">  name: registry-pull-secret</span><br><span class="line">data:</span><br><span class="line">  .dockerconfigjson: ewoJImF1dGhzIjogewoJCSIxNzIuMTcuNzAuMjQ1IjogewoJCQkiYXV0aCI6ICJZV1J0YVc0NmJIZzJPRE15T0RFMU13PT0iCgkJfQoJfSwKCSJIdHRwSGVhZGVycyI6IHsKCQkiVXNlci1BZ2VudCI6ICJEb2NrZXItQ2xpZW50LzE4LjA5LjYgKGxpbnV4KSIKCX0KfQ==</span><br><span class="line">type: kubernetes.io/dockerconfigjson</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master ~]# kubectl create -f registry-pull-secret.yaml </span><br><span class="line">secret/registry-pull-secret created</span><br><span class="line"></span><br><span class="line"># 如果数据是0 就是没有成功保存进去</span><br><span class="line"></span><br><span class="line">[root@k8s-master ~]# kubectl get secret</span><br><span class="line">NAME                   TYPE                                  DATA   AGE</span><br><span class="line">default-token-m8m58    kubernetes.io/service-account-token   3      24h</span><br><span class="line">registry-pull-secret   kubernetes.io/dockerconfigjson        1      76s</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 配置凭据</span><br><span class="line">    spec:</span><br><span class="line">      imagePullSecrets:</span><br><span class="line">      - name: registry-pull-secret</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.17.70.245/project/tomcat</span><br><span class="line">        imagePullPolicy: Always</span><br><span class="line">        name: tomcat</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 8080</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_31.png" width="75%"></p>
+<p><img src="/img/k8s/k8s_32.png" width="75%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 创建</span><br><span class="line">[root@k8s-master demo]# kubectl apply -f tomcat-deployment.yaml </span><br><span class="line">deployment.apps/tomcat configured    # 有修改</span><br><span class="line">service/tomcat-service unchanged</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 可以创建啦</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl get pods,svc,deploy</span><br><span class="line">NAME                          READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/tomcat-67c68f7479-c68fx   1/1     Running   0          107s</span><br><span class="line">pod/tomcat-67c68f7479-q8jrx   1/1     Running   0          96s</span><br><span class="line">pod/tomcat-67c68f7479-v27gp   1/1     Running   0          108s</span><br><span class="line"></span><br><span class="line">NAME                     TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">service/kubernetes       ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        25h</span><br><span class="line">service/tomcat-service   NodePort    10.0.0.126   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:31882/TCP   39m</span><br><span class="line"></span><br><span class="line">NAME                     READY   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">deployment.apps/tomcat   3/3     3            3           38m</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_33.png" width="75%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 测试访问</span><br><span class="line">http://39.106.100.108:31882</span><br><span class="line">http://123.56.14.192:31882</span><br><span class="line"></span><br><span class="line"># 仓库三个pod 都会拉取1次 仓库显示下载次数3次</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_34.png" width="75%"></p>
+<p><img src="/img/k8s/k8s_35.png" width="75%"></p>
+<h2 id="Pod-资源限制"><a href="#Pod-资源限制" class="headerlink" title="Pod 资源限制"></a>Pod 资源限制</h2><ol>
+<li>Pod和Container的资源请求和限制： </li>
+<li>不能让容器占用所有的物理资源</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 官方示例</span><br><span class="line">https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">• spec.containers[].resources.limits.cpu</span><br><span class="line">• spec.containers[].resources.limits.memory</span><br><span class="line">• spec.containers[].resources.requests.cpu</span><br><span class="line">• spec.containers[].resources.requests.memory</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">limits   资源的总限制</span><br><span class="line">requests 创建pod最低 如果node上没有资源，就不会调度到node上，必须满足才能调度上去</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 调用了docker自身限制</span><br><span class="line"></span><br><span class="line">requests:           # 创建容器时要满足</span><br><span class="line">memory: "64Mi"      # 内存64M</span><br><span class="line">cpu: "250m"         # 1核cpu的25%</span><br><span class="line"></span><br><span class="line">limits:             # 最大使用</span><br><span class="line">memory: "128Mi"     # 最大使用内存 128M</span><br><span class="line">cpu: "500m"         # 最大使用cpu  1核心 50% 0.5个cpu</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# vim pod2.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: frontend</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: db</span><br><span class="line">    image: mysql:5.6</span><br><span class="line">    env:</span><br><span class="line">    - name: MYSQL_ROOT_PASSWORD</span><br><span class="line">      value: "password"</span><br><span class="line">    resources:</span><br><span class="line">      requests:</span><br><span class="line">        memory: "64Mi"</span><br><span class="line">        cpu: "250m"</span><br><span class="line">      limits:</span><br><span class="line">        memory: "128Mi"</span><br><span class="line">        cpu: "500m"</span><br><span class="line">  - name: wp</span><br><span class="line">    image: wordpress</span><br><span class="line">    resources:</span><br><span class="line">      requests:</span><br><span class="line">        memory: "64Mi"</span><br><span class="line">        cpu: "250m"</span><br><span class="line">      limits:</span><br><span class="line">        memory: "128Mi"</span><br><span class="line">        cpu: "500m"</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl apply -f pod2.yaml </span><br><span class="line">pod/frontend created</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl get pod</span><br><span class="line"># 在一个pod中创建了两个容器 wordpress 和 mysql</span><br><span class="line"># 本地没有镜像会去下载镜像 然后再启动容器</span><br><span class="line"></span><br><span class="line">NAME                      READY   STATUS              RESTARTS   AGE</span><br><span class="line">frontend                  0/2     ContainerCreating   0          28s</span><br><span class="line">tomcat-67c68f7479-c68fx   1/1     Running             0          56m</span><br><span class="line">tomcat-67c68f7479-q8jrx   1/1     Running             0          56m</span><br><span class="line">tomcat-67c68f7479-v27gp   1/1     Running             0          56m</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl describe pod frontend</span><br><span class="line"></span><br><span class="line">Events:</span><br><span class="line">  Type     Reason     Age                  From                Message</span><br><span class="line">  ----     ------     ----                 ----                -------</span><br><span class="line">  Normal   Scheduled  <span class="tag">&lt;<span class="name">unknown</span>&gt;</span>            default-scheduler   Successfully assigned default/frontend to k8s-node1</span><br><span class="line">  Normal   Pulling    65s                  kubelet, k8s-node1  Pulling image "wordpress"</span><br><span class="line">  Normal   Created    50s                  kubelet, k8s-node1  Created container wp</span><br><span class="line">  Normal   Started    50s                  kubelet, k8s-node1  Started container wp</span><br><span class="line">  Normal   Pulled     50s                  kubelet, k8s-node1  Successfully pulled image "wordpress"</span><br><span class="line">  Normal   Pulling    24s (x3 over 2m37s)  kubelet, k8s-node1  Pulling image "mysql"</span><br><span class="line">  Normal   Created    23s (x3 over 66s)    kubelet, k8s-node1  Created container db</span><br><span class="line">  Normal   Started    23s (x3 over 65s)    kubelet, k8s-node1  Started container db</span><br><span class="line">  Normal   Pulled     23s (x3 over 66s)    kubelet, k8s-node1  Successfully pulled image "mysql"</span><br><span class="line">  Warning  BackOff    2s (x3 over 38s)     kubelet, k8s-node1  Back-off restarting failed container</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 查看pod日志 pod中两个容器会有选择</span><br><span class="line">[root@k8s-master demo]# kubectl logs frontend</span><br><span class="line">Error from server (BadRequest): a container name must be specified for pod frontend, choose one of: [db wp]</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl logs frontend db</span><br></pre></td></tr></table></figure>
+<h3 id="检查节点容量和分配的数量"><a href="#检查节点容量和分配的数量" class="headerlink" title="检查节点容量和分配的数量"></a>检查节点容量和分配的数量</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># kubectl describe nodes k8s-node1</span><br><span class="line"># 显示的是pod的总和数据</span><br><span class="line">[root@k8s-master demo]# kubectl describe nodes k8s-node1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 查看命名空间</span><br><span class="line">[root@k8s-master demo]# kubectl get ns</span><br><span class="line">NAME              STATUS   AGE</span><br><span class="line">default           Active   26h</span><br><span class="line">kube-node-lease   Active   26h</span><br><span class="line">kube-public       Active   26h</span><br><span class="line">kube-system       Active   26h</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_36.png" width="75%"></p>
+<h2 id="Pod-重启策略"><a href="#Pod-重启策略" class="headerlink" title="Pod 重启策略"></a>Pod 重启策略</h2><ol>
+<li>再K8S中 POD 是没有重启的概念，每次都是重建</li>
+<li>jod 计划任务 都是一次性的 不适合 Always</li>
+<li>Always 适合 web服务 一直在运行 挂了再拉起一个</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">• Always：当容器终止退出后，总是重启容器，默认策略。</span><br><span class="line">• OnFailure：当容器异常退出（退出状态码非0）时，才重启容器。</span><br><span class="line">• Never:：当容器终止推出，从不重启容器。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: foo</span><br><span class="line">  image: janedoe/awesomeapp:v1</span><br><span class="line">  restartPolicy: Always</span><br></pre></td></tr></table></figure>
+<h3 id="异常退出重启"><a href="#异常退出重启" class="headerlink" title="异常退出重启"></a>异常退出重启</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl edit deployment tomcat</span><br><span class="line">restartPolicy: Always # 默认策略</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 写个例子 </span><br><span class="line"># busybox镜像 重启30秒后exit退出</span><br><span class="line">[root@k8s-master demo]# vim pod3.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: foo</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: busybox</span><br><span class="line">    image: busybox</span><br><span class="line">    args:</span><br><span class="line">    - /bin/sh</span><br><span class="line">    - -c</span><br><span class="line">    - sleep 30; exit 3</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl apply -f pod3.yaml </span><br><span class="line"></span><br><span class="line"># RESTARTS 重启的次数 运行了32秒 重启了一次 说明pod是默认Always重启策略</span><br><span class="line">[root@k8s-master demo]# kubectl get pods</span><br><span class="line">NAME                      READY   STATUS    RESTARTS   AGE</span><br><span class="line">foo                       1/1     Running   1          32s</span><br><span class="line">tomcat-67c68f7479-c68fx   1/1     Running   0          108m</span><br><span class="line">tomcat-67c68f7479-q8jrx   1/1     Running   0          108m</span><br><span class="line">tomcat-67c68f7479-v27gp   1/1     Running   0          108m</span><br></pre></td></tr></table></figure>
+<h3 id="改成正常退出不重启"><a href="#改成正常退出不重启" class="headerlink" title="改成正常退出不重启"></a>改成正常退出不重启</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# vim pod3.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: foo</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: busybox</span><br><span class="line">    image: busybox</span><br><span class="line">    args:</span><br><span class="line">    - /bin/sh</span><br><span class="line">    - -c</span><br><span class="line">    - sleep 30; exit 0</span><br><span class="line">  restartPolicy: Never</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl delete -f pod3.yaml </span><br><span class="line">pod "foo" deleted</span><br><span class="line">[root@k8s-master demo]# kubectl apply -f pod3.yaml </span><br><span class="line">pod/foo created</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl get pods</span><br><span class="line">NAME                      READY   STATUS      RESTARTS   AGE</span><br><span class="line">foo                       0/1     Completed   0          36s</span><br><span class="line">tomcat-67c68f7479-c68fx   1/1     Running     0          113m</span><br><span class="line">tomcat-67c68f7479-q8jrx   1/1     Running     0          113m</span><br><span class="line">tomcat-67c68f7479-v27gp   1/1     Running     0          113m</span><br><span class="line"></span><br><span class="line"># Completed 完成 pod不再会重启，重建</span><br><span class="line"># 正常拉起是25秒左右 </span><br><span class="line"># 持久运行的应用就是默认值</span><br></pre></td></tr></table></figure>
+<h3 id="根据yaml文件删除pod"><a href="#根据yaml文件删除pod" class="headerlink" title="根据yaml文件删除pod"></a>根据yaml文件删除pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl delete -f pod3.yaml</span><br></pre></td></tr></table></figure>
+<h2 id="Pod-健康检查-probes探针"><a href="#Pod-健康检查-probes探针" class="headerlink" title="Pod 健康检查 probes探针"></a>Pod 健康检查 probes探针</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/</span><br></pre></td></tr></table></figure>
+<ol>
+<li>service endpoints 就是service关联的pod的ip地址和端口</li>
+<li>健康检查的目的 就是再服务出现问题的情况下 能够重启pod</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">[root@k8s-master ~]# kubectl get ep</span><br><span class="line">NAME             ENDPOINTS                                            AGE</span><br><span class="line">kubernetes       172.17.70.245:6443,172.17.70.246:6443                28h</span><br><span class="line">tomcat-service   10.244.0.24:8080,10.244.0.25:8080,10.244.1.15:8080   3h56m</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>Probe有以下两种类型</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. livenessProbe</span><br><span class="line">如果检查失败，将杀死容器，根据Pod的restartPolicy来操作。</span><br><span class="line">2. readinessProbe</span><br><span class="line">如果检查失败，Kubernetes会把Pod从service endpoints中剔除。</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>Probe支持以下三种检查方法</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. httpGet</span><br><span class="line">发送HTTP请求，返回200-400范围状态码为成功。</span><br><span class="line">2. exec</span><br><span class="line">执行Shell命令返回状态码是0为成功。</span><br><span class="line">3. tcpSocket</span><br><span class="line">发起TCP Socket建立成功。</span><br></pre></td></tr></table></figure>
+<h3 id="健康检查示例"><a href="#健康检查示例" class="headerlink" title="健康检查示例"></a>健康检查示例</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# vim pod4.yaml </span><br><span class="line"># 文件不存在就是非0 </span><br><span class="line"># initialDelaySeconds: 5 # 容器启动5秒后 开始健康检查</span><br><span class="line"># periodSeconds: 5       # 每隔5秒执行一次</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    test: liveness</span><br><span class="line">  name: liveness-exec</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: liveness</span><br><span class="line">    image: busybox</span><br><span class="line">    args:</span><br><span class="line">    - /bin/sh</span><br><span class="line">    - -c</span><br><span class="line">    - touch /tmp/healthy; sleep 10; rm -rf /tmp/healthy;</span><br><span class="line">    livenessProbe:</span><br><span class="line">      exec:</span><br><span class="line">        command:</span><br><span class="line">        - cat</span><br><span class="line">        - /tmp/healthy</span><br><span class="line">      initialDelaySeconds: 5</span><br><span class="line">      periodSeconds: 5</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl apply -f pod4.yaml </span><br><span class="line">pod/liveness-exec created</span><br><span class="line"></span><br><span class="line"># </span><br><span class="line">[root@k8s-master demo]# kubectl get pods</span><br><span class="line">NAME                      READY   STATUS      RESTARTS   AGE</span><br><span class="line">foo                       0/1     Completed   0          105m</span><br><span class="line">liveness-exec             1/1     Running     1          13s</span><br><span class="line">tomcat-67c68f7479-c68fx   1/1     Running     0          3h37m</span><br><span class="line">tomcat-67c68f7479-q8jrx   1/1     Running     0          3h37m</span><br><span class="line">tomcat-67c68f7479-v27gp   1/1     Running     0          3h37m</span><br></pre></td></tr></table></figure>
+<h2 id="Pod-调度约束"><a href="#Pod-调度约束" class="headerlink" title="Pod 调度约束"></a>Pod 调度约束</h2><ol>
+<li>让pod调度到指定的节点上</li>
+<li>比如我们有很多node节点 ，希望根据部门区分，A部门使用node 123，B部门使用node 456</li>
+<li>默认的调度规则是根据资源利用率，做打分</li>
+</ol>
+<h3 id="pod工作流程图"><a href="#pod工作流程图" class="headerlink" title="pod工作流程图"></a>pod工作流程图</h3><p><img src="/img/k8s/k8s_37.png" width="75%"></p>
+<ol>
+<li>用户在命令行创建pod请求发送给 apiserver,</li>
+<li>apiserver收到请求,写入到 etcd中,里面记录了用户请求要创建的pod属性,</li>
+<li>scheduler 调度器 watch 获取 etcd中有新pod需要创建，</li>
+<li>scheduler 调度器通过算法判断交给哪个节点创建,并更新给etcd,etcd记录要调配到哪个node上,</li>
+<li>kubelet 通过 watch 从etcd中,获取哪个pod要绑定到自己node中,</li>
+<li>kubelet 拿到pod要创建的信息后,通过 docker run启动容器,将启动的Pod状态更新到etcd中,</li>
+<li>最后 kubectl get pod 请求 apiserver 从etcd中拿到 pod的状态</li>
+<li>如果创建的 deployment 还需要控制器参与处理</li>
+</ol>
+<h3 id="调度约束"><a href="#调度约束" class="headerlink" title="调度约束"></a>调度约束</h3><ol>
+<li>两个字段指定</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. nodeName用于将Pod调度到指定的Node名称上  </span><br><span class="line">2. nodeSelector用于将Pod调度到匹配Label的Node上,用于资源区分</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_38.png" width="75%"></p>
+<h3 id="指定node创建pod"><a href="#指定node创建pod" class="headerlink" title="指定node创建pod"></a>指定node创建pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# vim pod5.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: pod-example</span><br><span class="line">  labels:</span><br><span class="line">    app: nginx</span><br><span class="line">spec:</span><br><span class="line">  nodeName: k8s-node2</span><br><span class="line">  containers:</span><br><span class="line">  - name: nginx</span><br><span class="line">    image: nginx:1.16</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl apply -f pod5.yaml </span><br><span class="line"></span><br><span class="line"># 调度到 k8s-node2 </span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl get pods -o wide</span><br><span class="line">NAME                      READY   STATUS      RESTARTS   AGE    IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">foo                       0/1     Completed   0          135m   10.244.1.19   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pod-example               1/1     Running     0          44s    10.244.1.22   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">tomcat-67c68f7479-c68fx   1/1     Running     0          4h8m   10.244.1.15   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">tomcat-67c68f7479-q8jrx   1/1     Running     0          4h8m   10.244.0.25   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">tomcat-67c68f7479-v27gp   1/1     Running     0          4h8m   10.244.0.24   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl describe pod pod-example</span><br><span class="line"># 没有走调度器 直接创建 ,也就是没有default-scheduler这一步</span><br><span class="line">Events:</span><br><span class="line">  Type    Reason   Age   From                Message</span><br><span class="line">  ----    ------   ----  ----                -------</span><br><span class="line">  Normal  Pulled   63s   kubelet, k8s-node2  Container image "nginx:1.16" already present on machine</span><br><span class="line">  Normal  Created  63s   kubelet, k8s-node2  Created container nginx</span><br><span class="line">  Normal  Started  63s   kubelet, k8s-node2  Started container nginx</span><br></pre></td></tr></table></figure>
+<h3 id="通过yaml一次性删除所有pod"><a href="#通过yaml一次性删除所有pod" class="headerlink" title="通过yaml一次性删除所有pod"></a>通过yaml一次性删除所有pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# cd /opt/demo/</span><br><span class="line">[root@k8s-master demo]# kubectl delete -f .</span><br></pre></td></tr></table></figure>
+<h3 id="nodeSelector-按照标签调度"><a href="#nodeSelector-按照标签调度" class="headerlink" title="nodeSelector 按照标签调度"></a>nodeSelector 按照标签调度</h3><ol>
+<li>先给node打标签</li>
+<li>node pod 都可以设计标签</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl get nodes</span><br><span class="line">NAME        STATUS   ROLES    AGE   VERSION</span><br><span class="line">k8s-node1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   29h   v1.16.0</span><br><span class="line">k8s-node2   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   29h   v1.16.0</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl label nodes k8s-node1 team=a</span><br><span class="line">node/k8s-node1 labeled</span><br><span class="line">[root@k8s-master demo]# kubectl label nodes k8s-node2 team=b</span><br><span class="line">node/k8s-node2 labeled</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl get nodes --show-labels</span><br><span class="line">NAME        STATUS   ROLES    AGE   VERSION   LABELS</span><br><span class="line">k8s-node1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   29h   v1.16.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8s-node1,kubernetes.io/os=linux,team=a</span><br><span class="line">k8s-node2   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   29h   v1.16.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8s-node2,kubernetes.io/os=linux,team=b</span><br><span class="line"></span><br><span class="line"># 前面的都是默认，最后team才是我们自己打的标签</span><br><span class="line"># 可以区分团队node了</span><br><span class="line"># env_role: dev </span><br><span class="line"># env_role: prod</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# vim pod5.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: pod-example</span><br><span class="line">  labels:</span><br><span class="line">    app: nginx</span><br><span class="line">spec:</span><br><span class="line">  nodeSelector:</span><br><span class="line">    team: b</span><br><span class="line">  containers:</span><br><span class="line">  - name: nginx</span><br><span class="line">    image: nginx:1.16</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl delete -f . </span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl apply -f pod5.yaml </span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl get pods -o wide</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">pod-example   1/1     Running   0          8s    10.244.1.24   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl describe pod pod-example</span><br><span class="line"># 走了调度器 </span><br><span class="line">Events:</span><br><span class="line">  Type    Reason     Age        From                Message</span><br><span class="line">  ----    ------     ----       ----                -------</span><br><span class="line">  Normal  Scheduled  <span class="tag">&lt;<span class="name">unknown</span>&gt;</span>  default-scheduler   Successfully assigned default/pod-example to k8s-node2</span><br><span class="line">  Normal  Pulled     37s        kubelet, k8s-node2  Container image "nginx:1.16" already present on machine</span><br><span class="line">  Normal  Created    37s        kubelet, k8s-node2  Created container nginx</span><br><span class="line">  Normal  Started    37s        kubelet, k8s-node2  Started container nginx</span><br><span class="line"></span><br><span class="line"># 开发</span><br><span class="line"># 测试</span><br><span class="line"># 生产都在一套集群下 就可以按照标签调度</span><br><span class="line"># 创建一个pod 经过哪些流程</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_39.png" width="75%"></p>
+<h2 id="Pod-故障排查"><a href="#Pod-故障排查" class="headerlink" title="Pod 故障排查"></a>Pod 故障排查</h2><ol>
+<li>理清思路</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 官方手册</span><br><span class="line">https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/</span><br></pre></td></tr></table></figure>
+<h3 id="pod-的状态"><a href="#pod-的状态" class="headerlink" title="pod 的状态"></a>pod 的状态</h3><p><img src="/img/k8s/k8s_40.png" width="75%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># STATUS</span><br><span class="line">[root@k8s-master demo]# kubectl get pods</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod-example   1/1     Running   0          5m49s</span><br></pre></td></tr></table></figure>
+<h3 id="查看-pod-事件"><a href="#查看-pod-事件" class="headerlink" title="查看 pod 事件"></a>查看 pod 事件</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># Pending 因为某种原因而不能顺利创建 例如 下载镜像慢或者调度不成功 </span><br><span class="line"># 查看 pod 事件</span><br><span class="line">[root@k8s-master demo]# kubectl describe pod "podname"</span><br><span class="line"># 镜像问题的话 会一直处于 pulling image 的状态</span><br><span class="line"># 调度失败在上一层Scheduled </span><br><span class="line"># 顺序是从上之下 先调度 再下载镜像 最后启动容器</span><br><span class="line"></span><br><span class="line"># 下载镜像慢 可以使用加速器或者内部仓库</span><br><span class="line"># 调度失败 看看node节点是否满足创建需求 是否不能满足 或者标签不存在</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_41.png" width="75%"></p>
+<h3 id="查看-pod-日志"><a href="#查看-pod-日志" class="headerlink" title="查看 pod 日志"></a>查看 pod 日志</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># kubectl logs "podname" -n "namespace"</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl logs kube-flannel-ds-amd64-4jkk8 -n kube-system</span><br><span class="line"></span><br><span class="line"># 所以image需要做的很好 才能减少错误</span><br></pre></td></tr></table></figure>
+<h3 id="进入pod中的容器"><a href="#进入pod中的容器" class="headerlink" title="进入pod中的容器"></a>进入pod中的容器</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">kubectl describe TYPE/NAME</span><br><span class="line">kubectl logs TYPE/NAME [-c CONTAINER]</span><br><span class="line">kubectl exec POD [-c CONTAINER] -- COMMAND [args...]</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo]# kubectl exec -it pod-example bash</span><br><span class="line">root@pod-example:/#</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># running状态 但是服务没有正常启动 可以进入容器查看</span><br><span class="line"># 调度流程非常重要</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> kubernetes</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/07/k8s-03/" rel="next" title="03 kubectl 管理命令">
+                <i class="fa fa-chevron-left"></i> 03 kubectl 管理命令
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/08/k8s-05/" rel="prev" title="05 Service 与 外界连通">
+                05 Service 与 外界连通 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-简介"><span class="nav-number">1.</span> <span class="nav-text">Pod 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pod容器分类"><span class="nav-number">1.1.</span> <span class="nav-text">Pod容器分类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-实现机制"><span class="nav-number">2.</span> <span class="nav-text">Pod 实现机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#共享网络"><span class="nav-number">2.1.</span> <span class="nav-text">共享网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#共享存储"><span class="nav-number">2.2.</span> <span class="nav-text">共享存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同一Pod下的容器共享数据"><span class="nav-number">2.3.</span> <span class="nav-text">同一Pod下的容器共享数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-存在的意义"><span class="nav-number">3.</span> <span class="nav-text">Pod 存在的意义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-镜像拉取策略"><span class="nav-number">4.</span> <span class="nav-text">Pod 镜像拉取策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拉取私有仓库镜像-harbord的认证凭据"><span class="nav-number">5.</span> <span class="nav-text">拉取私有仓库镜像 harbord的认证凭据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置可信任"><span class="nav-number">5.1.</span> <span class="nav-text">配置可信任</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置k8s认证"><span class="nav-number">5.2.</span> <span class="nav-text">配置k8s认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试k8s无凭证拉取私有仓库镜像"><span class="nav-number">5.3.</span> <span class="nav-text">测试k8s无凭证拉取私有仓库镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看pod事件"><span class="nav-number">5.4.</span> <span class="nav-text">查看pod事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置凭据"><span class="nav-number">5.5.</span> <span class="nav-text">配置凭据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-资源限制"><span class="nav-number">6.</span> <span class="nav-text">Pod 资源限制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检查节点容量和分配的数量"><span class="nav-number">6.1.</span> <span class="nav-text">检查节点容量和分配的数量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-重启策略"><span class="nav-number">7.</span> <span class="nav-text">Pod 重启策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#异常退出重启"><span class="nav-number">7.1.</span> <span class="nav-text">异常退出重启</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#改成正常退出不重启"><span class="nav-number">7.2.</span> <span class="nav-text">改成正常退出不重启</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据yaml文件删除pod"><span class="nav-number">7.3.</span> <span class="nav-text">根据yaml文件删除pod</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-健康检查-probes探针"><span class="nav-number">8.</span> <span class="nav-text">Pod 健康检查 probes探针</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#健康检查示例"><span class="nav-number">8.1.</span> <span class="nav-text">健康检查示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-调度约束"><span class="nav-number">9.</span> <span class="nav-text">Pod 调度约束</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pod工作流程图"><span class="nav-number">9.1.</span> <span class="nav-text">pod工作流程图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调度约束"><span class="nav-number">9.2.</span> <span class="nav-text">调度约束</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定node创建pod"><span class="nav-number">9.3.</span> <span class="nav-text">指定node创建pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过yaml一次性删除所有pod"><span class="nav-number">9.4.</span> <span class="nav-text">通过yaml一次性删除所有pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nodeSelector-按照标签调度"><span class="nav-number">9.5.</span> <span class="nav-text">nodeSelector 按照标签调度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-故障排查"><span class="nav-number">10.</span> <span class="nav-text">Pod 故障排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pod-的状态"><span class="nav-number">10.1.</span> <span class="nav-text">pod 的状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看-pod-事件"><span class="nav-number">10.2.</span> <span class="nav-text">查看 pod 事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看-pod-日志"><span class="nav-number">10.3.</span> <span class="nav-text">查看 pod 日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进入pod中的容器"><span class="nav-number">10.4.</span> <span class="nav-text">进入pod中的容器</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

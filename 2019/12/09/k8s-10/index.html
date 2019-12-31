@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="kubernetes,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="10 k8s 容器持久化存储">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/12/09/k8s-10/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_163.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_164.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_165.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_166.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_167.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_168.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_167.png">
+<meta property="og:updated_time" content="2019-12-31T11:08:50.798Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="10 k8s 容器持久化存储">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/12/09/k8s-10/">
+
+
+
+
+
+  <title>10 k8s 容器持久化存储 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/12/09/k8s-10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">10 k8s 容器持久化存储</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-09T10:10:33+08:00">
+                2019-12-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="Volume-amp-PersistentVolume"><a href="#Volume-amp-PersistentVolume" class="headerlink" title="Volume &amp; PersistentVolume"></a>Volume &amp; PersistentVolume</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">官方文档</span><br><span class="line">https://kubernetes.io/docs/concepts/storage/volumes/</span><br></pre></td></tr></table></figure>
+<ol>
+<li>Kubernetes中的Volume提供了在容器中挂载外部存储的能力</li>
+<li>Pod需要设置卷来源（spec.volume）和挂载点（spec.containers.volumeMounts）两个信息后才可以使用相应的Volume</li>
+<li>本地数据卷<ul>
+<li>hostPath</li>
+<li>emptyDir </li>
+</ul>
+</li>
+</ol>
+<h3 id="Volume-概念"><a href="#Volume-概念" class="headerlink" title="Volume 概念"></a>Volume 概念</h3><ol>
+<li>容器中的文件在磁盘上是临时存放的，这给容器中运行的特殊应用程序带来一些问题。 </li>
+<li>首先，当容器崩溃时，kubelet 将重新启动容器，容器中的文件将会丢失——因为容器会以干净的状态重建。 </li>
+<li>其次，当在一个 Pod 中同时运行多个容器时，常常需要在这些容器之间共享文件。 </li>
+<li>Kubernetes 抽象出 Volume 对象来解决这两个问题。</li>
+</ol>
+<h3 id="Volume-支持的类型"><a href="#Volume-支持的类型" class="headerlink" title="Volume 支持的类型"></a>Volume 支持的类型</h3><ol>
+<li>本地 emptyDir hostPath </li>
+<li>网络 自建存储 ceph  </li>
+</ol>
+<h3 id="emptyDir"><a href="#emptyDir" class="headerlink" title="emptyDir"></a>emptyDir</h3><ol>
+<li>创建一个空卷，挂载到Pod中的容器。</li>
+<li>Pod删除该卷也会被删除,随着pod的生命周期 而存在 </li>
+<li>应用场景：Pod中容器之间数据共享,一个pod中有多个容器,他们之间完成数据共享,不使用数据卷容器之间的文件系统是隔离的，只能看到自己的</li>
+<li>使用数据卷让容器之间某个目录达到共享</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo2]# vim emptydir.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: my-pod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: write</span><br><span class="line">    image: centos:7</span><br><span class="line">    command: ["bash","-c","for i in &#123;1..100&#125;;do echo $i &gt;&gt; /data/hello;sleep 1;done"]</span><br><span class="line">    volumeMounts:</span><br><span class="line">      - name: data</span><br><span class="line">        mountPath: /data</span><br><span class="line"></span><br><span class="line">  - name: read</span><br><span class="line">    image: centos:7</span><br><span class="line">    command: ["bash","-c","tail -f /data/hello"]</span><br><span class="line">    volumeMounts:</span><br><span class="line">      - name: data</span><br><span class="line">        mountPath: /data</span><br><span class="line"></span><br><span class="line">  volumes:</span><br><span class="line">  - name: data</span><br><span class="line">    emptyDir: &#123;&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo2]# kubectl apply -f emptydir.yaml </span><br><span class="line">pod/my-pod created</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo2]# kubectl get pod</span><br><span class="line">NAME                     READY   STATUS    RESTARTS   AGE</span><br><span class="line">my-pod                   2/2     Running   0          4s</span><br><span class="line"></span><br><span class="line"># 两个容器 </span><br><span class="line"># write负责写</span><br><span class="line"># read读取到了数据卷中的数据</span><br><span class="line"># -f 实时输出 </span><br><span class="line">[root@k8s-master demo2]# kubectl logs my-pod -c read -f</span><br></pre></td></tr></table></figure>
+<h3 id="hostPath"><a href="#hostPath" class="headerlink" title="hostPath"></a>hostPath</h3><ol>
+<li>挂载 Node 文件系统上文件或者目录到Pod中的容器。</li>
+<li>应用场景：Pod中容器需要访问宿主机文件</li>
+<li>hostPath 有点像 Bind Mounts </li>
+<li>emptyDir 有点像 Volume</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo2]# vim hostPath.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: my-pod2</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: busybox</span><br><span class="line">    image: busybox</span><br><span class="line">    args:</span><br><span class="line">    - /bin/sh</span><br><span class="line">    - -c</span><br><span class="line">    - sleep 36000</span><br><span class="line">    volumeMounts:</span><br><span class="line">    - name: data</span><br><span class="line">      mountPath: /data</span><br><span class="line">  volumes:</span><br><span class="line">  - name: data</span><br><span class="line">    hostPath:</span><br><span class="line">      path: /tmp</span><br><span class="line">      type: Directory</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo2]# kubectl apply -f hostPath.yaml </span><br><span class="line">pod/my-pod2 created</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo2]# kubectl get pod -o wide</span><br><span class="line">my-pod2                  1/1     Running    10.244.0.33   k8s-node1</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo2]# kubectl exec -it my-pod2 sh</span><br><span class="line">/ # cd /data/</span><br><span class="line">/data # ls</span><br><span class="line">Aegis-<span class="tag">&lt;<span class="name">Guid(5A2C30A2-A87D-490A-9281-6765EDAD7CBA)</span>&gt;</span>                       systemd-private-4528dd471fc14018952a13c04541edd8-chronyd.service-GCklT8</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-node1 tmp]# touch pod2</span><br><span class="line">/data # ls -l</span><br><span class="line">total 4</span><br><span class="line">srwxr-xr-x    1 root     root    0 Nov  9 05:47 Aegis-<span class="tag">&lt;<span class="name">Guid(5A2C30A2-A87D-490A-9281-6765EDAD7CBA)</span>&gt;</span></span><br><span class="line">-rw-r--r--    1 root     root    0 Nov  9 07:39 pod2</span><br><span class="line">drwx------    3 root     root 4096 Nov  9 05:47 systemd-private-4528dd471fc14018952a13c04541edd8-chronyd.service-GCklT8</span><br></pre></td></tr></table></figure>
+<h3 id="NFS（网络存储）"><a href="#NFS（网络存储）" class="headerlink" title="NFS（网络存储）"></a>NFS（网络存储）</h3><ol>
+<li>本地数据卷 只能绑定指定的node上,如果node出现问题,node上的pod会被放到其他node上,数据就无从获取</li>
+<li><p>挂载网络卷 就算拉一起一个新的也能访问到</p>
+</li>
+<li><p>安装nfs</p>
+</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 选择master2 作为服务端</span><br><span class="line">[root@k8s-master2 ~]# yum install -y nfs-utils</span><br><span class="line"># 客户端也就是node上也要安装</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>配置服务端的访问路径 启动服务端守护进程</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master2 ~]# vim /etc/exports</span><br><span class="line">/data/nfs *(rw,no_root_squash)</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 ~]# systemctl start nfs</span><br><span class="line">[root@k8s-master2 ~]# ps -ef|grep nfs</span><br><span class="line"># 得有这个目录才能挂载</span><br><span class="line">[root@k8s-master2 ~]# mkdir -p /data/nfs</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>配置启动</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"># k8s帮我们mount 在配置文件里指定，只要安装nfs客户端即可</span><br><span class="line">[root@k8s-master demo2]# vim nfs.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: nginx-nfs-deployment</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: nginx</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: nginx</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: nginx</span><br><span class="line">        image: nginx:1.16</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - name: wwwroot</span><br><span class="line">          mountPath: /usr/share/nginx/html</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 80</span><br><span class="line">      volumes:</span><br><span class="line">      - name: wwwroot</span><br><span class="line">        nfs:</span><br><span class="line">          server: 172.17.70.245</span><br><span class="line">          path: /data/nfs</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo2]# kubectl apply -f nfs.yaml </span><br><span class="line">deployment.apps/nginx-nfs-deployment created</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo2]# kubectl get pod</span><br><span class="line">NAME                                    READY   STATUS    RESTARTS   AGE</span><br><span class="line">nginx-nfs-deployment-5b8f7c4d57-9tbgq   1/1     Running   0          3s</span><br><span class="line">nginx-nfs-deployment-5b8f7c4d57-mgvzh   1/1     Running   0          3s</span><br><span class="line">nginx-nfs-deployment-5b8f7c4d57-wqwtg   1/1     Running   0          3s</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master demo2]# kubectl exec -it nginx-nfs-deployment-5b8f7c4d57-9tbgq bash</span><br><span class="line">root@nginx-nfs-deployment-5b8f7c4d57-9tbgq:/# cd /usr/share/nginx/html/</span><br><span class="line"></span><br><span class="line"># 去nfs数据目录服务端加点东西再查看</span><br><span class="line">[root@k8s-master2 nfs]# echo "hello nginx" &gt;&gt; index.html</span><br><span class="line"># pod中的容器有了同样的文件 挂载成功</span><br><span class="line">root@nginx-nfs-deployment-5b8f7c4d57-9tbgq:/usr/share/nginx/html# ls</span><br><span class="line">index.html</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 为这组pod创建svc</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim nfs-svc.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    app: nfs-nginx</span><br><span class="line">  name: nfs-nginx</span><br><span class="line">spec:</span><br><span class="line">  type: NodePort</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80</span><br><span class="line">    protocol: TCP</span><br><span class="line">    targetPort: 80</span><br><span class="line">    nodePort: 31000</span><br><span class="line">  selector:</span><br><span class="line">    app: nginx</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl apply -f nfs-svc.yaml </span><br><span class="line">service/nfs-nginx created</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master demo2]# kubectl get ep</span><br><span class="line">NAME         ENDPOINTS                                      AGE</span><br><span class="line">kubernetes   172.17.70.246:6443                             2d7h</span><br><span class="line">my-service   10.244.0.35:80,10.244.1.35:80,10.244.1.36:80   24h</span><br><span class="line"></span><br><span class="line"># web访问</span><br><span class="line">http://123.56.14.192:31000/</span><br><span class="line"></span><br><span class="line"># 如果pod被销毁 但是数据不会丢</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 销毁</span><br><span class="line">[root@k8s-master demo2]# kubectl delete -f nfs.yaml </span><br><span class="line">deployment.apps "nginx-nfs-deployment" deleted</span><br><span class="line"># 启动</span><br><span class="line">[root@k8s-master demo2]# kubectl apply -f nfs.yaml </span><br><span class="line">deployment.apps/nginx-nfs-deployment created</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo2]# kubectl get pod</span><br><span class="line">NAME                                    READY   STATUS    RESTARTS   AGE</span><br><span class="line">nginx-nfs-deployment-5b8f7c4d57-2pg97   1/1     Running   0          28s</span><br><span class="line">nginx-nfs-deployment-5b8f7c4d57-84c6d   1/1     Running   0          28s</span><br><span class="line">nginx-nfs-deployment-5b8f7c4d57-9rh6k   1/1     Running   0          28s</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo2]# kubectl exec -it nginx-nfs-deployment-5b8f7c4d57-9rh6k bash</span><br><span class="line">root@nginx-nfs-deployment-5b8f7c4d57-9rh6k:/# cd /usr/share/nginx/html/           </span><br><span class="line">root@nginx-nfs-deployment-5b8f7c4d57-9rh6k:/usr/share/nginx/html# ls</span><br><span class="line">index.html</span><br></pre></td></tr></table></figure>
+<h2 id="PersistentVolume-持久存储数据卷"><a href="#PersistentVolume-持久存储数据卷" class="headerlink" title="PersistentVolume 持久存储数据卷"></a>PersistentVolume 持久存储数据卷</h2><ol>
+<li>PersistenVolume（PV）：对存储资源创建和使用的抽象，使得存储作为集群中的资源管理。(专业的存储人员来做)<ul>
+<li>静态 手动创建资源</li>
+<li>动态 自动创建PV</li>
+</ul>
+</li>
+<li><p>PersistentVolumeClaim（PVC）：让用户不需要关心具体的Volume实现细节,只关心用多大的容量。</p>
+</li>
+<li><p>作用: 将存储资源作为集群的一部分来管理,开发者不用关系如何创造出存储,也不必担心暴露存储的位置。</p>
+</li>
+<li><p>Pod使用持久卷在任何地点都能访问,即使POD销毁再拉起也能使用。</p>
+</li>
+<li><p>PV是提供存储容量的,PVC是消费存储的。PV与PVC的关系是绑定,绑定后其他人就无法使用了。</p>
+</li>
+</ol>
+<h3 id="pv-静态供给"><a href="#pv-静态供给" class="headerlink" title="pv 静态供给"></a>pv 静态供给</h3><p><img src="/img/k8s/k8s_163.png" width="50%">  </p>
+<ol>
+<li>容器中指定 pvc</li>
+<li>创建pvc需求模板</li>
+<li>创建pv</li>
+</ol>
+<h4 id="创建-pv"><a href="#创建-pv" class="headerlink" title="创建 pv"></a>创建 pv</h4><ol>
+<li>pv可以是存储人员定义,他们会创建很多pv等待pvc来挂载</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# cat pv-nfs.yaml </span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: PersistentVolume</span><br><span class="line">metadata:</span><br><span class="line">  name: my-pv</span><br><span class="line">spec:</span><br><span class="line">  capacity:</span><br><span class="line">    storage: 5Gi</span><br><span class="line">  accessModes:</span><br><span class="line">    - ReadWriteMany</span><br><span class="line">  nfs:</span><br><span class="line">    path: /data/nfs</span><br><span class="line">    server: 172.31.228.53</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim pv-nfs.yaml</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl apply -f pv-nfs.yaml </span><br><span class="line">persistentvolume/my-pv created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pv</span><br><span class="line">NAME    CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE</span><br><span class="line">my-pv   5Gi        RWX            Retain           Available                                   4s</span><br><span class="line"></span><br><span class="line"># Available 可用状态</span><br></pre></td></tr></table></figure>
+<h4 id="创建-deployment-指定pvc"><a href="#创建-deployment-指定pvc" class="headerlink" title="创建 deployment 指定pvc"></a>创建 deployment 指定pvc</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim nfs-pvc.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: nginx-nfs-deployment</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: nginx</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: nginx</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: nginx</span><br><span class="line">        image: nginx:1.16</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - name: wwwroot</span><br><span class="line">          mountPath: /usr/share/nginx/html</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 80</span><br><span class="line">      volumes:</span><br><span class="line">      - name: wwwroot</span><br><span class="line">        persistentVolumeClaim:</span><br><span class="line">          # pv 名称 </span><br><span class="line">          claimName: my-pvc</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: PersistentVolumeClaim</span><br><span class="line">metadata:</span><br><span class="line">  # 匹配 claimName</span><br><span class="line">  name: my-pvc</span><br><span class="line">spec:</span><br><span class="line">  # 访问模式 RMX 可以同时在多个节点上挂载并被不同的Pod使用 </span><br><span class="line">  accessModes:</span><br><span class="line">    - ReadWriteMany</span><br><span class="line">  resources:</span><br><span class="line">    requests:</span><br><span class="line">      # 请求存储大小 5G</span><br><span class="line">      storage: 5Gi</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl apply -f nfs-pvc.yaml </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME                                    READY   STATUS    RESTARTS   AGE</span><br><span class="line">nginx-nfs-deployment-7ccdb4f76f-7m6cp   1/1     Running   0          12s</span><br><span class="line">nginx-nfs-deployment-7ccdb4f76f-fmmqt   1/1     Running   0          12s</span><br><span class="line">nginx-nfs-deployment-7ccdb4f76f-x2fbj   1/1     Running   0          12s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pv,pvc</span><br><span class="line">NAME                     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM            STORAGECLASS   REASON   AGE</span><br><span class="line">persistentvolume/my-pv   5Gi        RWX            Retain           Bound    default/my-pvc                           2m55s</span><br><span class="line"></span><br><span class="line">NAME                           STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE</span><br><span class="line">persistentvolumeclaim/my-pvc   Bound    my-pv    5Gi        RWX                           39s</span><br><span class="line"></span><br><span class="line"># my-pv   状态 Bound </span><br><span class="line"># my-pvc  状态 Bound  VOLUME = my-pv </span><br><span class="line"># pv 与 pvc 绑定成功</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl exec -it nginx-nfs-deployment-7ccdb4f76f-7m6cp bash</span><br><span class="line">root@nginx-nfs-deployment-7ccdb4f76f-7m6cp:/# cd /usr/share/nginx/html/</span><br><span class="line">root@nginx-nfs-deployment-7ccdb4f76f-7m6cp:/usr/share/nginx/html# ls</span><br><span class="line">index.html</span><br></pre></td></tr></table></figure>
+<h4 id="删除-pvc-和-pv"><a href="#删除-pvc-和-pv" class="headerlink" title="删除 pvc 和 pv"></a>删除 pvc 和 pv</h4><ol>
+<li>默认情况下 删除的pvc，之前与他绑定的pv也不能够再使用了，需要手动清理pv,但是数据还在</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl delete -f nfs-pvc.yaml </span><br><span class="line">deployment.apps "nginx-nfs-deployment" deleted</span><br><span class="line">persistentvolumeclaim "my-pvc" deleted</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pv,pvc</span><br><span class="line">NAME                     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS     CLAIM            STORAGECLASS   REASON   AGE</span><br><span class="line">persistentvolume/my-pv   5Gi        RWX            Retain           Released   default/my-pvc                           9m7s</span><br><span class="line"></span><br><span class="line"># 手动删除pv</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete -f pv-nfs.yaml</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># 重新部署应用 , 查看数据</span><br><span class="line">[root@k8s-master1 demo]# kubectl apply -f pv-nfs.yaml </span><br><span class="line">[root@k8s-master1 demo]# kubectl apply -f nfs-pvc.yaml </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pv,pvc</span><br><span class="line">NAME                     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM            STORAGECLASS   REASON   AGE</span><br><span class="line">persistentvolume/my-pv   5Gi        RWX            Retain           Bound    default/my-pvc                           11s</span><br><span class="line"></span><br><span class="line">NAME                           STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE</span><br><span class="line">persistentvolumeclaim/my-pvc   Bound    my-pv    5Gi        RWX                           3s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME                                    READY   STATUS    RESTARTS   AGE</span><br><span class="line">nginx-nfs-deployment-7ccdb4f76f-9p94w   1/1     Running   0          49s</span><br><span class="line">nginx-nfs-deployment-7ccdb4f76f-jtfsm   1/1     Running   0          49s</span><br><span class="line">nginx-nfs-deployment-7ccdb4f76f-rllm5   1/1     Running   0          49s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl exec -it nginx-nfs-deployment-7ccdb4f76f-rllm5 bash</span><br><span class="line">root@nginx-nfs-deployment-7ccdb4f76f-rllm5:/# cd /usr/share/nginx/html/</span><br><span class="line">root@nginx-nfs-deployment-7ccdb4f76f-rllm5:/usr/share/nginx/html# cat index.html </span><br><span class="line">123</span><br><span class="line">root@nginx-nfs-deployment-7ccdb4f76f-rllm5:/usr/share/nginx/html# echo 666 &gt; index.html </span><br><span class="line"></span><br><span class="line">[root@k8s-node2 wwwroot]# cd /data/nfs/wwwroot/</span><br><span class="line">[root@k8s-node2 wwwroot]# cat index.html </span><br><span class="line">666</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_164.png" width="50%">  </p>
+<p><img src="/img/k8s/k8s_165.png" width="50%">  </p>
+<h4 id="总结-PV-静态供给"><a href="#总结-PV-静态供给" class="headerlink" title="总结 PV 静态供给"></a>总结 PV 静态供给</h4><ol>
+<li>持久卷静态供给,pod需要申请pvc,可以在deployment同一个yaml中定义</li>
+<li>提供数据卷定义,创建 pv</li>
+<li>pvc会根据绑定关系，尤其是存储的容量和访问模式去匹配pvc</li>
+<li>这种情况下创建pv需要手动创建，如何可以自动部署绑定</li>
+</ol>
+<h3 id="pv-动态供给"><a href="#pv-动态供给" class="headerlink" title="pv 动态供给"></a>pv 动态供给</h3><ol>
+<li>主要是针对容量问题，手动划分非常麻烦，如果pvc的容量匹配不上pv就无法绑定</li>
+<li>k8s的动态供给就是可以动态划分容量</li>
+<li>Dynamic Provisioning机制工作的核心在于StorageClass的API对象。 </li>
+<li>StorageClass声明存储插件，用于自动创建PV。</li>
+</ol>
+<h4 id="k8s-支持持久卷的存储插件"><a href="#k8s-支持持久卷的存储插件" class="headerlink" title="k8s 支持持久卷的存储插件"></a>k8s 支持持久卷的存储插件</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://kubernetes.io/docs/concepts/storage/persistent-volumes/</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_166.png" width="50%">  </p>
+<h4 id="StorageClass"><a href="#StorageClass" class="headerlink" title="StorageClass"></a>StorageClass</h4><ol>
+<li>StorageClass 是能够自动操作后端存储，并且自动创建pv 。</li>
+<li>StorageClass 声明使用哪种存储插件，它来对接存储。</li>
+<li>Kubernetes支持动态供给的存储插件：</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://kubernetes.io/docs/concepts/storage/storage-classes/</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_167.png" width="50%">  </p>
+<p><img src="/img/k8s/k8s_168.png" width="50%">  </p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 上传 storage-class</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 storage-class]# pwd</span><br><span class="line">/opt/storage-class</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 storage-class]# ls -l</span><br><span class="line">total 20</span><br><span class="line">-rw-r--r-- 1 root root 886 Dec 31 16:45 deployment-nfs.yaml</span><br><span class="line">-rw-r--r-- 1 root root 842 Dec 31 16:45 nginx-demo.yaml</span><br><span class="line">-rw-r--r-- 1 root root 703 Dec 31 16:45 pvc.yaml</span><br><span class="line">-rw-r--r-- 1 root root 949 Dec 31 16:45 rbac.yaml</span><br><span class="line">-rw-r--r-- 1 root root 120 Dec 31 16:45 storageclass-nfs.yaml</span><br></pre></td></tr></table></figure>
+<h4 id="StorageClass-定义"><a href="#StorageClass-定义" class="headerlink" title="StorageClass 定义"></a>StorageClass 定义</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 storage-class]# cat storageclass-nfs.yaml </span><br><span class="line">apiVersion: storage.k8s.io/v1beta1</span><br><span class="line">kind: StorageClass</span><br><span class="line">metadata:</span><br><span class="line">  # StorageClass 名字</span><br><span class="line">  name: managed-nfs-storage</span><br><span class="line">  # 提供者标识 外部插件</span><br><span class="line">provisioner: fuseim.pri/ifs</span><br></pre></td></tr></table></figure>
+<h4 id="提供者-自动创建pv"><a href="#提供者-自动创建pv" class="headerlink" title="提供者 自动创建pv"></a>提供者 自动创建pv</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"># 该服务帮我们自动创建pv</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 storage-class]# vim deployment-nfs.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: nfs-client-provisioner</span><br><span class="line">spec:</span><br><span class="line">  replicas: 1</span><br><span class="line">  strategy:</span><br><span class="line">    type: Recreate</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: nfs-client-provisioner</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: nfs-client-provisioner</span><br><span class="line">    spec:</span><br><span class="line">      # 授权</span><br><span class="line">      serviceAccount: nfs-client-provisioner</span><br><span class="line">      containers:</span><br><span class="line">        - name: nfs-client-provisioner</span><br><span class="line">          image: lizhenliang/nfs-client-provisioner:v2.0.0</span><br><span class="line">          volumeMounts:</span><br><span class="line">            - name: nfs-client-root</span><br><span class="line">              mountPath: /persistentvolumes</span><br><span class="line">          env:</span><br><span class="line">            - name: PROVISIONER_NAME</span><br><span class="line">              value: fuseim.pri/ifs</span><br><span class="line">              # 定义nfs地址</span><br><span class="line">            - name: NFS_SERVER</span><br><span class="line">              value: 172.31.228.53</span><br><span class="line">            - name: NFS_PATH</span><br><span class="line">              value: /data/nfs</span><br><span class="line">      volumes:</span><br><span class="line">        - name: nfs-client-root</span><br><span class="line">          nfs:</span><br><span class="line">            server: 172.31.228.53</span><br><span class="line">            path: /data/nfs</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">参考地址:</span><br><span class="line">https://github.com/kubernetes-incubator/external-storage</span><br><span class="line">https://github.com/kubernetes-incubator/external-storage/tree/master/nfs-client/deploy</span><br></pre></td></tr></table></figure>
+<h4 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h4><ol>
+<li>动态创建pv插件需要连接apiserver ，所以需要授权</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 storage-class]# cat rbac.yaml </span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  name: nfs-client-provisioner</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">kind: ClusterRole</span><br><span class="line">apiVersion: rbac.authorization.k8s.io/v1beta1</span><br><span class="line">metadata:</span><br><span class="line">  name: nfs-client-provisioner-runner</span><br><span class="line">rules:</span><br><span class="line">  - apiGroups: [""]</span><br><span class="line">    resources: ["persistentvolumes"]</span><br><span class="line">    verbs: ["get", "list", "watch", "create", "delete"]</span><br><span class="line">  - apiGroups: [""]</span><br><span class="line">    resources: ["persistentvolumeclaims"]</span><br><span class="line">    verbs: ["get", "list", "watch", "update"]</span><br><span class="line">  - apiGroups: ["storage.k8s.io"]</span><br><span class="line">    resources: ["storageclasses"]</span><br><span class="line">    verbs: ["get", "list", "watch"]</span><br><span class="line">  - apiGroups: [""]</span><br><span class="line">    resources: ["events"]</span><br><span class="line">    verbs: ["list", "watch", "create", "update", "patch"]</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">kind: ClusterRoleBinding</span><br><span class="line">apiVersion: rbac.authorization.k8s.io/v1beta1</span><br><span class="line">metadata:</span><br><span class="line">  name: run-nfs-client-provisioner</span><br><span class="line">subjects:</span><br><span class="line">  - kind: ServiceAccount</span><br><span class="line">    name: nfs-client-provisioner</span><br><span class="line">    namespace: default</span><br><span class="line">roleRef:</span><br><span class="line">  kind: ClusterRole</span><br><span class="line">  name: nfs-client-provisioner-runner</span><br><span class="line">  apiGroup: rbac.authorization.k8s.io</span><br></pre></td></tr></table></figure>
+<h4 id="创建-pv-动态供给"><a href="#创建-pv-动态供给" class="headerlink" title="创建 pv 动态供给"></a>创建 pv 动态供给</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 storage-class]# kubectl apply -f storageclass-nfs.yaml</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl apply -f rbac.yaml </span><br><span class="line">[root@k8s-master1 storage-class]# kubectl apply -f deployment-nfs.yaml </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 storage-class]# kubectl get sc</span><br><span class="line">NAME                  PROVISIONER      AGE</span><br><span class="line">managed-nfs-storage   fuseim.pri/ifs   9m27s</span><br><span class="line"></span><br><span class="line"># 查看 自动创建pv的pod 当申请资源的时候这个pod会自动去创建</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl get pods</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE</span><br><span class="line">nfs-client-provisioner-57998f486c-8nqsp   1/1     Running   0          86s</span><br></pre></td></tr></table></figure>
+<h4 id="自动供给流程"><a href="#自动供给流程" class="headerlink" title="自动供给流程"></a>自动供给流程</h4><p><img src="/img/k8s/k8s_167.png" width="50%">  </p>
+<ol>
+<li>kubectl 部署有状态应用，唯一的网路身份标识符，主机名=dns名称和持久存储 </li>
+<li>mysql主从的数据不一样的，所以需要存储保持不同的数据</li>
+<li>Statefulset 也会去维护存储，网络身份和存储都标识 0 1 2 </li>
+<li>部署一个应用存储部分会去请求 -&gt; storageclass -&gt; nfs-client-provisioner 这个pod -&gt; 请求nfs创建pv</li>
+<li>应用里面指定好 使用哪个 storageclass 就行</li>
+</ol>
+<h3 id="pv-动态供给应用案例-Statefulset-MySQL"><a href="#pv-动态供给应用案例-Statefulset-MySQL" class="headerlink" title="pv 动态供给应用案例 Statefulset + MySQL"></a>pv 动态供给应用案例 Statefulset + MySQL</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 storage-class]# cat mysql-demo.yaml</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: mysql</span><br><span class="line">spec:</span><br><span class="line">  ports:</span><br><span class="line">  - port: 3306</span><br><span class="line">    name: mysql</span><br><span class="line">  clusterIP: None</span><br><span class="line">  selector:</span><br><span class="line">    app: mysql-public</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: StatefulSet</span><br><span class="line">metadata:</span><br><span class="line">  name: db</span><br><span class="line">spec:</span><br><span class="line">  serviceName: "mysql"</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: mysql-public</span><br><span class="line">  replicas: 3</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: mysql-public</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: mysql</span><br><span class="line">        image: mysql:5.7</span><br><span class="line">        env:</span><br><span class="line">        - name: MYSQL_ROOT_PASSWORD</span><br><span class="line">          value: "123456"</span><br><span class="line">        - name: MYSQL_DATABASE</span><br><span class="line">          value: test</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 3306</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - mountPath: "/var/lib/mysql"</span><br><span class="line">          name: mysql-data</span><br><span class="line">  volumeClaimTemplates:</span><br><span class="line">  - metadata:</span><br><span class="line">      name: mysql-data</span><br><span class="line">    spec:</span><br><span class="line">      accessModes: ["ReadWriteMany"]</span><br><span class="line">      # 动态pv name</span><br><span class="line">      storageClassName: "managed-nfs-storage"</span><br><span class="line">      resources:</span><br><span class="line">        requests:</span><br><span class="line">          storage: 2Gi</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 storage-class]# kubectl get pod,pv,pvc</span><br><span class="line">NAME                                          READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/db-0                                      1/1     Running   0          32m</span><br><span class="line">pod/db-1                                      1/1     Running   0          105s</span><br><span class="line">pod/db-2                                      1/1     Running   0          28s</span><br><span class="line">pod/nfs-client-provisioner-57998f486c-8nqsp   1/1     Running   0          91m</span><br><span class="line"></span><br><span class="line">NAME                                                                                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                     STORAGECLASS          REASON   AGE</span><br><span class="line">persistentvolume/default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845   2Gi        RWX            Delete           Bound    default/mysql-data-db-0   managed-nfs-storage            32m</span><br><span class="line">persistentvolume/default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07   2Gi        RWX            Delete           Bound    default/mysql-data-db-1   managed-nfs-storage            105s</span><br><span class="line">persistentvolume/default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e   2Gi        RWX            Delete           Bound    default/mysql-data-db-2   managed-nfs-storage            28s</span><br><span class="line"></span><br><span class="line">NAME                                    STATUS   VOLUME                                                             CAPACITY   ACCESS MODES   STORAGECLASS          AGE</span><br><span class="line">persistentvolumeclaim/mysql-data-db-0   Bound    default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845   2Gi        RWX            managed-nfs-storage   32m</span><br><span class="line">persistentvolumeclaim/mysql-data-db-1   Bound    default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07   2Gi        RWX            managed-nfs-storage   105s</span><br><span class="line">persistentvolumeclaim/mysql-data-db-2   Bound    default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e   2Gi        RWX            managed-nfs-storage   29s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-node2 nfs]# ls -l</span><br><span class="line">total 16</span><br><span class="line">drwxrwxrwx 6 polkitd root 4096 Dec 31 18:07 default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845</span><br><span class="line">drwxrwxrwx 6 polkitd root 4096 Dec 31 18:37 default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07</span><br><span class="line">drwxrwxrwx 6 polkitd root 4096 Dec 31 18:37 default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e</span><br><span class="line">drwxr-xr-x 2 root    root 4096 Dec 31 16:04 wwwroot</span><br></pre></td></tr></table></figure>
+<h3 id="创建mysql-pod-去测试连接数据库"><a href="#创建mysql-pod-去测试连接数据库" class="headerlink" title="创建mysql pod 去测试连接数据库"></a>创建mysql pod 去测试连接数据库</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># mysql 通过dns访问</span><br><span class="line"># dns=pod名称.service名称.命名空间</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 storage-class]# kubectl run -it --image mysql:5.7 mysql-client  --restart=Never --rm /bin/bash</span><br><span class="line">root@mysql-client:/# mysql -h db-0.mysql.default -uroot -p</span><br><span class="line"></span><br><span class="line">mysql&gt; show databases;</span><br><span class="line">+--------------------+</span><br><span class="line">| Database           |</span><br><span class="line">+--------------------+</span><br><span class="line">| information_schema |</span><br><span class="line">| mysql              |</span><br><span class="line">| performance_schema |</span><br><span class="line">| sys                |</span><br><span class="line">| test               |</span><br><span class="line">+--------------------+</span><br><span class="line">5 rows in set (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; create database leo;</span><br></pre></td></tr></table></figure>
+<h3 id="测试删除一个pod-看能否自动挂载存储"><a href="#测试删除一个pod-看能否自动挂载存储" class="headerlink" title="测试删除一个pod 看能否自动挂载存储"></a>测试删除一个pod 看能否自动挂载存储</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 storage-class]# kubectl delete pod db-0 </span><br><span class="line"></span><br><span class="line"># 删除后自动拉起了pod</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl get pod,pv,pvc</span><br><span class="line">NAME                                          READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/db-0                                      1/1     Running   0          5s</span><br><span class="line">pod/db-1                                      1/1     Running   0          12m</span><br><span class="line">pod/db-2                                      1/1     Running   0          11m</span><br><span class="line">pod/nfs-client-provisioner-57998f486c-8nqsp   1/1     Running   0          101m</span><br><span class="line"></span><br><span class="line">NAME                                                                                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                     STORAGECLASS          REASON   AGE</span><br><span class="line">persistentvolume/default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845   2Gi        RWX            Delete           Bound    default/mysql-data-db-0   managed-nfs-storage            42m</span><br><span class="line">persistentvolume/default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07   2Gi        RWX            Delete           Bound    default/mysql-data-db-1   managed-nfs-storage            12m</span><br><span class="line">persistentvolume/default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e   2Gi        RWX            Delete           Bound    default/mysql-data-db-2   managed-nfs-storage            11m</span><br><span class="line"></span><br><span class="line">NAME                                    STATUS   VOLUME                                                             CAPACITY   ACCESS MODES   STORAGECLASS          AGE</span><br><span class="line">persistentvolumeclaim/mysql-data-db-0   Bound    default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845   2Gi        RWX            managed-nfs-storage   42m</span><br><span class="line">persistentvolumeclaim/mysql-data-db-1   Bound    default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07   2Gi        RWX            managed-nfs-storage   12m</span><br><span class="line">persistentvolumeclaim/mysql-data-db-2   Bound    default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e   2Gi        RWX            managed-nfs-storage   11m</span><br><span class="line"></span><br><span class="line"># 查看数据是否还在</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl run -it --image mysql:5.7 mysql-client  --restart=Never --rm /bin/bash</span><br><span class="line">root@mysql-client:/# mysql -h db-0.mysql.default -uroot -p</span><br><span class="line"></span><br><span class="line"># 之前创建的库还存在</span><br><span class="line">mysql&gt; show databases;</span><br><span class="line">+--------------------+</span><br><span class="line">| Database           |</span><br><span class="line">+--------------------+</span><br><span class="line">| information_schema |</span><br><span class="line">| leo                |</span><br><span class="line">| mysql              |</span><br><span class="line">| performance_schema |</span><br><span class="line">| sys                |</span><br><span class="line">| test               |</span><br><span class="line">+--------------------+</span><br><span class="line">6 rows in set (0.01 sec)</span><br></pre></td></tr></table></figure>
+<h3 id="删除-pv"><a href="#删除-pv" class="headerlink" title="删除 pv"></a>删除 pv</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">1. 先删除 与其关联的 Pod 及 PVC</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl delete -f .</span><br><span class="line"></span><br><span class="line">2. 如果还存在pv和pvc</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 storage-class]# kubectl get pod,pv,pvc</span><br><span class="line">NAME                                                                                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS        CLAIM                     STORAGECLASS          REASON   AGE</span><br><span class="line">persistentvolume/default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845   2Gi        RWX            Delete           Terminating   default/mysql-data-db-0   managed-nfs-storage            50m</span><br><span class="line">persistentvolume/default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07   2Gi        RWX            Delete           Bound         default/mysql-data-db-1   managed-nfs-storage            20m</span><br><span class="line">persistentvolume/default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e   2Gi        RWX            Delete           Bound         default/mysql-data-db-2   managed-nfs-storage            19m</span><br><span class="line"></span><br><span class="line">NAME                                    STATUS   VOLUME                                                             CAPACITY   ACCESS MODES   STORAGECLASS          AGE</span><br><span class="line">persistentvolumeclaim/mysql-data-db-0   Bound    default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845   2Gi        RWX            managed-nfs-storage   50m</span><br><span class="line">persistentvolumeclaim/mysql-data-db-1   Bound    default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07   2Gi        RWX            managed-nfs-storage   20m</span><br><span class="line">persistentvolumeclaim/mysql-data-db-2   Bound    default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e   2Gi        RWX            managed-nfs-storage   19m</span><br><span class="line"></span><br><span class="line"># 手动删除</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl delete persistentvolumeclaim/mysql-data-db-0 </span><br><span class="line">[root@k8s-master1 storage-class]# kubectl delete persistentvolumeclaim/mysql-data-db-1</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl delete persistentvolumeclaim/mysql-data-db-2</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 storage-class]# kubectl delete persistentvolume/default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl delete persistentvolume/default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl delete persistentvolume/default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e</span><br><span class="line"></span><br><span class="line"># 数据还在存储里</span><br><span class="line">[root@k8s-node2 nfs]# ls -l</span><br><span class="line"></span><br><span class="line">drwxrwxrwx 7 polkitd root 4096 Dec 31 18:50 default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845</span><br><span class="line">drwxrwxrwx 6 polkitd root 4096 Dec 31 18:50 default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07</span><br><span class="line">drwxrwxrwx 6 polkitd root 4096 Dec 31 18:50 default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e</span><br><span class="line">drwxr-xr-x 2 root    root 4096 Dec 31 16:04 wwwroot</span><br></pre></td></tr></table></figure>
+<h3 id="重新建立pv-pvc和-mysql有状态部署"><a href="#重新建立pv-pvc和-mysql有状态部署" class="headerlink" title="重新建立pv,pvc和 mysql有状态部署"></a>重新建立pv,pvc和 mysql有状态部署</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"># 如果删除了 pv和pvc 再重新创建pod 是会重新分配存储 </span><br><span class="line">[root@k8s-master1 storage-class]# kubectl apply -f storageclass-nfs.yaml</span><br><span class="line">[root@k8s-master1 storage-class]# kubectl apply -f rbac.yaml </span><br><span class="line">[root@k8s-master1 storage-class]# kubectl apply -f deployment-nfs.yaml </span><br><span class="line">[root@k8s-master1 storage-class]# kubectl apply -f mysql-demo.yaml</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 storage-class]# kubectl get pods,pvc,pv</span><br><span class="line">NAME                                          READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/db-0                                      1/1     Running   0          2m35s</span><br><span class="line">pod/db-1                                      1/1     Running   0          103s</span><br><span class="line">pod/db-2                                      1/1     Running   0          101s</span><br><span class="line">pod/nfs-client-provisioner-57998f486c-m5x25   1/1     Running   0          116s</span><br><span class="line"></span><br><span class="line">NAME                                    STATUS   VOLUME                                                             CAPACITY   ACCESS MODES   STORAGECLASS          AGE</span><br><span class="line">persistentvolumeclaim/mysql-data-db-0   Bound    default-mysql-data-db-0-pvc-55657d89-f615-420c-a481-a1d4422c86c5   2Gi        RWX            managed-nfs-storage   4m7s</span><br><span class="line">persistentvolumeclaim/mysql-data-db-1   Bound    default-mysql-data-db-1-pvc-e94b491f-380a-48a2-b152-a7c76af2c603   2Gi        RWX            managed-nfs-storage   103s</span><br><span class="line">persistentvolumeclaim/mysql-data-db-2   Bound    default-mysql-data-db-2-pvc-a8c0a2d8-af2d-422f-910b-01f2f2a11563   2Gi        RWX            managed-nfs-storage   101s</span><br><span class="line"></span><br><span class="line">NAME                                                                                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                     STORAGECLASS          REASON   AGE</span><br><span class="line">persistentvolume/default-mysql-data-db-0-pvc-55657d89-f615-420c-a481-a1d4422c86c5   2Gi        RWX            Delete           Bound    default/mysql-data-db-0   managed-nfs-storage            105s</span><br><span class="line">persistentvolume/default-mysql-data-db-1-pvc-e94b491f-380a-48a2-b152-a7c76af2c603   2Gi        RWX            Delete           Bound    default/mysql-data-db-1   managed-nfs-storage            103s</span><br><span class="line">persistentvolume/default-mysql-data-db-2-pvc-a8c0a2d8-af2d-422f-910b-01f2f2a11563   2Gi        RWX            Delete           Bound    default/mysql-data-db-2   managed-nfs-storage            100s</span><br><span class="line"></span><br><span class="line"># 新建了存储目录 </span><br><span class="line">[root@k8s-node2 nfs]# ls -l</span><br><span class="line">total 28</span><br><span class="line">drwxrwxrwx 6 polkitd root 4096 Dec 31 19:02 default-mysql-data-db-0-pvc-55657d89-f615-420c-a481-a1d4422c86c5</span><br><span class="line">drwxrwxrwx 7 polkitd root 4096 Dec 31 18:50 default-mysql-data-db-0-pvc-ebc9a67d-1558-4cf6-b35d-004ae6393845</span><br><span class="line">drwxrwxrwx 6 polkitd root 4096 Dec 31 18:50 default-mysql-data-db-1-pvc-da2b75e9-7d93-40c6-b47e-9b3df2ebab07</span><br><span class="line">drwxrwxrwx 5 polkitd root 4096 Dec 31 19:02 default-mysql-data-db-1-pvc-e94b491f-380a-48a2-b152-a7c76af2c603</span><br><span class="line">drwxrwxrwx 6 polkitd root 4096 Dec 31 18:50 default-mysql-data-db-2-pvc-298c380a-8d61-4372-9503-8d886723089e</span><br><span class="line">drwxrwxrwx 6 polkitd root 4096 Dec 31 19:02 default-mysql-data-db-2-pvc-a8c0a2d8-af2d-422f-910b-01f2f2a11563</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 storage-class]# kubectl run -it --image mysql:5.7 mysql-client  --restart=Never --rm /bin/bash</span><br><span class="line">root@mysql-client:/# mysql -h db-0.mysql.default -uroot -p</span><br><span class="line"></span><br><span class="line">mysql&gt; show databases;</span><br><span class="line">+--------------------+</span><br><span class="line">| Database           |</span><br><span class="line">+--------------------+</span><br><span class="line">| information_schema |</span><br><span class="line">| mysql              |</span><br><span class="line">| performance_schema |</span><br><span class="line">| sys                |</span><br><span class="line">| test               |</span><br><span class="line">+--------------------+</span><br><span class="line">5 rows in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> kubernetes</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/09/k8s-09/" rel="next" title="09 k8s Ingress 与外界连通">
+                <i class="fa fa-chevron-left"></i> 09 k8s Ingress 与外界连通
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/24/k8s-11/" rel="prev" title="11 k8s 项目迁移 简单版">
+                11 k8s 项目迁移 简单版 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Volume-amp-PersistentVolume"><span class="nav-number">1.</span> <span class="nav-text">Volume &amp; PersistentVolume</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Volume-概念"><span class="nav-number">1.1.</span> <span class="nav-text">Volume 概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Volume-支持的类型"><span class="nav-number">1.2.</span> <span class="nav-text">Volume 支持的类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#emptyDir"><span class="nav-number">1.3.</span> <span class="nav-text">emptyDir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hostPath"><span class="nav-number">1.4.</span> <span class="nav-text">hostPath</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NFS（网络存储）"><span class="nav-number">1.5.</span> <span class="nav-text">NFS（网络存储）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PersistentVolume-持久存储数据卷"><span class="nav-number">2.</span> <span class="nav-text">PersistentVolume 持久存储数据卷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pv-静态供给"><span class="nav-number">2.1.</span> <span class="nav-text">pv 静态供给</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-pv"><span class="nav-number">2.1.1.</span> <span class="nav-text">创建 pv</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-deployment-指定pvc"><span class="nav-number">2.1.2.</span> <span class="nav-text">创建 deployment 指定pvc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除-pvc-和-pv"><span class="nav-number">2.1.3.</span> <span class="nav-text">删除 pvc 和 pv</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结-PV-静态供给"><span class="nav-number">2.1.4.</span> <span class="nav-text">总结 PV 静态供给</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pv-动态供给"><span class="nav-number">2.2.</span> <span class="nav-text">pv 动态供给</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#k8s-支持持久卷的存储插件"><span class="nav-number">2.2.1.</span> <span class="nav-text">k8s 支持持久卷的存储插件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#StorageClass"><span class="nav-number">2.2.2.</span> <span class="nav-text">StorageClass</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#StorageClass-定义"><span class="nav-number">2.2.3.</span> <span class="nav-text">StorageClass 定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#提供者-自动创建pv"><span class="nav-number">2.2.4.</span> <span class="nav-text">提供者 自动创建pv</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#授权"><span class="nav-number">2.2.5.</span> <span class="nav-text">授权</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-pv-动态供给"><span class="nav-number">2.2.6.</span> <span class="nav-text">创建 pv 动态供给</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自动供给流程"><span class="nav-number">2.2.7.</span> <span class="nav-text">自动供给流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pv-动态供给应用案例-Statefulset-MySQL"><span class="nav-number">2.3.</span> <span class="nav-text">pv 动态供给应用案例 Statefulset + MySQL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建mysql-pod-去测试连接数据库"><span class="nav-number">2.4.</span> <span class="nav-text">创建mysql pod 去测试连接数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试删除一个pod-看能否自动挂载存储"><span class="nav-number">2.5.</span> <span class="nav-text">测试删除一个pod 看能否自动挂载存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除-pv"><span class="nav-number">2.6.</span> <span class="nav-text">删除 pv</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重新建立pv-pvc和-mysql有状态部署"><span class="nav-number">2.7.</span> <span class="nav-text">重新建立pv,pvc和 mysql有状态部署</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="k8s,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="04 k8s 弹性伸缩">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/12/06/k8s-base06/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_76.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_77.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_78.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_79.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_80.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_81.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_82.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_83.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_84.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_85.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_86.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_87.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_88.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_89.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_90.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_92.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_91.png">
+<meta property="og:updated_time" content="2019-12-13T09:13:55.975Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="04 k8s 弹性伸缩">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/12/06/k8s-base06/">
+
+
+
+
+
+  <title>04 k8s 弹性伸缩 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/12/06/k8s-base06/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">04 k8s 弹性伸缩</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-06T17:13:51+08:00">
+                2019-12-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/k8s/" itemprop="url" rel="index">
+                    <span itemprop="name">k8s</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="传统弹性伸缩的困境"><a href="#传统弹性伸缩的困境" class="headerlink" title="传统弹性伸缩的困境"></a>传统弹性伸缩的困境</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 简单理解,资源不够了加机器,资源多了减机器</span><br><span class="line">2. 从传统意义上，弹性伸缩主要解决的问题是 容量规划与实际负载的矛盾。</span><br><span class="line">3. 资源池能否快速扩大,快速回收</span><br><span class="line">4. 快速的流量突发难以提前预知</span><br><span class="line">5. 已知的可以提前准备,如遇到活动业务</span><br></pre></td></tr></table></figure>
+<ol>
+<li>从传统意义上，弹性伸缩:主要解决的问题是 容量规划 与 实际负载 的矛盾。</li>
+<li>蓝色水位线表示集群资源容量随着负载的增加不断扩容，红色曲线表示集群资源实际负载变化。</li>
+<li>弹性伸缩就是要解决当实际负载增大，而集群资源容量没来得及反应的问题。</li>
+</ol>
+<p><img src="/img/k8s/k8s_76.png" width="50%"></p>
+<h3 id="Kubernetes-中弹性伸缩存在的问题"><a href="#Kubernetes-中弹性伸缩存在的问题" class="headerlink" title="Kubernetes 中弹性伸缩存在的问题"></a>Kubernetes 中弹性伸缩存在的问题</h3><ol>
+<li>常规的做法是给集群资源预留保障集群可用，通常20%左右。</li>
+<li>这种方式看似没什么问题，但放到Kubernetes中，就会发现如下2个问题。</li>
+</ol>
+<h4 id="机器规格不统一-造成机器利用率百分比碎片化"><a href="#机器规格不统一-造成机器利用率百分比碎片化" class="headerlink" title="机器规格不统一,造成机器利用率百分比碎片化"></a>机器规格不统一,造成机器利用率百分比碎片化</h4><ol>
+<li>在一个Kubernetes集群中，通常不只包含一种规格的机器，</li>
+<li>假设集群中存在4C8G与16C32G两种规格的机器，对于10%的资源预留，这两种规格代表的意义是完全不同的。</li>
+</ol>
+<p><img src="/img/k8s/k8s_77.png" width="50%"></p>
+<ol start="3">
+<li>特别是在缩容的场景下，为了保证缩容后集群稳定性，我们一般会一个节点一个节点从集群中摘除，</li>
+<li>那么如何判断节点是否可以摘除其利用率百分比就是重要的指标。</li>
+<li>此时如果大规格机器有较低的利用率被判断缩容，那么很有可能会造成节点缩容后，容器重新调度后的争抢。</li>
+<li>如果优先缩容小规格机器，则可能造成缩容后资源的大量冗余。</li>
+</ol>
+<h4 id="机器利用率不能单纯依靠宿主机计算"><a href="#机器利用率不能单纯依靠宿主机计算" class="headerlink" title="机器利用率不能单纯依靠宿主机计算"></a>机器利用率不能单纯依靠宿主机计算</h4><ol>
+<li>在大部分生产环境中，资源利用率都不会保持一个高的水位，但从调度来讲，调度应该保持一个比较高的水位，这样才能保障集群稳定性，又不过多浪费资源。</li>
+</ol>
+<h2 id="弹性伸缩概念的延伸"><a href="#弹性伸缩概念的延伸" class="headerlink" title="弹性伸缩概念的延伸"></a>弹性伸缩概念的延伸</h2><ol>
+<li>不是所有的业务都存在峰值流量，越来越细分的业务形态带来更多成本节省和可用性之间的跳转。</li>
+<li>不同类型的负载对于弹性伸缩的要求有所不同，在线负载对弹出时间敏感，离线任务对价格敏感，定时任务对调度敏感。</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 在线负载型：微服务、网站、API</span><br><span class="line">2. 离线任务型：离线计算、机器学习</span><br><span class="line">3. 定时任务型：定时批量计算</span><br></pre></td></tr></table></figure>
+<h3 id="kubernetes-弹性伸缩布局"><a href="#kubernetes-弹性伸缩布局" class="headerlink" title="kubernetes 弹性伸缩布局"></a>kubernetes 弹性伸缩布局</h3><ol>
+<li>在 Kubernetes 的生态中，在多个维度、多个层次提供了不同的组件来满足不同的伸缩场景。</li>
+<li>有三种弹性伸缩：</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- CA（Cluster Autoscaler）：Node级别自动扩/缩容  适用于,无状态应用 </span><br><span class="line">    cluster-autoscaler组件  适用于,无状态应用  </span><br><span class="line"></span><br><span class="line">- HPA（Horizontal Pod Autoscaler）：Pod个数自动扩/缩容</span><br><span class="line"></span><br><span class="line">- VPA（Vertical Pod Autoscaler）：Pod配置自动扩/缩容，主要是CPU、内存</span><br><span class="line">    addon-resizer组件  适用于,有状态应用</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>如果在云上建议 HPA 结合 cluster-autoscaler 的方式进行集群的弹性伸缩管理。</li>
+</ol>
+<h2 id="Node-自动扩容-缩容"><a href="#Node-自动扩容-缩容" class="headerlink" title="Node 自动扩容/缩容"></a>Node 自动扩容/缩容</h2><h3 id="Cluster-AutoScaler"><a href="#Cluster-AutoScaler" class="headerlink" title="Cluster AutoScaler"></a>Cluster AutoScaler</h3><ol>
+<li>扩容：Cluster AutoScaler 定期检测是否有充足的资源来调度新创建的 Pod，当资源不足时会调用 Cloud Provider 创建新的 Node。</li>
+</ol>
+<p><img src="/img/k8s/k8s_78.png" width="50%"></p>
+<ol start="2">
+<li>缩容：Cluster AutoScaler 也会定期监测 Node 的资源使用情况，当一个 Node 长时间资源利用率都很低时（低于 50%）自动将其所在虚拟机从云服务商中删除。此时，原来的 Pod 会自动调度到其他 Node 上面。</li>
+</ol>
+<p><img src="/img/k8s/k8s_79.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">支持的云提供商：</span><br><span class="line"></span><br><span class="line"># aliyun:   https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/alicloud/README.md</span><br><span class="line"># AWS:      https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md</span><br><span class="line"># Azure:    https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/azure/README.md</span><br></pre></td></tr></table></figure>
+<h3 id="Ansible-扩容-Node"><a href="#Ansible-扩容-Node" class="headerlink" title="Ansible 扩容 Node"></a>Ansible 扩容 Node</h3><ol>
+<li>自动化流程：</li>
+</ol>
+<p><img src="/img/k8s/k8s_80.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. 触发新增Node</span><br><span class="line">2. 调用Ansible脚本部署组件</span><br><span class="line">3. 检查服务是否可用</span><br><span class="line">4. 调用API将新Node加入集群或者启用Node自动加入</span><br><span class="line">5. 观察新Node状态</span><br><span class="line">6. 完成Node扩容，接收新Pod</span><br></pre></td></tr></table></figure>
+<h4 id="扩容"><a href="#扩容" class="headerlink" title="扩容"></a>扩容</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 模拟场景：创建超出当前资源的 pod，使当前k8s环境又需要扩容node的需求</span><br><span class="line"># 1. 查看当前各个node节点配置</span><br><span class="line"># 服务器配置是 2c2G</span><br><span class="line">[root@k8s-master1 ~]# kubectl get nodes</span><br><span class="line">NAME        STATUS   ROLES    AGE   VERSION</span><br><span class="line">k8s-node1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h   v1.16.0</span><br><span class="line">k8s-node2   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h   v1.16.0</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># 2. 创建超出当前资源的 pod </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl run web --image=nginx:1.16 --replicas=4 --requests='cpu=1,memory=256Mi'</span><br><span class="line">kubectl run --generator=deployment/apps.v1 is DEPRECATED and will be removed in a future version. Use kubectl run --generator=run-pod/v1 or kubectl create instead.</span><br><span class="line">deployment.apps/web created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl get pods -o wide</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">web-584dbdb99d-2cv2z   0/1     Pending   0          8s    <span class="tag">&lt;<span class="name">none</span>&gt;</span>        <span class="tag">&lt;<span class="name">none</span>&gt;</span>      <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-584dbdb99d-crfdz   1/1     Running   0          8s    10.244.1.13   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-584dbdb99d-hclmf   1/1     Running   0          8s    10.244.0.11   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-584dbdb99d-mtthk   0/1     Pending   0          8s    <span class="tag">&lt;<span class="name">none</span>&gt;</span>        <span class="tag">&lt;<span class="name">none</span>&gt;</span>      <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl describe pod/web-584dbdb99d-2cv2z</span><br><span class="line"># scheduler 调度器提示 2个node 都不满足 cpu不充足</span><br><span class="line"></span><br><span class="line">Events:</span><br><span class="line">  Type     Reason            Age        From               Message</span><br><span class="line">  ----     ------            ----       ----               -------</span><br><span class="line">  Warning  FailedScheduling  <span class="tag">&lt;<span class="name">unknown</span>&gt;</span>  default-scheduler  0/2 nodes are available: 2 Insufficient cpu.</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 3. 准备 k8s-node3 节点</span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# cat hosts </span><br><span class="line">[newnode]</span><br><span class="line">172.17.70.252 node_name=k8s-node3</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 4. 部署k8s-node3节点</span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# ansible-playbook -i hosts add-node.yaml -uroot -k</span><br><span class="line">[root@k8s-master2 ~]# ps -ef|grep kube</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"># 5. 手动加入集群 </span><br><span class="line"># 如果是物理服务器,别忘记时间需要同步 ntpdate time.windows.com </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl get csr</span><br><span class="line">NAME                                                   AGE    REQUESTOR           CONDITION</span><br><span class="line">node-csr-y6GEkP8FXoD3VJnj-BkmrKBO6vSPA32Coi3Wf2Vu9og   8m6s   kubelet-bootstrap   Pending</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl certificate approve node-csr-y6GEkP8FXoD3VJnj-BkmrKBO6vSPA32Coi3Wf2Vu9og</span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl get csr</span><br><span class="line">NAME                                                   AGE     REQUESTOR           CONDITION</span><br><span class="line">node-csr-y6GEkP8FXoD3VJnj-BkmrKBO6vSPA32Coi3Wf2Vu9og   9m44s   kubelet-bootstrap   Approved,Issued</span><br><span class="line"></span><br><span class="line"># daemonset 自动部署了 flannel</span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl get nodes</span><br><span class="line">NAME        STATUS   ROLES    AGE   VERSION</span><br><span class="line">k8s-node1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h   v1.16.0</span><br><span class="line">k8s-node2   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h   v1.16.0</span><br><span class="line">k8s-node3   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   42s   v1.16.0</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl get pods</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE</span><br><span class="line">web-584dbdb99d-2cv2z   1/1     Running   0          7m40s</span><br><span class="line">web-584dbdb99d-crfdz   1/1     Running   0          7m40s</span><br><span class="line">web-584dbdb99d-hclmf   1/1     Running   0          7m40s</span><br><span class="line">web-584dbdb99d-mtthk   0/1     Pending   0          7m40s</span><br><span class="line"></span><br><span class="line"># 资源多起来一台 还是资源不够 所有还需要扩容~ 但是扩容的操作已经成功</span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl describe node k8s-node3</span><br><span class="line"></span><br><span class="line"># 修改配置 再启动</span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl delete deployment/web</span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl run web --image=nginx:1.16 --replicas=4 --requests='cpu=500m,memory=256Mi'</span><br><span class="line">[root@k8s-master1 ansible-k8s-deploy]# kubectl get pods</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE</span><br><span class="line">web-868b6f9d7f-5j4d9   1/1     Running   0          3s</span><br><span class="line">web-868b6f9d7f-98wc4   1/1     Running   0          3s</span><br><span class="line">web-868b6f9d7f-spmsd   1/1     Running   0          3s</span><br><span class="line">web-868b6f9d7f-wlnw7   1/1     Running   0          3s</span><br></pre></td></tr></table></figure>
+<h4 id="缩容"><a href="#缩容" class="headerlink" title="缩容"></a>缩容</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 考虑的较多</span><br><span class="line"># 1. 集群中哪个节点可以删除 资源利用率最低 </span><br><span class="line"># 2. 跑的POD 最少  </span><br><span class="line"># 3. 人工干预</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 平滑移除了一个 k8s 节点,正确流程如下:</span><br><span class="line"># 1. 获取节点列表</span><br><span class="line"># 可以下线pod最少的node,这次测试 就下线node3 </span><br><span class="line">[root@k8s-master1 ~]# kubectl get nodes</span><br><span class="line">NAME        STATUS   ROLES    AGE     VERSION</span><br><span class="line">k8s-node1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h     v1.16.0</span><br><span class="line">k8s-node2   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h     v1.16.0</span><br><span class="line">k8s-node3   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   8m45s   v1.16.0</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 2. 设置不可调度</span><br><span class="line"># 防止有新的pod调度过来</span><br><span class="line">[root@k8s-master1 ~]#  kubectl cordon k8s-node3</span><br><span class="line">node/k8s-node3 cordoned</span><br><span class="line">[root@k8s-master1 ~]# kubectl get nodes</span><br><span class="line">NAME        STATUS                     ROLES    AGE   VERSION</span><br><span class="line">k8s-node1   Ready                      <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h   v1.16.0</span><br><span class="line">k8s-node2   Ready                      <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h   v1.16.0</span><br><span class="line">k8s-node3   Ready,SchedulingDisabled   <span class="tag">&lt;<span class="name">none</span>&gt;</span>   10m   v1.16.0</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 3. 驱逐这个节点上的已有的pod 到其他节点</span><br><span class="line"># 将节点设置为 维护状态并驱逐pod,但是忽略驱逐daemonsets (--ignore-daemonsets)</span><br><span class="line"># 在驱逐之前也要考虑计算其他节点是否有足够的资源,可以接纳node3上的pod</span><br><span class="line">[root@k8s-master1 ~]# kubectl drain k8s-node3 --ignore-daemonsets</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods -o wide</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE     IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">web-868b6f9d7f-5j4d9   1/1     Running   0          9m33s   10.244.1.14   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-868b6f9d7f-ctxk5   1/1     Running   0          48s     10.244.1.15   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-868b6f9d7f-wlnw7   1/1     Running   0          9m33s   10.244.0.12   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-868b6f9d7f-wngdw   1/1     Running   0          48s     10.244.0.13   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 驱逐流程:</span><br><span class="line">1. 删除下线节点上的pod</span><br><span class="line">2. pod 是deployment 维护副本数,是由控制器来维护操作并拉起指定的副本数，该操作会走调度</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 4. 移除节点</span><br><span class="line"># 该节点上已经没有任何资源了，可以直接移除节点</span><br><span class="line">[root@k8s-master1 ~]# kubectl delete node k8s-node3</span><br><span class="line">node "k8s-node3" deleted</span><br><span class="line">[root@k8s-master1 ~]# kubectl get nodes</span><br><span class="line">NAME        STATUS   ROLES    AGE   VERSION</span><br><span class="line">k8s-node1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h   v1.16.0</span><br><span class="line">k8s-node2   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   17h   v1.16.0</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 总结:</span><br><span class="line">1. 如果直接关闭node3服务器,模拟自动出现故障,k8s大约需要5分钟才能调度,而驱逐是即时操作,不如驱逐效率</span><br><span class="line">2. 重启node3的kubelet 可以重新发送加入请求,并加入到集群中</span><br><span class="line">3. 如何自动通过csr 怎么配置</span><br><span class="line">4. 当前是自动化 和 人工干预 对node的扩容和缩容</span><br></pre></td></tr></table></figure>
+<h2 id="Pod-自动扩容-缩容（HPA）"><a href="#Pod-自动扩容-缩容（HPA）" class="headerlink" title="Pod 自动扩容/缩容（HPA）"></a>Pod 自动扩容/缩容（HPA）</h2><ol>
+<li>Horizontal Pod Autoscaler（HPA，Pod水平自动伸缩），根据资源利用率或者自定义指标自动调整 replication controller, deployment 或 replica set，</li>
+<li>实现部署的自动扩展和缩减，让部署的规模接近于实际服务的负载。HPA不适于无法缩放的对象，例如DaemonSet。</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1. 针对pod的利用率做计算 然后调整副本数量</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_81.png" width="50%"></p>
+<h3 id="HPA-基本原理"><a href="#HPA-基本原理" class="headerlink" title="HPA 基本原理"></a>HPA 基本原理</h3><ol>
+<li>Kubernetes 中的组件 Metrics Server 持续采集所有 Pod 副本的指标数据。 (heapster 在k8s 1.13 版本后 被弃用了)</li>
+<li>HPA 控制器通过 Metrics Server 的 API（Heapster 的 API 或聚合 API）获取这些数据，基于用户定义的扩缩容规则进行计算，得到目标 Pod 副本数量。</li>
+<li>当目标 Pod 副本数量与当前副本数量不同时，HPA 控制器就向 Pod 的副本控制器（Deployment、RC 或 ReplicaSet）发起 scale 操作，调整 Pod 的副本数量，完成扩缩容操作。</li>
+</ol>
+<p><img src="/img/k8s/k8s_82.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. HPA需要创建规则，里面定义好缩容和扩容范围,设置好对象,设置阈值</span><br><span class="line">2. HPA会去从Metrics Server中 获取指标,判断是否到达HPA的阈值,如果是,会去执行deployment scale去扩容</span><br><span class="line">3. 如果长期在低使用率会帮我们缩容POD副本</span><br><span class="line">4. Metrics Server 从cadvisor中获取</span><br><span class="line">5. cadvisor 提供哪些指标? CPU、内存 的使用率，cadvisor 采集容器的资源利用率</span><br></pre></td></tr></table></figure>
+<h3 id="扩容冷却-和-缩容冷却"><a href="#扩容冷却-和-缩容冷却" class="headerlink" title="扩容冷却 和 缩容冷却"></a>扩容冷却 和 缩容冷却</h3><ol>
+<li>在弹性伸缩中，冷却周期是不能逃避的一个话题， 由于评估的度量标准是动态特性，副本的数量可能会不断波动。有时被称为颠簸，所以在每次做出扩容缩容后，冷却时间是多少。</li>
+<li>在 HPA 中，<strong>默认的扩容冷却周期是 3 分钟，缩容冷却周期是 5 分钟。</strong></li>
+<li>可以通过调整 kube-controller-manager 组件启动参数设置冷却时间：</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">--horizontal-pod-autoscaler-downscale-delay ： 扩容冷却</span><br><span class="line">--horizontal-pod-autoscaler-upscale-delay ：   缩容冷却</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">pod1 pod2 pod3      # cpu使用率 50%</span><br><span class="line">HPA                 # cpu阈值   60%   周期对比pod的cpu使用率  </span><br><span class="line"> </span><br><span class="line"># HPA 指标: </span><br><span class="line">1. 最大创建POD数量 最小POD数量</span><br><span class="line">2. 阈值</span><br><span class="line">3. 对象 操作哪一组POD</span><br><span class="line"></span><br><span class="line"># 转化</span><br><span class="line">扩容: cpu利用率 70%了 扩容 3-10个副本</span><br><span class="line">缩容: 马上利用率下降了 到20%了 由10个 降低到 5个  </span><br><span class="line">这个转化时间频率不能太高,如果太高或者利用率间隙触发,业务不稳定，HPA拥有冷却机制</span><br><span class="line">1. 第一次扩容之后,第二次扩容需要经过扩容冷却时间, 默认三分钟</span><br><span class="line">2. 第一次缩容之后,第二次缩容需要经过缩容冷却时间, 默认五分钟</span><br><span class="line">3. 这些都在 kube-controller-manager 组件参数中设置</span><br><span class="line">4. 不断的扩容、缩容这种现象，成为颠簸</span><br></pre></td></tr></table></figure>
+<h3 id="HPA-的演进历程"><a href="#HPA-的演进历程" class="headerlink" title="HPA 的演进历程"></a>HPA 的演进历程</h3><ol>
+<li>目前 HPA 已经支持了 autoscaling/v1、autoscaling/v2beta1 和 autoscaling/v2beta2  三个大版本。</li>
+<li>目前大多数人比较熟悉是 autoscaling/v1 ，这个版本只支持 CPU 一个指标的弹性伸缩。</li>
+<li>而 autoscaling/v2beta1 增加了支持自定义指标， 如第三方支持QPS</li>
+<li>autoscaling/v2beta2 又额外增加了外部指标支持。 </li>
+<li>而产生这些变化不得不提的是Kubernetes社区对监控与监控指标的认识与转变。从早期Heapster到Metrics Server再到将指标边界进行划分，一直在丰富监控生态。</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. autoscaling/v1版本 只暴露了cpu 为什么没有暴露内存 ? 因为内存不是很好的提现弹性伸缩的指标,都是应用在调整</span><br><span class="line">2. autoscaling/v2beta2 增加更多的指标</span><br></pre></td></tr></table></figure>
+<h2 id="基于-CPU-指标缩放"><a href="#基于-CPU-指标缩放" class="headerlink" title="基于 CPU 指标缩放"></a>基于 CPU 指标缩放</h2><h3 id="Kubernetes-API-Aggregation"><a href="#Kubernetes-API-Aggregation" class="headerlink" title="Kubernetes API Aggregation"></a>Kubernetes API Aggregation</h3><ol>
+<li>在 Kubernetes 1.7 版本引入了聚合层，允许第三方应用程序通过将自己注册到kube-apiserver上，仍然通过 API Server 的 HTTP URL 对新的 API 进行访问和操作。</li>
+<li>为了实现这个机制，Kubernetes 在 kube-apiserver 服务中引入了一个 API 聚合层（API Aggregation Layer），用于将扩展 API 的访问请求转发到用户服务的功能。</li>
+</ol>
+<p><img src="/img/k8s/k8s_83.png" width="50%"></p>
+<ol start="3">
+<li>当你访问 apis/metrics.k8s.io/v1beta1 的时候，实际上访问到的是一个叫作 kube-aggregator 的代理。而 kube-apiserver，正是这个代理的一个后端；而 Metrics Server，则是另一个后端 。</li>
+<li>通过这种方式，我们就可以很方便地扩展 Kubernetes 的 API 了。</li>
+<li>如果你使用kubeadm部署的，默认已开启。</li>
+<li>如果你使用二进制方式部署的话，需要在kube-APIServer中添加启动参数，增加以下配置：</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># vi /opt/kubernetes/cfg/kube-apiserver.conf</span><br><span class="line">...</span><br><span class="line"># 指定ca根证书和客户端证书 访问聚合层的认证</span><br><span class="line">--requestheader-client-ca-file=/opt/kubernetes/ssl/ca.pem \</span><br><span class="line">--proxy-client-cert-file=/opt/kubernetes/ssl/server.pem \</span><br><span class="line">--proxy-client-key-file=/opt/kubernetes/ssl/server-key.pem \</span><br><span class="line"># server.pem 证书cn名称 = kubernetes </span><br><span class="line">--requestheader-allowed-names=kubernetes \</span><br><span class="line"># 请求头信息 </span><br><span class="line">--requestheader-extra-headers-prefix=X-Remote-Extra- \</span><br><span class="line">--requestheader-group-headers=X-Remote-Group \</span><br><span class="line">--requestheader-username-headers=X-Remote-User \</span><br><span class="line"># 启用聚合层路由 </span><br><span class="line">--enable-aggregator-routing=true \</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>在设置完成 重启 kube-apiserver 服务，就启用 API 聚合功能了。  </li>
+</ol>
+<h3 id="开启-kube-apiserver-聚合层"><a href="#开启-kube-apiserver-聚合层" class="headerlink" title="开启 kube-apiserver 聚合层"></a>开启 kube-apiserver 聚合层</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 ~]# vim /opt/kubernetes/cfg/kube-apiserver.conf </span><br><span class="line">[root@k8s-master1 ssl]# systemctl restart kube-apiserver</span><br><span class="line">[root@k8s-master1 ssl]# systemctl status kube-apiserver</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_84.png" width="50%"></p>
+<h3 id="autoscaling-v1（CPU指标实践）"><a href="#autoscaling-v1（CPU指标实践）" class="headerlink" title="autoscaling/v1（CPU指标实践）"></a>autoscaling/v1（CPU指标实践）</h3><h4 id="部署-Metrics-Server"><a href="#部署-Metrics-Server" class="headerlink" title="部署 Metrics Server"></a>部署 Metrics Server</h4><ol>
+<li>Metrics Server 是一个集群范围的资源使用情况的数据聚合器。作为一个应用部署在集群中。</li>
+<li>Metrics Server 从每个节点上Kubelet(内置的cadvisor)公开的摘要API收集指标。 </li>
+<li>Metrics Server 通过Kubernetes聚合器注册在Master APIServer中。</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">                      HPA </span><br><span class="line">            获取整体POD的CPU资源利用率</span><br><span class="line">               </span><br><span class="line">                    Metrics</span><br><span class="line">                      汇总</span><br><span class="line">                  </span><br><span class="line">pod1(cadvisor)  pod2(cadvisor)   pod3(cadvisor)</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_85.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 ~]# yum install lrzsz unzip</span><br><span class="line">[root@k8s-master1 ~]# unzip metrics-server.zip </span><br><span class="line">[root@k8s-master1 ~]# cd metrics-server</span><br><span class="line"># 修改参数:</span><br><span class="line">[root@k8s-master1 metrics-server]# vim metrics-server-deployment.yaml</span><br><span class="line">...</span><br><span class="line">      containers:</span><br><span class="line">      - name: metrics-server</span><br><span class="line">        image: lizhenliang/metrics-server-amd64:v0.3.1</span><br><span class="line">        command:</span><br><span class="line">        - /metrics-server</span><br><span class="line">        - --kubelet-insecure-tls                            # 忽略证书</span><br><span class="line">        - --kubelet-preferred-address-types=InternalIP      # 找到nodeIP，默认使用注册节点名称,修改成IP</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"># 部署</span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl apply -f . </span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl get pods -n kube-system</span><br><span class="line">NAME                             READY   STATUS    RESTARTS   AGE</span><br><span class="line">coredns-6d8cfdd59d-mh5pk         1/1     Running   2          22h</span><br><span class="line">kube-flannel-ds-amd64-5bfgl      1/1     Running   2          22h</span><br><span class="line">kube-flannel-ds-amd64-pjjgj      1/1     Running   2          22h</span><br><span class="line">metrics-server-7dbbcf4c7-vzdn2   1/1     Running   0          28s</span><br><span class="line"></span><br><span class="line"># 检查是否正常工作</span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl logs metrics-server-7dbbcf4c7-vzdn2 -n kube-system</span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl get apiservice</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_86.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 获取资源利用率 metrics-server 工作正常 采集到了数据</span><br><span class="line">[root@localhost metrics-server]# kubectl top node</span><br><span class="line">NAME          CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%   </span><br><span class="line">k8s-master1   119m         5%     1075Mi          57%       </span><br><span class="line">k8s-node1     59m          2%     630Mi           33%       </span><br><span class="line">k8s-node2     61m          3%     672Mi           35%   </span><br><span class="line">    </span><br><span class="line">[root@localhost metrics-server]# kubectl top pods</span><br><span class="line">NAME                   CPU(cores)   MEMORY(bytes)   </span><br><span class="line">web-868b6f9d7f-d4rwc   0m           2Mi             </span><br><span class="line">web-868b6f9d7f-dj9nb   0m           3Mi             </span><br><span class="line">web-868b6f9d7f-n6gv8   0m           3Mi             </span><br><span class="line">web-868b6f9d7f-s6hk4   0m           2Mi</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 可通过Metrics API在Kubernetes中获得资源使用率指标，例如容器CPU和内存使用率。这些度量标准既可以由用户直接访问</span><br><span class="line"># 例如，通过使用`kubectl top`命令，也可以由集群中的控制器（例如，Horizontal Pod Autoscaler）用于进行决策。</span><br><span class="line"># 测试：hpa获取资源利用率是使用api接口 返回json格式</span><br><span class="line"></span><br><span class="line">[root@localhost metrics-server]# kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes</span><br><span class="line"></span><br><span class="line">&#123;"kind":"NodeMetricsList","apiVersion":"metrics.k8s.io/v1beta1",</span><br><span class="line">"metadata":&#123;"selfLink":"/apis/metrics.k8s.io/v1beta1/nodes"&#125;,</span><br><span class="line">"items":[&#123;"metadata":&#123;"name":"k8s-master1",</span><br><span class="line">"selfLink":"/apis/metrics.k8s.io/v1beta1/nodes/k8s-master1",</span><br><span class="line">"creationTimestamp":"2019-12-11T11:48:23Z"&#125;,"timestamp":"2019-12-11T11:47:31Z",</span><br><span class="line">"window":"30s","usage":&#123;"cpu":"141907959n","memory":"1121116Ki"&#125;&#125;,</span><br><span class="line">&#123;"metadata":&#123;"name":"k8s-node1","selfLink":"/apis/metrics.k8s.io/v1beta1/nodes/k8s-node1",</span><br><span class="line">"creationTimestamp":"2019-12-11T11:48:23Z"&#125;,"timestamp":"2019-12-11T11:47:40Z","window":"30s",</span><br><span class="line">"usage":&#123;"cpu":"88731198n","memory":"646736Ki"&#125;&#125;,&#123;"metadata":&#123;"name":"k8s-node2",</span><br><span class="line">"selfLink":"/apis/metrics.k8s.io/v1beta1/nodes/k8s-node2",</span><br><span class="line">"creationTimestamp":"2019-12-11T11:48:23Z"&#125;,</span><br><span class="line">"timestamp":"2019-12-11T11:47:32Z","window":"30s","usage":&#123;"cpu":"55617927n","memory":"693224Ki"&#125;&#125;]&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@localhost metrics-server]# kubectl top node</span><br><span class="line">NAME          CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%   </span><br><span class="line">k8s-master1   94m          4%     1074Mi          57%       </span><br><span class="line">k8s-node1     89m          4%     634Mi           33%       </span><br><span class="line">k8s-node2     173m         8%     662Mi           35%</span><br></pre></td></tr></table></figure>
+<h4 id="启动三个web副本"><a href="#启动三个web副本" class="headerlink" title="启动三个web副本"></a>启动三个web副本</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 hpa]# mkdir -p /root/hpa</span><br><span class="line">[root@k8s-master1 hpa]# vim app.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: web</span><br><span class="line">spec:</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80</span><br><span class="line">    protocol: TCP</span><br><span class="line">    targetPort: 80</span><br><span class="line">  selector:</span><br><span class="line">    run: web</span><br><span class="line">---</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    run: web</span><br><span class="line">  name: web</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      run: web</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        run: web</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: nginx:1.16</span><br><span class="line">        name: web</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 80</span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 100m</span><br><span class="line">            memory: 100Mi</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 hpa]# kubectl delete deploy web </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# kubectl apply -f app.yaml </span><br><span class="line">service/web unchanged</span><br><span class="line">deployment.apps/web created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# kubectl get pods</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE</span><br><span class="line">web-6f4b67f8cc-kz295   1/1     Running   0          5s</span><br><span class="line">web-6f4b67f8cc-nmfpv   1/1     Running   0          5s</span><br><span class="line">web-6f4b67f8cc-s9mvc   1/1     Running   0          5s</span><br><span class="line"></span><br><span class="line"># 测试访问 </span><br><span class="line">[root@k8s-master1 hpa]# kubectl get pods,svc</span><br><span class="line">NAME                       READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/web-6f4b67f8cc-kz295   1/1     Running   0          3m47s</span><br><span class="line">pod/web-6f4b67f8cc-nmfpv   1/1     Running   0          3m47s</span><br><span class="line">pod/web-6f4b67f8cc-s9mvc   1/1     Running   0          3m47s</span><br><span class="line"></span><br><span class="line">NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE</span><br><span class="line">service/kubernetes   ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP   39m</span><br><span class="line">service/web          ClusterIP   10.0.0.129   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80/TCP    10m</span><br><span class="line">[root@k8s-master1 hpa]# curl 10.0.0.129</span><br></pre></td></tr></table></figure>
+<h4 id="创建-HPA-策略"><a href="#创建-HPA-策略" class="headerlink" title="创建 HPA 策略"></a>创建 HPA 策略</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 自动创建</span><br><span class="line">[root@k8s-master1 hpa]# kubectl autoscale --help</span><br><span class="line">[root@k8s-master1 hpa]# kubectl autoscale deployment web --min=2 --max=10 -o yaml --dry-run &gt; hpa-v1.yaml</span><br><span class="line"></span><br><span class="line"># 修改后</span><br><span class="line">[root@k8s-master1 hpa]# vim hpa-v1.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: autoscaling/v1</span><br><span class="line">kind: HorizontalPodAutoscaler</span><br><span class="line">metadata:</span><br><span class="line">  name: web</span><br><span class="line">spec:</span><br><span class="line">  maxReplicas: 10</span><br><span class="line">  minReplicas: 2</span><br><span class="line">  scaleTargetRef:</span><br><span class="line">    apiVersion: apps/v1</span><br><span class="line">    kind: Deployment</span><br><span class="line">    name: web</span><br><span class="line">  targetCPUUtilizationPercentage: 60</span><br><span class="line"></span><br><span class="line"># scaleTargetRef：表示当前要伸缩对象是谁 </span><br><span class="line"># targetCPUUtilizationPercentage：当整体的资源利用率超过60%的时候，会进行扩容。低于60%且在2个副本上会被缩容</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 创建并查看 需要等待一小会 hpa会去调用api汇总web的使用率</span><br><span class="line">[root@k8s-master1 hpa]# kubectl apply -f hpa-v1.yaml </span><br><span class="line">horizontalpodautoscaler.autoscaling/web created</span><br><span class="line"></span><br><span class="line"># 现在web中的nginx 还没有什么使用率</span><br><span class="line">[root@k8s-master1 hpa]# kubectl get hpa</span><br><span class="line">NAME   REFERENCE        TARGETS   MINPODS   MAXPODS   REPLICAS   AGE</span><br><span class="line">web    Deployment/web   0%/60%    2         10        3          17s</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 长时间没有利用率 帮我们缩容了</span><br><span class="line">[root@k8s-master1 hpa]# kubectl describe hpa web</span><br><span class="line"></span><br><span class="line">Events:</span><br><span class="line">  Type    Reason             Age    From                       Message</span><br><span class="line">  ----    ------             ----   ----                       -------</span><br><span class="line">  Normal  SuccessfulRescale  9m19s  horizontal-pod-autoscaler  New size: 2; reason: All metrics below target</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"># 开启压测</span><br><span class="line"># 安装ab工具</span><br><span class="line"># ab -n 100000 -c 100  http://10.0.0.129/status.php</span><br><span class="line"># -n 请求数</span><br><span class="line"># -c 并发数</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# yum install httpd-tools</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# kubectl get hpa</span><br><span class="line">NAME   REFERENCE        TARGETS   MINPODS   MAXPODS   REPLICAS   AGE</span><br><span class="line">web    Deployment/web   0%/60%    2         10        2          18m</span><br><span class="line"></span><br><span class="line"># 没有坐limit限制下 进行ab测试</span><br><span class="line">[root@k8s-master1 hpa]# ab -n 1000000 -c 100 http://10.0.0.129/index.html</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl top pods</span><br><span class="line">NAME                   CPU(cores)   MEMORY(bytes)   </span><br><span class="line">web-6f4b67f8cc-nmfpv   701m         3Mi             </span><br><span class="line">web-6f4b67f8cc-s9mvc   662m         3Mi </span><br><span class="line"></span><br><span class="line"># 负载上来了 并且副本个数动态增加了 实验成功后 可以关闭压测</span><br><span class="line">[root@k8s-master1 ~]# kubectl get hpa</span><br><span class="line">NAME   REFERENCE        TARGETS    MINPODS   MAXPODS   REPLICAS   AGE</span><br><span class="line">web    Deployment/web   681%/60%   2         10        8          23m</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE</span><br><span class="line">web-6f4b67f8cc-9h2c6   1/1     Running   0          39s</span><br><span class="line">web-6f4b67f8cc-czpp4   1/1     Running   0          39s</span><br><span class="line">web-6f4b67f8cc-frd8k   1/1     Running   0          55s</span><br><span class="line">web-6f4b67f8cc-ls6z9   1/1     Running   0          24s</span><br><span class="line">web-6f4b67f8cc-nfnhs   1/1     Running   0          39s</span><br><span class="line">web-6f4b67f8cc-nmfpv   1/1     Running   0          48m</span><br><span class="line">web-6f4b67f8cc-s9mvc   1/1     Running   0          48m</span><br><span class="line">web-6f4b67f8cc-sxtbq   1/1     Running   0          24s</span><br><span class="line">web-6f4b67f8cc-tkmzr   1/1     Running   0          39s</span><br><span class="line">web-6f4b67f8cc-vnbcj   1/1     Running   0          54s</span><br><span class="line"></span><br><span class="line"># 等待几分钟 负载下来后 查看缩容</span><br><span class="line">[root@k8s-master1 ~]# kubectl get hpa</span><br><span class="line">NAME   REFERENCE        TARGETS   MINPODS   MAXPODS   REPLICAS   AGE</span><br><span class="line">web    Deployment/web   0%/60%    2         10        10         23m</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl describe hpa web</span><br><span class="line"></span><br><span class="line">Events:</span><br><span class="line">  Type    Reason             Age   From                       Message</span><br><span class="line">  ----    ------             ----  ----                       -------</span><br><span class="line">  Normal  SuccessfulRescale  18m   horizontal-pod-autoscaler  New size: 2; reason: All metrics below target</span><br><span class="line">  Normal  SuccessfulRescale  102s  horizontal-pod-autoscaler  New size: 4; reason: cpu resource utilization (percentage of request) above target</span><br><span class="line">  Normal  SuccessfulRescale  86s   horizontal-pod-autoscaler  New size: 8; reason: cpu resource utilization (percentage of request) above target</span><br><span class="line">  Normal  SuccessfulRescale  71s   horizontal-pod-autoscaler  New size: 10; reason: cpu resource utilization (percentage of request) above target</span><br></pre></td></tr></table></figure>
+<p><strong>工作流程：hpa -&gt; apiserver -&gt; kube aggregation -&gt; metrics-server -&gt; kubelet(cadvisor)</strong></p>
+<h3 id="autoscaling-v2beta2（多指标）"><a href="#autoscaling-v2beta2（多指标）" class="headerlink" title="autoscaling/v2beta2（多指标）"></a>autoscaling/v2beta2（多指标）</h3><ol>
+<li>为满足更多的需求，HPA 还有 autoscaling/v2beta1 和 autoscaling/v2beta2 两个版本。</li>
+<li>这两个版本的区别是 autoscaling/v1beta1支持了 Resource Metrics（CPU）和 Custom Metrics（应用程序指标），</li>
+<li>而在 autoscaling/v2beta2的版本中额外增加了 External Metrics 的支持。</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># v2版本支持 自定义指标 ,可以对接第三方监控的指标</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># 自动生成</span><br><span class="line">[root@k8s-master1 hpa]# kubectl get hpa.v2beta2.autoscaling -o yaml &gt; hpa-v2.yaml</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# vim hpa-v2.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">items:</span><br><span class="line">apiVersion: autoscaling/v2beta2</span><br><span class="line">kind: HorizontalPodAutoscaler</span><br><span class="line">metadata:</span><br><span class="line">  name: web</span><br><span class="line">  namespace: default</span><br><span class="line">spec:</span><br><span class="line">  maxReplicas: 10</span><br><span class="line">  minReplicas: 2</span><br><span class="line">  metrics:</span><br><span class="line">  - resource:</span><br><span class="line">      name: cpu</span><br><span class="line">      target:</span><br><span class="line">        averageUtilization: 60</span><br><span class="line">        type: Utilization</span><br><span class="line">    type: Resource</span><br><span class="line">  scaleTargetRef:</span><br><span class="line">    apiVersion: apps/v1</span><br><span class="line">    kind: Deployment</span><br><span class="line">    name: web</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">metrics中的type字段有四种类型的值：Object、Pods、Resource、External。 </span><br><span class="line"></span><br><span class="line">- Resource：指的是当前伸缩对象下的pod的cpu和memory指标，只支持Utilization和AverageValue类型的目标值。</span><br><span class="line"></span><br><span class="line">- Object：指的是指定k8s内部对象的指标，数据需要第三方adapter提供，只支持Value和AverageValue类型的目标值。</span><br><span class="line"></span><br><span class="line">- Pods：指的是伸缩对象Pods的指标，数据需要第三方的adapter提供，只允许AverageValue类型的目标值。</span><br><span class="line"></span><br><span class="line">- External：指的是k8s外部的指标，数据同样需要第三方的adapter提供，只支持Value和AverageValue类型的目标值。</span><br></pre></td></tr></table></figure>
+<p><strong>工作流程：hpa -&gt; apiserver -&gt; kube aggregation -&gt; metrics-server -&gt; kubelet(cadvisor)</strong><br><strong>工作流程：hpa -&gt; apiserver -&gt; kube aggregation  -&gt; prometheus-adapter -&gt; prometheus -&gt; pods</strong></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">prometheus-adapter 完成注册 和 数据格式的转换</span><br></pre></td></tr></table></figure>
+<h4 id="基于-Prometheus-自定义指标缩放"><a href="#基于-Prometheus-自定义指标缩放" class="headerlink" title="基于 Prometheus 自定义指标缩放"></a>基于 Prometheus 自定义指标缩放</h4><ol>
+<li>资源指标只包含CPU、内存，一般来说也够了。但如果想根据自定义指标:如请求qps/5xx错误数来实现HPA，就需要使用自定义指标了，</li>
+<li>目前比较成熟的实现是 Prometheus Custom Metrics。</li>
+<li>自定义指标由Prometheus来提供，再利用k8s-prometheus-adpater聚合到apiserver，实现和核心指标（metric-server)同样的效果。</li>
+</ol>
+<p><img src="/img/k8s/k8s_87.png" width="50%"></p>
+<h4 id="Prometheus-介绍"><a href="#Prometheus-介绍" class="headerlink" title="Prometheus 介绍"></a>Prometheus 介绍</h4><ol>
+<li>Prometheus（普罗米修斯）是一个最初在SoundCloud上构建的监控系统。自2012年成为社区开源项目，拥有非常活跃的开发人员和用户社区。</li>
+<li>为强调开源及独立维护，Prometheus于2016年加入云原生云计算基金会（CNCF），成为继Kubernetes之后的第二个托管项目。</li>
+</ol>
+<p><strong>Prometheus</strong> <strong>特点：</strong></p>
+<ul>
+<li><p>多维数据模型：由度量名称和键值对标识的时间序列数据</p>
+</li>
+<li><p>PromSQL：一种灵活的查询语言，可以利用多维数据完成复杂的查询</p>
+</li>
+<li><p>不依赖分布式存储，单个服务器节点可直接工作</p>
+</li>
+<li><p>基于HTTP的pull方式采集时间序列数据</p>
+</li>
+<li><p>推送时间序列数据通过PushGateway组件支持</p>
+</li>
+<li><p>通过服务发现或静态配置发现目标</p>
+</li>
+<li><p>多种图形模式及仪表盘支持（grafana）</p>
+</li>
+</ul>
+<p><img src="/img/k8s/k8s_88.png" width="50%"></p>
+<ul>
+<li><p>Prometheus Server：收集指标和存储时间序列数据，并提供查询接口</p>
+</li>
+<li><p>ClientLibrary：客户端库</p>
+</li>
+<li><p>Push Gateway：短期存储指标数据。主要用于临时性的任务</p>
+</li>
+<li><p>Exporters：采集已有的第三方服务监控指标并暴露metrics</p>
+</li>
+<li><p>Alertmanager：告警</p>
+</li>
+<li><p>Web UI：简单的Web控制台</p>
+</li>
+</ul>
+<h4 id="Prometheus-部署"><a href="#Prometheus-部署" class="headerlink" title="Prometheus 部署"></a>Prometheus 部署</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 只需要部署服务端</span><br></pre></td></tr></table></figure>
+<ol>
+<li>部署nfs自动供给</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"># 安装nfs</span><br><span class="line"># 选择 master2 作为服务端</span><br><span class="line"># 客户端也所有 node上也要安装</span><br><span class="line">[root@k8s-master2 ~]# yum install -y nfs-utils</span><br><span class="line"></span><br><span class="line">[root@k8s-node2 ~]# mkdir -p /ifs/kubernetes</span><br><span class="line">[root@k8s-node2 ~]# cat /etc/exports</span><br><span class="line">/ifs/kubernetes *(rw,no_root_squash)</span><br><span class="line"></span><br><span class="line">[root@k8s-node2 ~]# systemctl start nfs</span><br><span class="line">[root@k8s-node2 ~]# ps -ef|grep nfs</span><br><span class="line"></span><br><span class="line"># 上传nfs-client 修改IP地址为nfs服务端地址</span><br><span class="line">[root@k8s-master1 nfs-client]# ls -l</span><br><span class="line">total 12</span><br><span class="line">-rw-r--r-- 1 root root  225 Nov 30 20:50 class.yaml</span><br><span class="line">-rw-r--r-- 1 root root  993 Dec 13 09:25 deployment.yaml</span><br><span class="line">-rw-r--r-- 1 root root 1526 Nov 30 20:50 rbac.yaml</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 nfs-client]# cat deployment.yaml</span><br><span class="line">            - name: NFS_SERVER</span><br><span class="line">              value: 172.17.70.254 </span><br><span class="line">            - name: NFS_PATH</span><br><span class="line">              value: /ifs/kubernetes</span><br><span class="line">      volumes:</span><br><span class="line">        - name: nfs-client-root</span><br><span class="line">          nfs:</span><br><span class="line">            server: 172.17.70.254</span><br><span class="line">            path: /ifs/kubernetes</span><br><span class="line"></span><br><span class="line"># 创建</span><br><span class="line">[root@k8s-master1 nfs-client]# kubectl apply -f .</span><br><span class="line">[root@k8s-master1 nfs-client]# kubectl get pods</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE</span><br><span class="line">nfs-client-provisioner-5dd6f66f47-27rcz   1/1     Running   0          5m50s</span><br><span class="line">web-6f4b67f8cc-nmfpv                      1/1     Running   1          17h</span><br><span class="line">web-6f4b67f8cc-s9mvc                      1/1     Running   1          17h</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>安装 Prometheus </li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 prometheus]# kubectl apply -f prometheus-rbac.yaml          # 授权</span><br><span class="line">[root@k8s-master1 prometheus]# kubectl apply -f prometheus-configmap.yaml     # 配置文件</span><br><span class="line">[root@k8s-master1 prometheus]# kubectl apply -f prometheus-rules.yaml         # 告警文件</span><br><span class="line">[root@k8s-master1 prometheus]# kubectl apply -f prometheus-service.yaml       # 告警规则</span><br><span class="line">[root@k8s-master1 prometheus]# kubectl apply -f prometheus-statefulset.yaml   # 服务</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 prometheus]# kubectl get pods -n kube-system</span><br><span class="line">NAME                             READY   STATUS    RESTARTS   AGE</span><br><span class="line">coredns-6d8cfdd59d-h59sl         1/1     Running   1          18h</span><br><span class="line">kube-flannel-ds-amd64-9s7s2      1/1     Running   1          18h</span><br><span class="line">kube-flannel-ds-amd64-j77m8      1/1     Running   1          18h</span><br><span class="line">kube-flannel-ds-amd64-pqw7p      1/1     Running   2          18h</span><br><span class="line">metrics-server-7dbbcf4c7-29ms2   1/1     Running   1          18h</span><br><span class="line">prometheus-0                     2/2     Running   0          58s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 prometheus]# kubectl get svc -n kube-system</span><br><span class="line">NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</span><br><span class="line">kube-dns         ClusterIP   10.0.0.2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        53/UDP,53/TCP    18h</span><br><span class="line">metrics-server   ClusterIP   10.0.0.52    <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP          18h</span><br><span class="line">prometheus       NodePort    10.0.0.237   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        9090:30090/TCP   4m5s</span><br><span class="line"></span><br><span class="line"># 访问web  没有部署node 并不影响,只要能采集到pod就行</span><br><span class="line">http://39.106.100.108:30090/graph</span><br><span class="line">http://39.106.100.108:30090/targets</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_89.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 自定义指标逻辑很负载 做的不是很多</span><br></pre></td></tr></table></figure>
+<h4 id="部署一个监控应用"><a href="#部署一个监控应用" class="headerlink" title="部署一个监控应用"></a>部署一个监控应用</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 hpa]# vim metrics-app.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    app: metrics-app</span><br><span class="line">  name: metrics-app</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: metrics-app</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: metrics-app</span><br><span class="line">      annotations:</span><br><span class="line">        prometheus.io/scrape: "true"</span><br><span class="line">        prometheus.io/port: "80"</span><br><span class="line">        prometheus.io/path: "/metrics"</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: lizhenliang/metrics-app</span><br><span class="line">        name: metrics-app</span><br><span class="line">        ports:</span><br><span class="line">        - name: web</span><br><span class="line">          containerPort: 80</span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 200m</span><br><span class="line">            memory: 256Mi</span><br><span class="line">        readinessProbe:</span><br><span class="line">          httpGet:</span><br><span class="line">            path: /</span><br><span class="line">            port: 80</span><br><span class="line">          initialDelaySeconds: 3</span><br><span class="line">          periodSeconds: 5</span><br><span class="line">        livenessProbe:</span><br><span class="line">          httpGet:</span><br><span class="line">            path: /</span><br><span class="line">            port: 80</span><br><span class="line">          initialDelaySeconds: 3</span><br><span class="line">          periodSeconds: 5</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: metrics-app</span><br><span class="line">  labels:</span><br><span class="line">    app: metrics-app</span><br><span class="line">spec:</span><br><span class="line">  ports:</span><br><span class="line">  - name: web</span><br><span class="line">    port: 80</span><br><span class="line">    targetPort: 80</span><br><span class="line">  selector:</span><br><span class="line">    app: metrics-app</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 hpa]# kubectl apply -f metrics-app.yaml </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# kubectl get pods</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE</span><br><span class="line">metrics-app-7674cfb699-67252              1/1     Running   0          15s</span><br><span class="line">metrics-app-7674cfb699-crq64              1/1     Running   0          15s</span><br><span class="line">metrics-app-7674cfb699-m7ksd              1/1     Running   0          15s</span><br><span class="line">nfs-client-provisioner-5dd6f66f47-27rcz   1/1     Running   0          45m</span><br><span class="line">web-6f4b67f8cc-nmfpv                      1/1     Running   1          18h</span><br><span class="line">web-6f4b67f8cc-s9mvc                      1/1     Running   1          18h</span><br></pre></td></tr></table></figure>
+<h4 id="查看监控指标"><a href="#查看监控指标" class="headerlink" title="查看监控指标"></a>查看监控指标</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 hpa]# curl 10.0.0.36</span><br><span class="line">Hello! My name is metrics-app-7674cfb699-crq64. The last 10 seconds, the average QPS has been 0.5. Total requests served: 24</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# curl 10.0.0.36/metrics</span><br><span class="line"># HELP http_requests_total The amount of requests in total</span><br><span class="line"># TYPE http_requests_total counter</span><br><span class="line">http_requests_total 53                      # 当前pod总共请求了多少次                                    </span><br><span class="line"># HELP http_requests_per_second The amount of requests per second the latest ten seconds</span><br><span class="line"># TYPE http_requests_per_second gauge</span><br><span class="line">http_requests_per_second 0.5                # 吞吐量 10秒之内 0.5个http请求 qps是每秒，吞吐率是一定时间范围之内</span><br></pre></td></tr></table></figure>
+<h4 id="查看采集数据"><a href="#查看采集数据" class="headerlink" title="查看采集数据"></a>查看采集数据</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 1. 暴露指标</span><br><span class="line"># 2. 需要告诉监控采集哪些指标 </span><br><span class="line"></span><br><span class="line">      annotations:</span><br><span class="line">        prometheus.io/scrape: "true"            # prometheus可以采集我</span><br><span class="line">        prometheus.io/port: "80"                # 采集我的端口</span><br><span class="line">        prometheus.io/path: "/metrics"          # 连接路径 </span><br><span class="line">        </span><br><span class="line"># 3. prometheus 服务发现</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_90.png" width="50%"></p>
+<h4 id="部署-Custom-Metrics-Adapter"><a href="#部署-Custom-Metrics-Adapter" class="headerlink" title="部署 Custom Metrics Adapter"></a>部署 Custom Metrics Adapter</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 先准备下helm环境：</span><br><span class="line">wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz</span><br><span class="line">tar zxvf helm-v3.0.0-linux-amd64.tar.gz </span><br><span class="line">mv linux-amd64/helm /usr/bin/</span><br><span class="line">helm repo add stable http://mirror.azure.cn/kubernetes/charts</span><br><span class="line">helm repo update</span><br><span class="line">helm repo list</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 ~]# helm repo list</span><br><span class="line">NAME  	URL                                     </span><br><span class="line">stable	http://mirror.azure.cn/kubernetes/charts</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# helm install prometheus-adapter stable/prometheus-adapter --namespace kube-system --set prometheus.url=http://prometheus.kube-system,prometheus.port=9090</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# helm ls -n kube-system</span><br><span class="line">NAME              	NAMESPACE  	REVISION	UPDATED                                	STATUS  	CHART                   	APP VERSION</span><br><span class="line">prometheus-adapter	kube-system	1       	2019-12-13 10:35:45.714034137 +0800 CST	deployed	prometheus-adapter-1.4.0	v0.5.0   </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods -n kube-system</span><br><span class="line">NAME                                  READY   STATUS    RESTARTS   AGE</span><br><span class="line">coredns-6d8cfdd59d-h59sl              1/1     Running   1          19h</span><br><span class="line">kube-flannel-ds-amd64-9s7s2           1/1     Running   1          19h</span><br><span class="line">kube-flannel-ds-amd64-j77m8           1/1     Running   1          19h</span><br><span class="line">kube-flannel-ds-amd64-pqw7p           1/1     Running   2          19h</span><br><span class="line">metrics-server-7dbbcf4c7-29ms2        1/1     Running   1          18h</span><br><span class="line">prometheus-0                          2/2     Running   0          57m</span><br><span class="line">prometheus-adapter-77b7b4dd8b-bwjrs   1/1     Running   0          57s</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 确保适配器注册到APIServer</span><br><span class="line">[root@k8s-master1 ~]# kubectl logs prometheus-adapter-77b7b4dd8b-bwjrs -n kube-system</span><br><span class="line">[root@k8s-master1 ~]# kubectl get apiservice</span><br><span class="line"></span><br><span class="line"># 测试数据</span><br><span class="line">[root@k8s-master1 ~]# kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1"</span><br><span class="line">[root@k8s-master1 ~]# kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1" | jq</span><br></pre></td></tr></table></figure>
+<h4 id="创建-HPA-策略-1"><a href="#创建-HPA-策略-1" class="headerlink" title="创建 HPA 策略"></a>创建 HPA 策略</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# vim hpa-v2.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: autoscaling/v2beta2</span><br><span class="line">kind: HorizontalPodAutoscaler</span><br><span class="line">metadata:</span><br><span class="line">  name: metrics-app-hpa</span><br><span class="line">  namespace: default</span><br><span class="line">spec:</span><br><span class="line">  scaleTargetRef:</span><br><span class="line">    apiVersion: apps/v1</span><br><span class="line">    kind: Deployment</span><br><span class="line">    name: metrics-app</span><br><span class="line">  minReplicas: 1</span><br><span class="line">  maxReplicas: 10</span><br><span class="line">  metrics:</span><br><span class="line">  - type: Pods</span><br><span class="line">    pods:</span><br><span class="line">      metric:</span><br><span class="line">        name: http_requests_per_second</span><br><span class="line">      target:</span><br><span class="line">        type: AverageValue</span><br><span class="line">        averageValue: 800m   # 800m 即0.8个/秒</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# kubectl apply -f hpa-v2.yaml</span><br><span class="line">horizontalpodautoscaler.autoscaling/metrics-app-hpa created</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 hpa]# kubectl get hpa</span><br><span class="line">NAME              REFERENCE        TARGETS          MINPODS   MAXPODS   REPLICAS   AGE</span><br><span class="line">metrics-app-hpa   Deployment/web   <span class="tag">&lt;<span class="name">unknown</span>&gt;</span>/800m   2         10        2          28s</span><br><span class="line">web               Deployment/web   0%/60%           2         10        2          18h</span><br></pre></td></tr></table></figure>
+<h4 id="配置适配器收集特定的指标"><a href="#配置适配器收集特定的指标" class="headerlink" title="配置适配器收集特定的指标"></a>配置适配器收集特定的指标</h4><ol>
+<li>用来数据转换</li>
+</ol>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 该规则将http_requests在2分钟的间隔内收集该服务的所有Pod的平均速率。</span><br><span class="line">[root@k8s-master1 hpa]# kubectl edit cm prometheus-adapter -n kube-system</span><br><span class="line"></span><br><span class="line">    rules: # 复制下面的规则</span><br><span class="line">    - seriesQuery: 'http_requests_total&#123;kubernetes_namespace!="",kubernetes_pod_name!=""&#125;'</span><br><span class="line">      resources:</span><br><span class="line">        overrides:</span><br><span class="line">          kubernetes_namespace: &#123;resource: "namespace"&#125;</span><br><span class="line">          kubernetes_pod_name: &#123;resource: "pod"&#125;</span><br><span class="line">      name:</span><br><span class="line">        matches: "^(.*)_total"</span><br><span class="line">        as: "$&#123;1&#125;_per_second"</span><br><span class="line">      metricsQuery: 'sum(rate(&lt;&lt;.Series&gt;&gt;&#123;&lt;&lt;.LabelMatchers&gt;&gt;&#125;[2m])) by (&lt;&lt;.GroupBy&gt;&gt;)'</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 重启pod加载生效</span><br><span class="line">[root@k8s-master1 hpa]# kubectl get pods -n kube-system</span><br><span class="line">NAME                                  READY   STATUS    RESTARTS   AGE</span><br><span class="line">coredns-6d8cfdd59d-h59sl              1/1     Running   1          19h</span><br><span class="line">kube-flannel-ds-amd64-9s7s2           1/1     Running   1          19h</span><br><span class="line">kube-flannel-ds-amd64-j77m8           1/1     Running   1          19h</span><br><span class="line">kube-flannel-ds-amd64-pqw7p           1/1     Running   2          19h</span><br><span class="line">metrics-server-7dbbcf4c7-29ms2        1/1     Running   1          19h</span><br><span class="line">prometheus-0                          2/2     Running   0          86m</span><br><span class="line">prometheus-adapter-77b7b4dd8b-bwjrs   1/1     Running   0          29m</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 hpa]# kubectl delete pod prometheus-adapter-77b7b4dd8b-bwjrs -n kube-system</span><br><span class="line"></span><br><span class="line"># 等待重建</span><br><span class="line">[root@k8s-master1 hpa]# kubectl get pods -n kube-system</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 再测试数据</span><br><span class="line">[root@k8s-master1 hpa]# kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*/http_requests_per_second" | jq</span><br><span class="line">[root@k8s-master1 hpa]# kubectl get hpa</span><br><span class="line">NAME              REFERENCE                TARGETS     MINPODS   MAXPODS   REPLICAS   AGE</span><br><span class="line">metrics-app-hpa   Deployment/metrics-app   416m/800m   1         10        2          29s</span><br><span class="line">web               Deployment/web           0%/60%      2         10        2          18h</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 hpa]# ab -n 100000 -c 100  http://10.0.0.136/metrics</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get hpa</span><br><span class="line">NAME              REFERENCE                TARGETS        MINPODS   MAXPODS   REPLICAS   AGE</span><br><span class="line">metrics-app-hpa   Deployment/metrics-app   100091m/800m   1         10        3          3m32s</span><br><span class="line">web               Deployment/web           0%/60%         2         10        2          28m</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get hpa</span><br><span class="line">NAME              REFERENCE                TARGETS        MINPODS   MAXPODS   REPLICAS   AGE</span><br><span class="line">metrics-app-hpa   Deployment/metrics-app   123285m/800m   1         10        6          3m46s</span><br><span class="line">web               Deployment/web           0%/60%         2         10        2          28m</span><br><span class="line"></span><br><span class="line"># 扩容成功</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_92.png" width="50%"></p>
+<h4 id="对接一个应用需要做哪些事"><a href="#对接一个应用需要做哪些事" class="headerlink" title="对接一个应用需要做哪些事"></a>对接一个应用需要做哪些事</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 总结</span><br><span class="line">1. 应用程序需要暴露/metrics监控指标，并且是 promettheus 数据格式</span><br><span class="line">2. promettheus 采集入库</span><br><span class="line">3. 针对数据添加adapter规则(promsql)</span><br><span class="line">4. adapter 注册 apiservice</span><br><span class="line">5. 编写HPA规则 （对应指标名称）</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_91.png" width="50%"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/30/ansible-base03/" rel="next" title="03 Ansible-Roles 快速入门">
+                <i class="fa fa-chevron-left"></i> 03 Ansible-Roles 快速入门
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/06/k8s-base07/" rel="prev" title="05 Helm 应用包管理器">
+                05 Helm 应用包管理器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#传统弹性伸缩的困境"><span class="nav-number">1.</span> <span class="nav-text">传统弹性伸缩的困境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Kubernetes-中弹性伸缩存在的问题"><span class="nav-number">1.1.</span> <span class="nav-text">Kubernetes 中弹性伸缩存在的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#机器规格不统一-造成机器利用率百分比碎片化"><span class="nav-number">1.1.1.</span> <span class="nav-text">机器规格不统一,造成机器利用率百分比碎片化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#机器利用率不能单纯依靠宿主机计算"><span class="nav-number">1.1.2.</span> <span class="nav-text">机器利用率不能单纯依靠宿主机计算</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#弹性伸缩概念的延伸"><span class="nav-number">2.</span> <span class="nav-text">弹性伸缩概念的延伸</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#kubernetes-弹性伸缩布局"><span class="nav-number">2.1.</span> <span class="nav-text">kubernetes 弹性伸缩布局</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-自动扩容-缩容"><span class="nav-number">3.</span> <span class="nav-text">Node 自动扩容/缩容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Cluster-AutoScaler"><span class="nav-number">3.1.</span> <span class="nav-text">Cluster AutoScaler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ansible-扩容-Node"><span class="nav-number">3.2.</span> <span class="nav-text">Ansible 扩容 Node</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#扩容"><span class="nav-number">3.2.1.</span> <span class="nav-text">扩容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缩容"><span class="nav-number">3.2.2.</span> <span class="nav-text">缩容</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-自动扩容-缩容（HPA）"><span class="nav-number">4.</span> <span class="nav-text">Pod 自动扩容/缩容（HPA）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HPA-基本原理"><span class="nav-number">4.1.</span> <span class="nav-text">HPA 基本原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#扩容冷却-和-缩容冷却"><span class="nav-number">4.2.</span> <span class="nav-text">扩容冷却 和 缩容冷却</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HPA-的演进历程"><span class="nav-number">4.3.</span> <span class="nav-text">HPA 的演进历程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于-CPU-指标缩放"><span class="nav-number">5.</span> <span class="nav-text">基于 CPU 指标缩放</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Kubernetes-API-Aggregation"><span class="nav-number">5.1.</span> <span class="nav-text">Kubernetes API Aggregation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开启-kube-apiserver-聚合层"><span class="nav-number">5.2.</span> <span class="nav-text">开启 kube-apiserver 聚合层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#autoscaling-v1（CPU指标实践）"><span class="nav-number">5.3.</span> <span class="nav-text">autoscaling/v1（CPU指标实践）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#部署-Metrics-Server"><span class="nav-number">5.3.1.</span> <span class="nav-text">部署 Metrics Server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动三个web副本"><span class="nav-number">5.3.2.</span> <span class="nav-text">启动三个web副本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-HPA-策略"><span class="nav-number">5.3.3.</span> <span class="nav-text">创建 HPA 策略</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#autoscaling-v2beta2（多指标）"><span class="nav-number">5.4.</span> <span class="nav-text">autoscaling/v2beta2（多指标）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基于-Prometheus-自定义指标缩放"><span class="nav-number">5.4.1.</span> <span class="nav-text">基于 Prometheus 自定义指标缩放</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Prometheus-介绍"><span class="nav-number">5.4.2.</span> <span class="nav-text">Prometheus 介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Prometheus-部署"><span class="nav-number">5.4.3.</span> <span class="nav-text">Prometheus 部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署一个监控应用"><span class="nav-number">5.4.4.</span> <span class="nav-text">部署一个监控应用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看监控指标"><span class="nav-number">5.4.5.</span> <span class="nav-text">查看监控指标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看采集数据"><span class="nav-number">5.4.6.</span> <span class="nav-text">查看采集数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署-Custom-Metrics-Adapter"><span class="nav-number">5.4.7.</span> <span class="nav-text">部署 Custom Metrics Adapter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-HPA-策略-1"><span class="nav-number">5.4.8.</span> <span class="nav-text">创建 HPA 策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置适配器收集特定的指标"><span class="nav-number">5.4.9.</span> <span class="nav-text">配置适配器收集特定的指标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对接一个应用需要做哪些事"><span class="nav-number">5.4.10.</span> <span class="nav-text">对接一个应用需要做哪些事</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

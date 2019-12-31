@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ELK,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="ELK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="08 ELK 收集Apache访问日志实战案例">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/10/27/elk-base08/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_96.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_97.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_98.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_99.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_100.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_101.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_102.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_104.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_105.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_106.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_108.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_107.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_109.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_110.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_111.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_112.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/elk_113.png">
+<meta property="og:updated_time" content="2019-10-28T04:10:54.593Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="08 ELK 收集Apache访问日志实战案例">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/10/27/elk-base08/">
+
+
+
+
+
+  <title>08 ELK 收集Apache访问日志实战案例 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/10/27/elk-base08/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">08 ELK 收集Apache访问日志实战案例</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-27T12:47:52+08:00">
+                2019-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ELK/" itemprop="url" rel="index">
+                    <span itemprop="name">ELK</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="ELK-收集日志的几种方式"><a href="#ELK-收集日志的几种方式" class="headerlink" title="ELK 收集日志的几种方式"></a>ELK 收集日志的几种方式</h2><ol start="0">
+<li>ELK收集日志常用的有两种方式，分别是：</li>
+<li>不修改源日志的格式，而是通过logstash的grok方式进行过滤、清洗，将原始无规则的日志转换为规则的日志。</li>
+<li>修改源日志输出格式，按照需要的日志格式输出规则日志，logstash只负责日志的收集和传输，不对日志做任何的过滤清洗。</li>
+<li>这两种方式各有优缺点，</li>
+<li>第一种方式不用修改原始日志输出格式，直接通过logstash的grok方式进行过滤分析，<ul>
+<li>好处是对线上业务系统无任何影响，缺点是logstash的grok方式在高压力情况下会成为性能瓶颈，如果要分析的日志量超大时，日志过滤分析可能阻塞正常的日志输出。</li>
+<li>因此，在使用logstash时，能不用grok的，尽量不使用grok过滤功能。</li>
+</ul>
+</li>
+<li>第二种方式缺点是需要事先定义好日志的输出格式，这可能有一定工作量，<ul>
+<li>但优点更明显，因为已经定义好了需要的日志输出格式，logstash只负责日志的收集和传输，这样就大大减轻了logstash的负担，可以更高效的收集和传输日志。</li>
+<li>另外，目前常见的web服务器，例如apache、nginx等都支持自定义日志输出格式。因此，在企业实际应用中，第二种方式是首选方案。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">主要看系统是否已上线,如果没有上线可与研发技术确认,使用定义好的日志输出格式,减少logstash压力,</span><br><span class="line">如果已上线,先看看日志的输出格式,能不用的话尽量不用grok,用了就加大资源配置,尤其是cpu</span><br></pre></td></tr></table></figure>
+<h2 id="ELK-收集Apache访问日志应用架构"><a href="#ELK-收集Apache访问日志应用架构" class="headerlink" title="ELK 收集Apache访问日志应用架构"></a>ELK 收集Apache访问日志应用架构</h2><ol>
+<li>ELK+Filebeat+Kafka+ZooKeeper构建大数据日志</li>
+<li>前端是apache服务器</li>
+</ol>
+<p><img src="/img/elk_96.png" width="50%"></p>
+<h2 id="apache-的日志格式与日志变量"><a href="#apache-的日志格式与日志变量" class="headerlink" title="apache 的日志格式与日志变量"></a>apache 的日志格式与日志变量</h2><ol>
+<li>apache支持自定义输出日志格式，但是，apache有很多日志变量字段，所以在收集日志前，需要首先确定哪些是我们需要的日志字段，然后将日志格式定下来。</li>
+<li>要完成这个工作，需要了解apache日志字段定义的方法和日志变量的含义，在apache配置文件httpd.conf中，对日志格式定义的配置项为LogFormat，</li>
+<li>默认的日志字段定义为如下内容：</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LogFormat "%h %l %u %t \"%r\" %&gt;s %b \"%&#123;Referer&#125;i\" \"%&#123;User-Agent&#125;i\"" combined</span><br></pre></td></tr></table></figure>
+<h3 id="apache-的日志格式"><a href="#apache-的日志格式" class="headerlink" title="apache 的日志格式"></a>apache 的日志格式</h3><p><img src="/img/elk_97.png" width="50%"></p>
+<p><img src="/img/elk_98.png" width="50%"></p>
+<h3 id="自定义apache日志格式"><a href="#自定义apache日志格式" class="headerlink" title="自定义apache日志格式"></a>自定义apache日志格式</h3><ol>
+<li>这里定义将apache日志输出为json格式，下面仅列出apache配置文件httpd.conf中日志格式和日志文件定义部分，定义好的日志格式与日志文件如下：</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@filebeat1 ~]# vim /etc/httpd/conf/httpd.conf </span><br><span class="line">LogFormat "&#123;\"@timestamp\":\"%&#123;%Y-%m-%dT%H:%M:%S%z&#125;t\",\"client_ip\":\"%&#123;X-Forwarded-For&#125;i\",\"direct_ip\": \"%a\",</span><br><span class="line">\"request_time\":%T,\"status\":%&gt;s,\"url\":\"%U%q\",\"method\":\"%m\",\"http_host\":\"%&#123;Host&#125;i\",</span><br><span class="line">\"server_ip\":\"%A\",\"http_referer\":\"%&#123;Referer&#125;i\",\"http_user_agent\":\"%&#123;User-agent&#125;i\",</span><br><span class="line">\"body_bytes_sent\":\"%B\",\"total_bytes_sent\":\"%O\"&#125;" access_log_json	 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">CustomLog logs/access.log access_log_json</span><br></pre></td></tr></table></figure>
+<p><img src="/img/elk_99.png" width="50%"></p>
+<p><img src="/img/elk_100.png" width="50%"></p>
+<ol start="2">
+<li>这里通过LogFormat指令定义了日志输出格式，在这个自定义日志输出中，定义了13个字段，定义方式为：字段名称:字段内容，字段名称是随意指定的，</li>
+<li>能代表其含义即可，字段名称和字段内容都通过双引号括起来，而双引号是特殊字符，需要转移，因此，使用了转移字符“\”，每个字段之间通过逗号分隔。</li>
+<li>此外，还定义了一个时间字段 @timestamp，这个字段的时间格式也是自定义的，此字段记录日志的生成时间，非常有用。</li>
+<li>CustomLog指令用来指定日志文件的名称和路径。</li>
+<li>需要注意的是，上面日志输出字段中用到了body_bytes_sent和total_bytes_sent发送字节数统计字段，这个功能需要apache加载mod_logio.so模块，</li>
+<li>如果没有加载这个模块的话，需要安装此模块并在httpd.conf文件中加载一下即可。</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 重启服务</span><br><span class="line"># 配置个访问页面</span><br><span class="line">cd /var/www/html</span><br><span class="line">echo "hello apache" &gt;&gt;index.html</span><br><span class="line"></span><br><span class="line"># 重启服务</span><br><span class="line">systemctl status httpd</span><br><span class="line"></span><br><span class="line"># 到其他服务器curl测试</span><br><span class="line">[root@server2 html]# curl 172.17.70.235</span><br><span class="line">hello apache</span><br><span class="line"></span><br><span class="line"># 查看日志</span><br><span class="line">[root@filebeat1 httpd]# cd /etc/httpd/logs/</span><br><span class="line">[root@filebeat1 logs]# cat access.log </span><br><span class="line">&#123;"@timestamp":"2019-10-28T08:21:21+0800","client_ip":"-","direct_ip": "172.17.70.230","request_time":0,"status":200,</span><br><span class="line">"url":"/index.html","method":"GET","http_host":"172.17.70.235","server_ip":"172.17.70.235","http_referer":"-","http_user_agent":"curl/7.29.0","body_bytes_sent":"13","total_bytes_sent":"253"&#125;</span><br><span class="line"></span><br><span class="line">&#123;"@timestamp":"2019-10-28T08:25:10+0800","client_ip":"-","direct_ip": "172.17.70.230","request_time":0,"status":200,</span><br><span class="line">"url":"/index.html","method":"GET","http_host":"172.17.70.235","server_ip":"172.17.70.235","http_referer":"-","http_user_agent":"curl/7.29.0","body_bytes_sent":"13","total_bytes_sent":"253"&#125;</span><br><span class="line"></span><br><span class="line"># 日志生成格式已经改变好</span><br><span class="line"># apache的简单反向代理</span><br></pre></td></tr></table></figure>
+<p><img src="/img/elk_101.png" width="50%"></p>
+<h3 id="验证日志输出"><a href="#验证日志输出" class="headerlink" title="验证日志输出"></a>验证日志输出</h3><ol>
+<li><p>apache的日志格式配置完成后，重启apache，然后查看输出日志是否正常，如果能看到类似如下内容，表示自定义日志格式输出正常：</p>
+</li>
+<li><p>在这个输出中，可以看到，client_ip和direct_ip输出的异同，</p>
+<ul>
+<li>client_ip字段对应的变量为“%{X-Forwarded-For}i”，它的输出是代理叠加而成的IP列表，</li>
+<li>而direct_ip对应的变量为%a，表示不经过代理访问的直连IP，当用户不经过任何代理直接访问apache时，client_ip和direct_ip应该是同一个IP。</li>
+</ul>
+</li>
+</ol>
+<p><img src="/img/elk_102.png" width="50%"></p>
+<h2 id="配置-filebeat"><a href="#配置-filebeat" class="headerlink" title="配置 filebeat"></a>配置 filebeat</h2><h3 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h3><ol>
+<li>filebeat是安装在apache服务器上</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[root@filebeat1 logs]# cd /usr/local/filebeat/</span><br><span class="line"></span><br><span class="line">[root@filebeat1 filebeat]# vim filebeat.yml </span><br><span class="line"></span><br><span class="line">filebeat.inputs:</span><br><span class="line">- type: log</span><br><span class="line">  enabled: true</span><br><span class="line">  paths:</span><br><span class="line">    - /var/log/httpd/access.log</span><br><span class="line">  fields:</span><br><span class="line">    log_topic: apachelogs</span><br><span class="line">    </span><br><span class="line">filebeat.config.modules:</span><br><span class="line">  path: $&#123;path.config&#125;/modules.d/*.yml</span><br><span class="line">  reload.enabled: false</span><br><span class="line">  </span><br><span class="line">name: "172.17.70.235"</span><br><span class="line"></span><br><span class="line">#============================= kafka output ==================================</span><br><span class="line">output.kafka:</span><br><span class="line">  enabled: true</span><br><span class="line">  hosts: ["172.17.70.232:9092", "172.17.70.232:9092", "172.17.70.232:9092"]</span><br><span class="line">  version: "0.10"</span><br><span class="line">  topic: '%&#123;[fields][log_topic]&#125;'</span><br><span class="line">  partition.round_robin:</span><br><span class="line">    reachable_only: true</span><br><span class="line">  worker: 2</span><br><span class="line">  required_acks: 1</span><br><span class="line">  compression: gzip</span><br><span class="line">  max_message_bytes: 10000000</span><br><span class="line">  </span><br><span class="line">#processors:</span><br><span class="line">#- drop_fields:</span><br><span class="line">#    fields: ["beat", "input", "source", "offset","prospector"]</span><br><span class="line"></span><br><span class="line">logging.level: debug</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 这个配置文件中，是将apache的访问日志/var/log/httpd/access.log内容实时的发送到kafka集群topic为apachelogs中。</span><br><span class="line">2. 需要注意的是filebeat输出日志到kafka中配置文件的写法。</span><br></pre></td></tr></table></figure>
+<h3 id="测试并启动"><a href="#测试并启动" class="headerlink" title="测试并启动"></a>测试并启动</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 启动</span><br><span class="line"># filebeat的职责是监控收集日志,发送给kafka</span><br><span class="line"></span><br><span class="line">[root@filebeat1 filebeat]#./filebeat -e -c filebeat.yml</span><br><span class="line"></span><br><span class="line"># debug模式</span><br><span class="line"># 访问一下 产生点内容</span><br><span class="line">[root@server2 html]# curl 172.17.70.235</span><br><span class="line">hello apache</span><br><span class="line"></span><br><span class="line"># 去kafka查看</span><br><span class="line"></span><br><span class="line">[root@kafkazk1 kafka]# bin/kafka-topics.sh --zookeeper 172.17.70.232:2181,172.17.70.233:2181,172.17.70.234:2181 --list</span><br><span class="line">__consumer_offsets</span><br><span class="line">apachelogs</span><br><span class="line">osmessages</span><br><span class="line"></span><br><span class="line"># 启动消费数据</span><br><span class="line">bin/kafka-console-consumer.sh --zookeeper 172.17.70.232:2181,172.17.70.233:2181,172.17.70.234:2181 --topic apachelogs</span><br><span class="line"></span><br><span class="line"># 消息已可正常发送到kafka</span><br><span class="line"># 使用logstash消费数据 并进行清洗数据</span><br></pre></td></tr></table></figure>
+<p><img src="/img/elk_104.png" width="50%"></p>
+<h2 id="配置-logstash"><a href="#配置-logstash" class="headerlink" title="配置 logstash"></a>配置 logstash</h2><ol>
+<li>logstash事件配置文件kafka_apache_into_es.conf</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@logstash logstash]# cd /usr/local/logstash/</span><br></pre></td></tr></table></figure>
+<h3 id="输入部分"><a href="#输入部分" class="headerlink" title="输入部分"></a>输入部分</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 输入部分</span><br><span class="line">input &#123;</span><br><span class="line">    kafka &#123;</span><br><span class="line">        # 指定输入源中kafka集群的地址。</span><br><span class="line">        bootstrap_servers =&gt; "172.17.70.232:9092,172.17.70.233:9092,172.17.70.234:9092"</span><br><span class="line">        #指定输入源中需要从哪个topic中读取数据。</span><br><span class="line">        topics =&gt; "apachelogs"</span><br><span class="line">        group_id =&gt; "logstash"</span><br><span class="line">        codec =&gt; json &#123;</span><br><span class="line">           # 将输入的json格式进行UTF8格式编码</span><br><span class="line">           # 从kafka取出数据也必须是json格式</span><br><span class="line">           charset =&gt; "UTF-8"</span><br><span class="line">        &#125;</span><br><span class="line">       # 增加一个字段，用于标识和判断，在output输出中会用到,用作标识判断,有标识就输出</span><br><span class="line">       add_field =&gt; &#123; "[@metadata][tagid]" =&gt; "apacheaccess_log" &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="过滤部分"><a href="#过滤部分" class="headerlink" title="过滤部分"></a>过滤部分</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"># 过滤部分</span><br><span class="line"># 由于我们在apache日志已经自定义了格式,所有过滤的工作减少了不少,否则要自制写正则过滤</span><br><span class="line">filter &#123;</span><br><span class="line">    if [@metadata][myid] == "apacheaccess_log" &#123;</span><br><span class="line">        # mutate 数据修改 </span><br><span class="line">        # 这里的message就是message字段，也就是日志的内容。</span><br><span class="line">        # 这个插件的作用是将message字段内容中UTF-8单字节编码做替换处理，这是为了应对URL有中文出现的情况。</span><br><span class="line">        mutate &#123;</span><br><span class="line">            gsub =&gt; ["message","\\x","\\\x"]</span><br><span class="line">        &#125;</span><br><span class="line">        # 如果message字段中有HEAD请求，就删除此条信息。get/post留下。</span><br><span class="line">        if ('method":"HEAD' in [message]) &#123;</span><br><span class="line">            drop &#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">        # 启用json解码插件</span><br><span class="line">        json &#123;</span><br><span class="line">            # 为什么要删除 message字段,是因为json插件解码后,已经保留了13个字段，而message就没有用了</span><br><span class="line">            source =&gt; "message"</span><br><span class="line">            # 这里添加一个字段，用于后面的判断。</span><br><span class="line">            add_field =&gt; &#123; "[@metadata][direct_ip]" =&gt; "%&#123;direct_ip&#125;"&#125;</span><br><span class="line">            # 移除不需要的字段，九个字段都是filebeat传输日志时添加的，没什么用处，所以需要移除。</span><br><span class="line">            remove_field =&gt; "@version"</span><br><span class="line">            remove_field =&gt; "prospector"</span><br><span class="line">            remove_field =&gt; "beat"</span><br><span class="line">            remove_field =&gt; "source"</span><br><span class="line">            remove_field =&gt; "input"</span><br><span class="line">            remove_field =&gt; "offset"</span><br><span class="line">            remove_field =&gt; "fields"</span><br><span class="line">            remove_field =&gt; "host"</span><br><span class="line">            # 因为json格式中已经定义好了每个字段，那么输出也是按照每个字段输出的，</span><br><span class="line">            # 因此就不需要message字段了，这里是移除message字段。</span><br><span class="line">            remove_field =&gt; "message"</span><br><span class="line">        &#125;</span><br><span class="line">        # 这是对client_ip这个字段按逗号进行分组切分，因为在多级代理情况下，client_ip获取到的IP可能是IP列表，</span><br><span class="line">        # 如果是单个ip的话，也会进行分组，只不过是分一个组而已。</span><br><span class="line">        mutate &#123;</span><br><span class="line">            split =&gt; ["client_ip", ","]</span><br><span class="line">        &#125;</span><br><span class="line">        # 将切分出来的第一个分组赋值给client_ip，因为client_ip是IP列表的情况下，第一个IP才是客户端真实的IP。</span><br><span class="line">        mutate &#123;</span><br><span class="line">            replace =&gt; &#123; "client_ip" =&gt; "%&#123;client_ip[0]&#125;" &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        # if判断，主要用来判断当client_ip为"-"的情况下，</span><br><span class="line">        # 当direct_ip不为"-"的情况下，就将direct_ip的值赋给client_ip。因为在client_ip为"-"的情况下，都是直接不经过代理的访问，</span><br><span class="line">        # 此时direct_ip的值就是客户端真实IP地址，所以要进行一下替换。</span><br><span class="line">        # not in ["%&#123;direct_ip&#125;","-"] 这个判断的意思是如果direct_ip非空。</span><br><span class="line">        if [client_ip] == "-" &#123;</span><br><span class="line">            if [@metadata][direct_ip] not in ["%&#123;direct_ip&#125;","-"] &#123;</span><br><span class="line">                 mutate &#123;</span><br><span class="line">                     replace =&gt; &#123; "client_ip" =&gt; "%&#123;direct_ip&#125;" &#125;</span><br><span class="line">                 &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            drop&#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">        # direct_ip只是一个过渡字段，主要用于在某些情况下将值传给client_ip，</span><br><span class="line">        # 因此传值完成后，就可以删除direct_ip字段了。</span><br><span class="line">        #mutate &#123;</span><br><span class="line">        #    remove_field =&gt; "direct_ip"</span><br><span class="line">        #&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="输出到终端测试"><a href="#输出到终端测试" class="headerlink" title="输出到终端测试"></a>输出到终端测试</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 放到终端输出测试</span><br><span class="line">output &#123;</span><br><span class="line">    if [@metadata][myid] == "apacheaccess_log" &#123;</span><br><span class="line">        stdout &#123;</span><br><span class="line">            codec =&gt; "rubydebug"</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">### 完整版本</span><br><span class="line"></span><br><span class="line">[root@logstash logstash]# vim kafka_apache_into_es.conf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        mutate &#123;</span><br><span class="line">            gsub =&gt; ["message","\\x","\\\x"]</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if ('method":"HEAD' in [message]) &#123;</span><br><span class="line">            drop &#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        json &#123;</span><br><span class="line">            source =&gt; "message"</span><br><span class="line">            add_field =&gt; &#123; "[@metadata][direct_ip]" =&gt; "%&#123;direct_ip&#125;"&#125;</span><br><span class="line">            remove_field =&gt; "@version"</span><br><span class="line">            remove_field =&gt; "prospector"</span><br><span class="line">            remove_field =&gt; "beat"</span><br><span class="line">            remove_field =&gt; "source"</span><br><span class="line">            remove_field =&gt; "input"</span><br><span class="line">            remove_field =&gt; "offset"</span><br><span class="line">            remove_field =&gt; "fields"</span><br><span class="line">            remove_field =&gt; "host"</span><br><span class="line">            remove_field =&gt; "message"</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mutate &#123;</span><br><span class="line">            split =&gt; ["client_ip", ","]</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mutate &#123;</span><br><span class="line">            replace =&gt; &#123; "client_ip" =&gt; "%&#123;client_ip[0]&#125;" &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if [client_ip] == "-" &#123;</span><br><span class="line">            if [@metadata][direct_ip] not in ["%&#123;direct_ip&#125;","-"] &#123;</span><br><span class="line">                 mutate &#123;</span><br><span class="line">                     replace =&gt; &#123; "client_ip" =&gt; "%&#123;direct_ip&#125;" &#125;</span><br><span class="line">                 &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            drop&#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        #mutate &#123;</span><br><span class="line">        #    remove_field =&gt; "direct_ip"</span><br><span class="line">        #&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">    if [@metadata][myid] == "apacheaccess_log" &#123;</span><br><span class="line">        stdout &#123;</span><br><span class="line">            codec =&gt; "rubydebug"</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 放到终端测试</span><br><span class="line"># 启动logstash</span><br><span class="line">[root@logstash logstash]# ./bin/logstash -f kafka_apache_into_es.conf </span><br><span class="line"># 测试</span><br><span class="line">[root@server2 html]# curl 172.17.70.235/index.html</span><br><span class="line">hello apache</span><br></pre></td></tr></table></figure>
+<p><img src="/img/elk_105.png" width="50%"></p>
+<p><img src="/img/elk_106.png" width="50%"></p>
+<h3 id="输出到-ES集群"><a href="#输出到-ES集群" class="headerlink" title="输出到 ES集群"></a>输出到 ES集群</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">output &#123;</span><br><span class="line">    # 用于判断，跟上面input中[@metadata][myid]对应，当有多个输入源的时候，</span><br><span class="line">    # 可根据不同的标识，指定到不同的输出地址。</span><br><span class="line">    if [@metadata][myid] == "apacheaccess_log" &#123;</span><br><span class="line"></span><br><span class="line">        elasticsearch &#123;</span><br><span class="line">            # 这是指定输出到elasticsearch，并指定elasticsearch集群的地址。</span><br><span class="line">            hosts =&gt; ["172.17.70.229:9200","172.17.70.230:9200","172.17.70.231:9200"]</span><br><span class="line">            # 指定apache日志在elasticsearch中索引的名称，这个名称会在Kibana中用到。</span><br><span class="line">            # 索引的名称推荐以logstash开头，后面跟上索引标识和时间。</span><br><span class="line">            index =&gt; "logstash_apachelogs-%&#123;+YYYY.MM.dd&#125;"</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@logstash logstash]# ./bin/logstash -f kafka_apache_into_es.conf </span><br><span class="line">http://60.205.217.112:5601/app/kibana#/home?_g=()</span><br></pre></td></tr></table></figure>
+<p><img src="/img/elk_108.png" width="50%"></p>
+<h3 id="klbana-展示数据"><a href="#klbana-展示数据" class="headerlink" title="klbana 展示数据"></a>klbana 展示数据</h3><ol>
+<li>filebeat收集数据到kafka，然后logstash从kafka拉取数据，如果数据能够正确发送到elasticsearch，</li>
+<li>我们就可以在Kibana中配置索引了。</li>
+<li>登录Kibana，首先配置一个index_pattern，点击kibana左侧导航中的Management菜单，</li>
+<li>然后选择右侧的Index Patterns按钮，最后点击左上角的Create index pattern。    </li>
+</ol>
+<h4 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 有数据才有索引</span><br><span class="line"># -* 索引会以日期命名,每天一个索引</span><br></pre></td></tr></table></figure>
+<p><img src="/img/elk_107.png" width="50%"></p>
+<p><img src="/img/elk_109.png" width="50%"></p>
+<p><img src="/img/elk_110.png" width="50%"></p>
+<h4 id="索引以什么排序"><a href="#索引以什么排序" class="headerlink" title="索引以什么排序"></a>索引以什么排序</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">以时间字段@timestamp排序</span><br><span class="line">创建成功字段全部都正常先收拾</span><br></pre></td></tr></table></figure>
+<p><img src="/img/elk_111.png" width="50%"></p>
+<p><img src="/img/elk_112.png" width="50%"></p>
+<h4 id="展示"><a href="#展示" class="headerlink" title="展示"></a>展示</h4><p><img src="/img/elk_113.png" width="50%"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ELK/" rel="tag"><i class="fa fa-tag"></i> ELK</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/27/elk-base07/" rel="next" title="07 ELK Logstash 配置语法详解">
+                <i class="fa fa-chevron-left"></i> 07 ELK Logstash 配置语法详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/28/elk-base09/" rel="prev" title="09 ELK 收集Nginx访问日志实战案例">
+                09 ELK 收集Nginx访问日志实战案例 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ELK-收集日志的几种方式"><span class="nav-number">1.</span> <span class="nav-text">ELK 收集日志的几种方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ELK-收集Apache访问日志应用架构"><span class="nav-number">2.</span> <span class="nav-text">ELK 收集Apache访问日志应用架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apache-的日志格式与日志变量"><span class="nav-number">3.</span> <span class="nav-text">apache 的日志格式与日志变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#apache-的日志格式"><span class="nav-number">3.1.</span> <span class="nav-text">apache 的日志格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义apache日志格式"><span class="nav-number">3.2.</span> <span class="nav-text">自定义apache日志格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证日志输出"><span class="nav-number">3.3.</span> <span class="nav-text">验证日志输出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-filebeat"><span class="nav-number">4.</span> <span class="nav-text">配置 filebeat</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改配置文件"><span class="nav-number">4.1.</span> <span class="nav-text">修改配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试并启动"><span class="nav-number">4.2.</span> <span class="nav-text">测试并启动</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-logstash"><span class="nav-number">5.</span> <span class="nav-text">配置 logstash</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#输入部分"><span class="nav-number">5.1.</span> <span class="nav-text">输入部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#过滤部分"><span class="nav-number">5.2.</span> <span class="nav-text">过滤部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输出到终端测试"><span class="nav-number">5.3.</span> <span class="nav-text">输出到终端测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输出到-ES集群"><span class="nav-number">5.4.</span> <span class="nav-text">输出到 ES集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#klbana-展示数据"><span class="nav-number">5.5.</span> <span class="nav-text">klbana 展示数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建索引"><span class="nav-number">5.5.1.</span> <span class="nav-text">创建索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#索引以什么排序"><span class="nav-number">5.5.2.</span> <span class="nav-text">索引以什么排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#展示"><span class="nav-number">5.5.3.</span> <span class="nav-text">展示</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

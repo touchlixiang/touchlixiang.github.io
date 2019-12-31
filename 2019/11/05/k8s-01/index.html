@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="kubernetes,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="01 Kubernetes 概述">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/11/05/k8s-01/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_01.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_06.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_07.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_08.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_09.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_10.png">
+<meta property="og:updated_time" content="2019-11-08T01:07:27.972Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="01 Kubernetes 概述">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/11/05/k8s-01/">
+
+
+
+
+
+  <title>01 Kubernetes 概述 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/11/05/k8s-01/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">01 Kubernetes 概述</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-05T16:59:03+08:00">
+                2019-11-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="Kubernetes-是什么"><a href="#Kubernetes-是什么" class="headerlink" title="Kubernetes 是什么"></a>Kubernetes 是什么</h2><p>• Kubernetes是Google在2014年开源的一个容器集群管理系统，Kubernetes简称K8S。<br>• K8S用于容器化应用程序的部署，扩展和管理。<br>• K8S提供了容器编排，资源调度，弹性伸缩，部署管理，服务发现等一系列功能。<br>• Kubernetes目标是让部署容器化应用简单高效。<br>• 官方网站: <a href="http://www.kubernetes.io" target="_blank" rel="noopener">http://www.kubernetes.io</a><br>• 官方网站: <a href="https://kubernetes.io/zh/" target="_blank" rel="noopener">https://kubernetes.io/zh/</a></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 概念 https://kubernetes.io/zh/docs/concepts/</span><br><span class="line"># 参考 https://kubernetes.io/zh/docs/reference/</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. k8s 是一个容器平台</span><br><span class="line">2. k8s 是微服务平台</span><br></pre></td></tr></table></figure>
+<h2 id="Kubernetes-特性"><a href="#Kubernetes-特性" class="headerlink" title="Kubernetes 特性"></a>Kubernetes 特性</h2><p>• 自我修复<br>在节点故障时重新启动失败的容器，替换和重新部署，保证预期的副本数量；杀死健康检查失败的容器，并且在未准备好之前不会处理客户端请求，确保线上服务不中断。</p>
+<p>• 弹性伸缩<br>使用命令、UI或者基于CPU使用情况自动快速扩容和缩容应用程序实例，保证应用业务高峰并发时的高可用性；业务低峰时回收资源，以最小成本运行服务。</p>
+<p>• 自动部署和回滚<br>K8S采用滚动更新策略更新应用，一次更新一个Pod，而不是同时删除所有Pod，如果更新过程中出现问题，将回滚更改，确保升级不受影响业务。</p>
+<p>• 服务发现和负载均衡<br>K8S为多个容器提供一个统一访问入口（内部IP地址和一个DNS名称），并且负载均衡关联的所有容器，使得用户无需考虑容器IP问题。 </p>
+<p>• 机密和配置管理<br>管理机密数据和应用程序配置，而不需要把敏感数据暴露在镜像里，提高敏感数据安全性。并可以将一些常用的配置存储在K8S中，方便应用程序使用。</p>
+<p>• 存储编排<br>挂载外部存储系统，无论是来自本地存储，公有云（如AWS），还是网络存储（如NFS、GlusterFS、Ceph）都作为集群资源的一部分使用，极大提高存储使用灵活性。 </p>
+<p>• 批处理<br>提供一次性任务，定时任务；满足批量数据处理和分析的场景。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 负载均衡 : 用户实际访问 -&gt; service统一入口 -&gt; 负载容器</span><br><span class="line">2. docker : 适合单机</span><br><span class="line">3. k8s : 适合集群</span><br></pre></td></tr></table></figure>
+<h2 id="Kubernetes-集群架构与组件"><a href="#Kubernetes-集群架构与组件" class="headerlink" title="Kubernetes 集群架构与组件"></a>Kubernetes 集群架构与组件</h2><p><img src="/img/k8s/k8s_01.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1. 两个角色: </span><br><span class="line">    - master主控制节点:管控整个集群，调度</span><br><span class="line">    - node工作节点:跑任务，创建容器</span><br><span class="line">    </span><br><span class="line">2. 用户部署应用 先发送请求到 -&gt; API Server 协调创建部署</span><br><span class="line">3. API Server 发送给scheduler调度，根据资源利用率，看部署到哪个节点</span><br><span class="line">4. 如果需要创建3个副本 会交给 controller-manager 控制器 去完成</span><br><span class="line">5. 操作信息记录到etcd中</span><br><span class="line">6. master全部完成后 会交给node工作节点，node节点创建容器 和 网络规则(怎么去访问这组容器) -&gt; docker 创建容器</span><br><span class="line">7. pod 一个或多个容器组成</span><br><span class="line">8. etcd 可以部署在master 也可以独立部署</span><br></pre></td></tr></table></figure>
+<h3 id="Master核心组件"><a href="#Master核心组件" class="headerlink" title="Master核心组件"></a>Master核心组件</h3><h4 id="API-Server"><a href="#API-Server" class="headerlink" title="API Server"></a>API Server</h4><ol>
+<li>Kubernetes API，集群的统一入口，各组件协调者，以RESTful API提供接口服务，</li>
+<li>所有对象资源的增删改查和监听操作都交给APIServer处理后再提交给Etcd存储。</li>
+</ol>
+<h4 id="scheduler"><a href="#scheduler" class="headerlink" title="scheduler"></a>scheduler</h4><ol>
+<li>根据调度算法为新创建的Pod选择一个Node节点，</li>
+<li>可以任意部署,可以部署在同一个节点上,也可以部署在不同的节点上。</li>
+</ol>
+<h4 id="controller-manager"><a href="#controller-manager" class="headerlink" title="controller-manager"></a>controller-manager</h4><ol>
+<li>处理集群中常规后台任务，一个资源对应一个控制器，</li>
+<li>ControllerManager就是负责管理这些控制器的。</li>
+</ol>
+<h4 id="etcd"><a href="#etcd" class="headerlink" title="etcd"></a>etcd</h4><ol>
+<li>分布式键值存储系统。用于保存集群状态数据，</li>
+<li>比如Pod、Service等对象信息。</li>
+</ol>
+<h3 id="Node核心组件"><a href="#Node核心组件" class="headerlink" title="Node核心组件"></a>Node核心组件</h3><h4 id="kubelet"><a href="#kubelet" class="headerlink" title="kubelet"></a>kubelet</h4><ol>
+<li>kubelet是Master在Node节点上的Agent，</li>
+<li>管理本机运行容器的生命周期，比如创建容器、Pod挂载数据卷、下载secret、获取容器和节点状态等工作。</li>
+<li>kubelet将每个Pod转换成一组容器。</li>
+</ol>
+<h4 id="kube-proxy"><a href="#kube-proxy" class="headerlink" title="kube-proxy"></a>kube-proxy</h4><ol>
+<li>在Node节点上实现Pod网络代理，维护网络规则和四层负载均衡工作。</li>
+</ol>
+<h4 id="docker-或-rocket"><a href="#docker-或-rocket" class="headerlink" title="docker 或 rocket"></a>docker 或 rocket</h4><ol>
+<li>容器引擎，运行容器，常用docker。</li>
+</ol>
+<h2 id="Kubernetes-核心概念"><a href="#Kubernetes-核心概念" class="headerlink" title="Kubernetes 核心概念"></a>Kubernetes 核心概念</h2><h3 id="Pod"><a href="#Pod" class="headerlink" title="Pod"></a>Pod</h3><p>• 最小部署单元<br>• 一组容器的集合,里面可能是1个、3个、多个<br>• 一个Pod中的容器共享网络命名空间,也可以挂载数据卷让数据共享<br>• Pod是短暂的,服务更新或者重新发布就会销毁</p>
+<h3 id="Controllers"><a href="#Controllers" class="headerlink" title="Controllers"></a>Controllers</h3><p>• 针对不同的应用场景,分为不同的控制器<br>• ReplicaSet ： 确保预期的Pod副本数量,创建pod 有几个副本 如果少一个会帮我们启动,多了会删除,不会直接接触<br>• Deployment ： 无状态应用部署，一般使用该控制器,实际上就是 ReplicaSet<br>• StatefulSet ： 有状态应用部署，无状态N1节点的pod 偏移到n2节点,还能继续使用,有状态就有很多限制,偏移过去后无法继续使用,比如有存储,或者网络ID唯一，zookeeper集群,mysql主从，有状态需要考虑存储和网络ID。<br>• DaemonSet ： 确保所有Node运行同一个Pod  适合每个node节点上都运行一个应用 监控agent<br>• Job ： 一次性任务 就执行一次 比如备份或者离线任务<br>• Cronjob ： 定时任务，类似crontab 定时周期去执行 比如数据备份<br>• Controllers是更高级层次对象，用于部署和管理Pod</p>
+<h3 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h3><p>• 防止Pod失联<br>• 定义一组Pod的访问策略<br>• 找到一组pod,负载均衡</p>
+<h3 id="部署应用必须掌握"><a href="#部署应用必须掌握" class="headerlink" title="部署应用必须掌握"></a>部署应用必须掌握</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1. Controllers 部署应用 -&gt; 创建一组Pod -&gt; Service暴露应用,让外部访问</span><br></pre></td></tr></table></figure>
+<h3 id="Label"><a href="#Label" class="headerlink" title="Label"></a>Label</h3><ol>
+<li>标签，在k8s中,所有的关联和筛选都是通过标签去做，每个资源都会打标签</li>
+<li>比如 Service 如何找到这一组Pod，通过标签关联</li>
+<li>标签，附加到某个资源上，用于关联对象、查询和筛选</li>
+</ol>
+<h3 id="Namespace"><a href="#Namespace" class="headerlink" title="Namespace"></a>Namespace</h3><ol>
+<li>命名空间，将对象逻辑上隔离</li>
+<li>逻辑概念, 用户可以访问某一个命名空间，看到的是指定的命名空间,针对团队项目创建不同的命名空间,管控权限</li>
+</ol>
+<h2 id="每天5分钟玩转k8s"><a href="#每天5分钟玩转k8s" class="headerlink" title="每天5分钟玩转k8s"></a>每天5分钟玩转k8s</h2><h3 id="重要概念梳理"><a href="#重要概念梳理" class="headerlink" title="重要概念梳理"></a>重要概念梳理</h3><h4 id="Master"><a href="#Master" class="headerlink" title="Master"></a>Master</h4><ol>
+<li>Master 是 Cluster 的大脑，它的主要职责是调度，即决定将应用放在哪里运行。</li>
+<li>Master 运行 Linux 操作系统，可以是物理机或者虚拟机。为了实现高可用，可以运行多个 Master。</li>
+</ol>
+<h4 id="Node"><a href="#Node" class="headerlink" title="Node"></a>Node</h4><ol>
+<li>Node 的职责是运行容器应用。Node 由 Master 管理，Node 负责监控并汇报容器的状态，并根据 Master 的要求管理容器的生命周期。</li>
+<li>Node 运行在 Linux 操作系统，可以是物理机或者是虚拟机。</li>
+</ol>
+<h4 id="Pod-1"><a href="#Pod-1" class="headerlink" title="Pod"></a>Pod</h4><ol>
+<li>Pod 是 Kubernetes 的最小工作单元。</li>
+<li>每个 Pod 包含一个或多个容器。</li>
+<li>Pod 中的容器会作为一个整体被 Master 调度到一个 Node 上运行。</li>
+</ol>
+<h4 id="Pod-作用"><a href="#Pod-作用" class="headerlink" title="Pod 作用"></a>Pod 作用</h4><ol>
+<li>可管理性:<ul>
+<li>有些容器天生就是需要紧密联系，一起工作。Pod 提供了比容器更高层次的抽象，将它们封装到一个部署单元中。Kubernetes 以 Pod 为最小单位进行调度、扩展、共享资源、管理生命周期。</li>
+</ul>
+</li>
+<li>通信和资源共享:<ul>
+<li>Pod 中的所有容器使用同一个网络 namespace，即相同的 IP 地址和 Port 空间。它们可以直接用 localhost 通信。同样的，这些容器可以共享存储，当 Kubernetes 挂载 volume 到 Pod，本质上是将 volume 挂载到 Pod 中的每一个容器。</li>
+</ul>
+</li>
+</ol>
+<h4 id="Pods-两种使用方式"><a href="#Pods-两种使用方式" class="headerlink" title="Pods 两种使用方式"></a>Pods 两种使用方式</h4><ol>
+<li><p>运行单一容器:</p>
+<ul>
+<li>one-container-per-Pod 是 Kubernetes 最常见的模型，这种情况下，只是将单个容器简单封装成 Pod。</li>
+<li>即便是只有一个容器，Kubernetes 管理的也是 Pod 而不是直接管理容器。</li>
+</ul>
+</li>
+</ol>
+<ol start="2">
+<li><p>运行多个容器:</p>
+<ul>
+<li>但问题在于：哪些容器应该放到一个 Pod 中？ </li>
+<li>答案是：这些容器联系必须 非常紧密，而且需要 直接共享资源。</li>
+</ul>
+</li>
+</ol>
+<ol start="3">
+<li>Tomcat 从 MySQL 读取数据，它们之间需要协作，但还不至于需要放到一个 Pod 中一起部署，一起启动，一起停止。同时它们是之间通过 JDBC 交换数据，并不是直接共享存储，所以放到各自的 Pod 中更合适。</li>
+</ol>
+<h4 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h4><ol>
+<li>Kubernetes 通常不会直接创建 Pod，而是通过 Controller 来管理 Pod 的。</li>
+<li>Controller 中定义了 Pod 的部署特性，比如有几个副本，在什么样的 Node 上运行等。</li>
+<li>为了满足不同的业务场景，Kubernetes 提供了多种 Controller，包括 Deployment、ReplicaSet、DaemonSet、StatefuleSet、Job 等。</li>
+</ol>
+<h4 id="Deployment"><a href="#Deployment" class="headerlink" title="Deployment"></a>Deployment</h4><ol>
+<li>是最常用的 Controller。Deployment 可以管理 Pod 的多个副本，并确保 Pod 按照期望的状态运行。</li>
+</ol>
+<h4 id="ReplicaSet"><a href="#ReplicaSet" class="headerlink" title="ReplicaSet"></a>ReplicaSet</h4><ol>
+<li>实现了 Pod 的多副本管理。使用 Deployment 时会自动创建 ReplicaSet，也就是说 Deployment 是通过 ReplicaSet 来管理 Pod 的多个副本，我们通常不需要直接使用 ReplicaSet。</li>
+</ol>
+<h4 id="DaemonSet"><a href="#DaemonSet" class="headerlink" title="DaemonSet"></a>DaemonSet</h4><ol>
+<li>用于每个 Node 最多只运行一个 Pod 副本的场景。正如其名称所揭示的，DaemonSet 通常用于运行 daemon。</li>
+</ol>
+<h4 id="StatefuleSet"><a href="#StatefuleSet" class="headerlink" title="StatefuleSet"></a>StatefuleSet</h4><ol>
+<li><p>能够保证 Pod 的每个副本在整个生命周期中名称是不变的。</p>
+</li>
+<li><p>而其他 Controller 不提供这个功能，当某个 Pod 发生故障需要删除并重新启动时，Pod 的名称会发生变化。</p>
+</li>
+<li><p>同时 StatefuleSet 会保证副本按照固定的顺序启动、更新或者删除。</p>
+</li>
+</ol>
+<h4 id="Job"><a href="#Job" class="headerlink" title="Job"></a>Job</h4><ol>
+<li>用于运行结束就删除的应用。而其他 Controller 中的 Pod 通常是长期持续运行。</li>
+</ol>
+<h4 id="Service-1"><a href="#Service-1" class="headerlink" title="Service"></a>Service</h4><ol>
+<li><p>Deployment 可以部署多个副本，每个 Pod 都有自己的 IP，外界如何访问这些副本呢？</p>
+</li>
+<li><p>通过 Pod 的 IP 吗？要知道 Pod 很可能会被频繁地销毁和重启，它们的 IP 会发生变化，用 IP 来访问不太现实。</p>
+</li>
+<li><p>Kubernetes Service 定义了外界访问一组特定 Pod 的方式。Service 有自己的 IP 和端口，Service 为 Pod 提供了负载均衡。</p>
+</li>
+<li><p>Kubernetes 运行容器（Pod）与访问容器（Pod）这两项任务分别由 Controller 和 Service 执行。</p>
+</li>
+</ol>
+<h4 id="Namespace-1"><a href="#Namespace-1" class="headerlink" title="Namespace"></a>Namespace</h4><ol>
+<li><p>如果有多个用户或项目组使用同一个 Kubernetes Cluster，如何将他们创建的 Controller、Pod 等资源分开呢？</p>
+</li>
+<li><p>Namespace 可以将一个物理的 Cluster 逻辑上划分成多个虚拟 Cluster，每个 Cluster 就是一个 Namespace。</p>
+</li>
+<li><p>不同 Namespace 里的资源是完全隔离的。</p>
+</li>
+<li><p>Kubernetes 默认创建了两个 Namespace。</p>
+<ul>
+<li><p>default – 创建资源时如果不指定，将被放到这个 Namespace 中。</p>
+</li>
+<li><p>kube-system – Kubernetes 自己创建的系统资源将放到这个 Namespace 中。</p>
+</li>
+<li><p>可以使用 kubectl get namespace 查看当前集群里所有的命名空间。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="Kubernetes-架构"><a href="#Kubernetes-架构" class="headerlink" title="Kubernetes 架构"></a>Kubernetes 架构</h3><ol>
+<li>Kubernetes Cluster 由 Master 和 Node 组成，节点上运行着若干 Kubernetes 服务。</li>
+</ol>
+<h4 id="Master-节点"><a href="#Master-节点" class="headerlink" title="Master 节点"></a>Master 节点</h4><ol>
+<li>Master 是 Kubernetes Cluster 的大脑，运行着如下 Daemon 服务：kube-apiserver、kube-scheduler、kube-controller-manager、etcd 和 Pod 网络（例如 flannel）。</li>
+</ol>
+<p><img src="/img/k8s/k8s_06.png" width="50%"></p>
+<h4 id="API-Server（kube-apiserver）"><a href="#API-Server（kube-apiserver）" class="headerlink" title="API Server（kube-apiserver）"></a>API Server（kube-apiserver）</h4><ol>
+<li>API Server 提供 HTTP/HTTPS RESTful API，即 Kubernetes API。</li>
+<li>API Server 是 Kubernetes Cluster 的前端接口，各种客户端工具（CLI 或 UI）以及 Kubernetes 其他组件可以通过它管理 Cluster 的各种资源。</li>
+</ol>
+<h4 id="Scheduler（kube-scheduler）"><a href="#Scheduler（kube-scheduler）" class="headerlink" title="Scheduler（kube-scheduler）"></a>Scheduler（kube-scheduler）</h4><ol>
+<li>Scheduler 负责决定将 Pod 放在哪个 Node 上运行。</li>
+<li>Scheduler 在调度时会充分考虑 Cluster 的拓扑结构，当前各个节点的负载，以及应用对高可用、性能、数据亲和性的需求。</li>
+</ol>
+<h4 id="Controller-Manager（kube-controller-manager）"><a href="#Controller-Manager（kube-controller-manager）" class="headerlink" title="Controller Manager（kube-controller-manager）"></a>Controller Manager（kube-controller-manager）</h4><ol>
+<li>Controller Manager 负责管理 Cluster 各种资源，保证资源处于预期的状态。</li>
+<li>Controller Manager 由多种 controller 组成，包括 replication controller、endpoints controller、namespace controller、serviceaccounts controller 等。</li>
+<li>不同的 controller 管理不同的资源。例如 replication controller 管理 Deployment、StatefulSet、DaemonSet 的生命周期，namespace controller 管理 Namespace 资源。</li>
+</ol>
+<h4 id="etcd-1"><a href="#etcd-1" class="headerlink" title="etcd"></a>etcd</h4><ol>
+<li>etcd 负责保存 Kubernetes Cluster 的配置信息和各种资源的状态信息。</li>
+<li>当数据发生变化时，etcd 会快速地通知 Kubernetes 相关组件。</li>
+</ol>
+<h4 id="Pod-网络"><a href="#Pod-网络" class="headerlink" title="Pod 网络"></a>Pod 网络</h4><ol>
+<li>Pod 要能够相互通信，Kubernetes Cluster 必须部署 Pod 网络，flannel 是其中一个可选方案。</li>
+<li>以上是 Master 上运行的组件</li>
+</ol>
+<h4 id="Node-1"><a href="#Node-1" class="headerlink" title="Node"></a>Node</h4><ol>
+<li>Node 是 Pod 运行的地方，Kubernetes 支持 Docker、rkt 等容器 Runtime。 </li>
+<li>Node上运行的 Kubernetes 组件有 kubelet、kube-proxy 和 Pod 网络（例如 flannel）。</li>
+</ol>
+<p><img src="/img/k8s/k8s_07.png" width="50%"></p>
+<h4 id="kubelet-1"><a href="#kubelet-1" class="headerlink" title="kubelet"></a>kubelet</h4><ol>
+<li>kubelet 是 Node 的 agent，当 Scheduler 确定在某个 Node 上运行 Pod 后，会将 Pod 的具体配置信息（image、volume 等）发送给该节点的 kubelet，</li>
+<li>kubelet 根据这些信息创建和运行容器，并向 Master 报告运行状态。</li>
+</ol>
+<h4 id="kube-proxy-1"><a href="#kube-proxy-1" class="headerlink" title="kube-proxy"></a>kube-proxy</h4><ol>
+<li>service 在逻辑上代表了后端的多个 Pod，外界通过 service 访问 Pod。</li>
+<li>service 接收到的请求是如何转发到 Pod 的呢？这就是 kube-proxy 要完成的工作。</li>
+<li>每个 Node 都会运行 kube-proxy 服务，它负责将访问 service 的 TCP/UPD 数据流转发到后端的容器。</li>
+<li>如果有多个副本，kube-proxy 会实现负载均衡。</li>
+</ol>
+<h4 id="Pod-网络-1"><a href="#Pod-网络-1" class="headerlink" title="Pod 网络"></a>Pod 网络</h4><ol>
+<li>Pod 要能够相互通信，Kubernetes Cluster 必须部署 Pod 网络，flannel 是其中一个可选方案。</li>
+</ol>
+<h4 id="完整的架构图"><a href="#完整的架构图" class="headerlink" title="完整的架构图"></a>完整的架构图</h4><p><img src="/img/k8s/k8s_08.png" width="50%"></p>
+<ol>
+<li>为什么 k8s-master 上也有 kubelet 和 kube-proxy 呢？</li>
+<li>这是因为 Master 上也可以运行应用，即 Master 同时也是一个 Node。</li>
+<li>几乎所有的 Kubernetes 组件本身也运行在 Pod 里，执行如下命令：</li>
+<li>kubectl get pod –all-namespaces -o wide</li>
+</ol>
+<p><img src="/img/k8s/k8s_09.png" width="50%"></p>
+<ol start="5">
+<li>Kubernetes 的系统组件都被放到 kube-system namespace 中。</li>
+<li>这里有一个 kube-dns 组件，它为 Cluster 提供 DNS 服务，我们后面会讨论。</li>
+<li>kube-dns是在执行 kubeadm init 时（第 ⑤ 步）作为附加组件安装的。</li>
+</ol>
+<p><img src="/img/k8s/k8s_10.png" width="50%"></p>
+<h3 id="通过例子理解-k8s-架构"><a href="#通过例子理解-k8s-架构" class="headerlink" title="通过例子理解 k8s 架构"></a>通过例子理解 k8s 架构</h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> kubernetes</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/01/docker-base09/" rel="next" title="Docker 构建持续集成环境">
+                <i class="fa fa-chevron-left"></i> Docker 构建持续集成环境
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/05/k8s-02/" rel="prev" title="02 搭建一个完整的Kubernetes集群">
+                02 搭建一个完整的Kubernetes集群 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes-是什么"><span class="nav-number">1.</span> <span class="nav-text">Kubernetes 是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes-特性"><span class="nav-number">2.</span> <span class="nav-text">Kubernetes 特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes-集群架构与组件"><span class="nav-number">3.</span> <span class="nav-text">Kubernetes 集群架构与组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Master核心组件"><span class="nav-number">3.1.</span> <span class="nav-text">Master核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#API-Server"><span class="nav-number">3.1.1.</span> <span class="nav-text">API Server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#scheduler"><span class="nav-number">3.1.2.</span> <span class="nav-text">scheduler</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#controller-manager"><span class="nav-number">3.1.3.</span> <span class="nav-text">controller-manager</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#etcd"><span class="nav-number">3.1.4.</span> <span class="nav-text">etcd</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Node核心组件"><span class="nav-number">3.2.</span> <span class="nav-text">Node核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#kubelet"><span class="nav-number">3.2.1.</span> <span class="nav-text">kubelet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#kube-proxy"><span class="nav-number">3.2.2.</span> <span class="nav-text">kube-proxy</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#docker-或-rocket"><span class="nav-number">3.2.3.</span> <span class="nav-text">docker 或 rocket</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes-核心概念"><span class="nav-number">4.</span> <span class="nav-text">Kubernetes 核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pod"><span class="nav-number">4.1.</span> <span class="nav-text">Pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Controllers"><span class="nav-number">4.2.</span> <span class="nav-text">Controllers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Service"><span class="nav-number">4.3.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署应用必须掌握"><span class="nav-number">4.4.</span> <span class="nav-text">部署应用必须掌握</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Label"><span class="nav-number">4.5.</span> <span class="nav-text">Label</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Namespace"><span class="nav-number">4.6.</span> <span class="nav-text">Namespace</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#每天5分钟玩转k8s"><span class="nav-number">5.</span> <span class="nav-text">每天5分钟玩转k8s</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#重要概念梳理"><span class="nav-number">5.1.</span> <span class="nav-text">重要概念梳理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Master"><span class="nav-number">5.1.1.</span> <span class="nav-text">Master</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Node"><span class="nav-number">5.1.2.</span> <span class="nav-text">Node</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pod-1"><span class="nav-number">5.1.3.</span> <span class="nav-text">Pod</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pod-作用"><span class="nav-number">5.1.4.</span> <span class="nav-text">Pod 作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pods-两种使用方式"><span class="nav-number">5.1.5.</span> <span class="nav-text">Pods 两种使用方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Controller"><span class="nav-number">5.1.6.</span> <span class="nav-text">Controller</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Deployment"><span class="nav-number">5.1.7.</span> <span class="nav-text">Deployment</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ReplicaSet"><span class="nav-number">5.1.8.</span> <span class="nav-text">ReplicaSet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DaemonSet"><span class="nav-number">5.1.9.</span> <span class="nav-text">DaemonSet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#StatefuleSet"><span class="nav-number">5.1.10.</span> <span class="nav-text">StatefuleSet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Job"><span class="nav-number">5.1.11.</span> <span class="nav-text">Job</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Service-1"><span class="nav-number">5.1.12.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Namespace-1"><span class="nav-number">5.1.13.</span> <span class="nav-text">Namespace</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kubernetes-架构"><span class="nav-number">5.2.</span> <span class="nav-text">Kubernetes 架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Master-节点"><span class="nav-number">5.2.1.</span> <span class="nav-text">Master 节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#API-Server（kube-apiserver）"><span class="nav-number">5.2.2.</span> <span class="nav-text">API Server（kube-apiserver）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Scheduler（kube-scheduler）"><span class="nav-number">5.2.3.</span> <span class="nav-text">Scheduler（kube-scheduler）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Controller-Manager（kube-controller-manager）"><span class="nav-number">5.2.4.</span> <span class="nav-text">Controller Manager（kube-controller-manager）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#etcd-1"><span class="nav-number">5.2.5.</span> <span class="nav-text">etcd</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pod-网络"><span class="nav-number">5.2.6.</span> <span class="nav-text">Pod 网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Node-1"><span class="nav-number">5.2.7.</span> <span class="nav-text">Node</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#kubelet-1"><span class="nav-number">5.2.8.</span> <span class="nav-text">kubelet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#kube-proxy-1"><span class="nav-number">5.2.9.</span> <span class="nav-text">kube-proxy</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pod-网络-1"><span class="nav-number">5.2.10.</span> <span class="nav-text">Pod 网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#完整的架构图"><span class="nav-number">5.2.11.</span> <span class="nav-text">完整的架构图</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过例子理解-k8s-架构"><span class="nav-number">5.3.</span> <span class="nav-text">通过例子理解 k8s 架构</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

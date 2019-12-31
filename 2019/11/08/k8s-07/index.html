@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="kubernetes,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="07 Deployment 功能及应用场景">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/11/08/k8s-07/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_73.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_74.png">
+<meta property="og:updated_time" content="2019-12-18T00:53:59.739Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="07 Deployment 功能及应用场景">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/11/08/k8s-07/">
+
+
+
+
+
+  <title>07 Deployment 功能及应用场景 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/11/08/k8s-07/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">07 Deployment 功能及应用场景</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-08T15:37:15+08:00">
+                2019-11-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="Deployment-控制器"><a href="#Deployment-控制器" class="headerlink" title="Deployment 控制器"></a>Deployment 控制器</h2><h3 id="Pod与controllers的关系"><a href="#Pod与controllers的关系" class="headerlink" title="Pod与controllers的关系"></a>Pod与controllers的关系</h3><ol>
+<li>controllers: 在集群上管理和运行容器的对象</li>
+<li>通过label-selector相关联</li>
+<li>Pod通过控制器实现应用的运维,如伸缩,滚动升级等</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. Pod是k8s当中最小的调度单元,但是一般很少直接使用pod</span><br><span class="line">2. 使用控制器去对应用做部署</span><br><span class="line">3. 控制器是高级对象，Pod是抽象的，控制器可以完成更高级的应用部署</span><br><span class="line">4. controllers另外的学名 workload 工作负载</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_73.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 在一个yaml文件中可以分成两类:</span><br><span class="line">1. 控制器</span><br><span class="line">    - 指定控制器和api</span><br><span class="line">    - 元数据</span><br><span class="line">    - 标明标签，通过标签找到一组Pod </span><br><span class="line">2. Pod模板</span><br><span class="line">    - 标明标签，关联控制器</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 知识点总结:</span><br><span class="line">1. 控制器管理Pod,使用控制器去部署应用</span><br><span class="line">2. 控制器通过标签关联Pod</span><br></pre></td></tr></table></figure>
+<h3 id="Deployment-功能与应用场景"><a href="#Deployment-功能与应用场景" class="headerlink" title="Deployment 功能与应用场景"></a>Deployment 功能与应用场景</h3><ol>
+<li>部署无状态应用</li>
+<li>管理Pod和ReplicaSet</li>
+<li>具有上线部署、副本设定、滚动升级、回滚等功能</li>
+<li>提供声明式更新，例如值只更新一个新的Image</li>
+<li>应用场景: Web服务，微服务</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1. ReplicaSet也是控制器,但是他得功能比较单一</span><br></pre></td></tr></table></figure>
+<h3 id="Deployment-YAML文件字段解析"><a href="#Deployment-YAML文件字段解析" class="headerlink" title="Deployment YAML文件字段解析"></a>Deployment YAML文件字段解析</h3><p><img src="/img/k8s/k8s_74.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在k8s集群中创建pod的两种方式：</span><br><span class="line">1. 使用命令创建 用于测试</span><br><span class="line">2. 使用yaml文件 便于管理和复用</span><br></pre></td></tr></table></figure>
+<h3 id="Deployment-部署无状态应用"><a href="#Deployment-部署无状态应用" class="headerlink" title="Deployment 部署无状态应用"></a>Deployment 部署无状态应用</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl create deployment --help</span><br><span class="line">Usage:</span><br><span class="line">  kubectl create deployment NAME --image=image [--dry-run] [options]</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 测试并输出到yaml格式文件</span><br><span class="line">[root@k8s-master1 demo]# kubectl create deployment web --image=nginx1.16 --dry-run -o yaml</span><br><span class="line">[root@k8s-master1 demo]# kubectl create deployment web --image=nginx1.16 --dry-run -o yaml &gt; web.yaml</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># 修改为应用属性</span><br><span class="line"># 1. 副本个数</span><br><span class="line"># 2. 标签名</span><br><span class="line"># 3. 容器镜像</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim web.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    app: web</span><br><span class="line">  name: web</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: web</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: web</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.17.70.252/project/java-demo:latest</span><br><span class="line">        name: java-demo</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl get pods -o wide</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">web-84c6fbbdcc-6tbkx   1/1     Running   0          28s   10.244.0.45   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-ldv48   1/1     Running   0          28s   10.244.0.46   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-qvl9f   1/1     Running   0          28s   10.244.1.48   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl logs web-84c6fbbdcc-6tbkx </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get deploy</span><br><span class="line">NAME   READY   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">web    3/3     3            3           6m23s</span><br></pre></td></tr></table></figure>
+<h3 id="暴露应用"><a href="#暴露应用" class="headerlink" title="暴露应用"></a>暴露应用</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在k8s集群中暴露应用两种方式:</span><br><span class="line">1. service</span><br><span class="line">2. ingress</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl expose --help</span><br><span class="line">Usage:</span><br><span class="line">  kubectl expose (-f FILENAME | TYPE NAME) [--port=port] [--protocol=TCP|UDP|SCTP] [--target-port=number-or-name]</span><br><span class="line">[--name=name] [--external-ip=external-ip-of-service] [--type=type] [options]</span><br><span class="line"></span><br><span class="line"># kubectl expose service名称 pod资源 pod名称 service端口 pod端口 service类型</span><br><span class="line">[root@k8s-master1 demo]# kubectl expose --name=web deployment web --port=80 --target-port=8080 --type=NodePort --dry-run -o yaml &gt; web-service.yaml</span><br><span class="line">[root@k8s-master1 demo]# vim web-service.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    app: web</span><br><span class="line">  name: web</span><br><span class="line">spec:</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80</span><br><span class="line">    protocol: TCP</span><br><span class="line">    targetPort: 8080</span><br><span class="line">  selector:</span><br><span class="line">    app: web                    # 关联pod标签</span><br><span class="line">  type: NodePort</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl apply -f web-service.yaml </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get svc</span><br><span class="line">NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">kubernetes   ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        15d</span><br><span class="line">web          NodePort    10.0.0.204   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:31619/TCP   13s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl edit service/web</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get ep</span><br><span class="line">NAME         ENDPOINTS                                            AGE</span><br><span class="line">kubernetes   172.17.70.251:6443,172.17.70.252:6443                16d</span><br><span class="line">web          10.244.0.45:8080,10.244.0.46:8080,10.244.1.48:8080   3m50s</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># nodeIP+端口测试访问</span><br></pre></td></tr></table></figure>
+<h3 id="升级与回滚"><a href="#升级与回滚" class="headerlink" title="升级与回滚"></a>升级与回滚</h3><h4 id="升级操作-set"><a href="#升级操作-set" class="headerlink" title="升级操作 set"></a>升级操作 set</h4><ol>
+<li>升级更新 </li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl set --help</span><br><span class="line"># 动态修改镜像</span><br><span class="line"># 镜像通过tag版本号进行区分</span><br><span class="line">[root@k8s-master1 demo]# kubectl set image --help</span><br><span class="line">Usage:</span><br><span class="line">  kubectl set image (-f FILENAME | TYPE NAME) CONTAINER_NAME_1=CONTAINER_IMAGE_1 ... CONTAINER_NAME_N=CONTAINER_IMAGE_N</span><br><span class="line">[options]</span><br><span class="line"># kubectl set image deployment/nginx busybox=busybox nginx=nginx:1.9.1</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>模拟程序升级</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"># 需要修改模拟程序并打包一个新的镜像,推送到镜像仓库,这里先用nginx替代</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# cat web.yaml </span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    app: web</span><br><span class="line">  name: web</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: web</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: web</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.17.70.252/project/java-demo:latest</span><br><span class="line">        name: java-demo</span><br><span class="line"></span><br><span class="line"># deployment name</span><br><span class="line"># 容器 name</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl set image deployment web java-demo=nginx:1.16</span><br><span class="line">deployment.apps/web image updated</span><br><span class="line"></span><br><span class="line"># 滚动升级 重新创建容器 失败了就不会删除之前的容器</span><br><span class="line"># 先启动一个新镜像的pod 成功后再删除之前打好标记的pod 一个一个平滑升级</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME                   READY   STATUS              RESTARTS   AGE</span><br><span class="line">web-7bddf7b45f-6ntcs   0/1     ContainerCreating   0          4s</span><br><span class="line">web-84c6fbbdcc-6tbkx   1/1     Running             0          30m</span><br><span class="line">web-84c6fbbdcc-ldv48   1/1     Running             0          30m</span><br><span class="line">web-84c6fbbdcc-qvl9f   1/1     Running             0          30m</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 错误原因 镜像名字写错了 </span><br><span class="line">Events:</span><br><span class="line">  Type     Reason     Age                 From                Message</span><br><span class="line">  ----     ------     ----                ----                -------</span><br><span class="line">  Normal   Scheduled  <span class="tag">&lt;<span class="name">unknown</span>&gt;</span>           default-scheduler   Successfully assigned default/web-7bddf7b45f-6ntcs to k8s-node1</span><br><span class="line">  Normal   BackOff    23s (x4 over 102s)  kubelet, k8s-node1  Back-off pulling image "nginx1.16"</span><br><span class="line">  Warning  Failed     23s (x4 over 102s)  kubelet, k8s-node1  Error: ImagePullBackOff</span><br><span class="line">  Normal   Pulling    11s (x4 over 110s)  kubelet, k8s-node1  Pulling image "nginx1.16"</span><br><span class="line">  Warning  Failed     6s (x4 over 103s)   kubelet, k8s-node1  Failed to pull image "nginx1.16": rpc error: code = Unknown desc = Error response from daemon: pull access denied for nginx1.16, repository does not exist or may require 'docker login'</span><br><span class="line">  Warning  Failed     6s (x4 over 103s)   kubelet, k8s-node1  Error: ErrImagePull</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl set image deployment web java-demo=nginx:1.16</span><br><span class="line"></span><br><span class="line"># 还需要修改service里面的端口 8080 -&gt; 80</span><br><span class="line">[root@k8s-master1 demo]# kubectl edit service/web</span><br><span class="line">...</span><br><span class="line">spec:</span><br><span class="line">  clusterIP: 10.0.0.204</span><br><span class="line">  externalTrafficPolicy: Cluster</span><br><span class="line">  ports:</span><br><span class="line">  - nodePort: 31619</span><br><span class="line">    port: 80</span><br><span class="line">    protocol: TCP</span><br><span class="line">    targetPort: 80                 # 修改目标端口</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>查看升级状态</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 如果pod做了健康检查,那么在更新的时候可以查看更新状态</span><br><span class="line">[root@k8s-master1 demo]# kubectl rollout status deployment/web</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>kubectl patch 补丁命令</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl patch --help</span><br></pre></td></tr></table></figure>
+<h4 id="回滚操作-rollout"><a href="#回滚操作-rollout" class="headerlink" title="回滚操作 rollout"></a>回滚操作 rollout</h4><ol>
+<li>查看deployment历史记录</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl rollout --help</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl rollout history deployment/web</span><br><span class="line">deployment.apps/web </span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         <span class="tag">&lt;<span class="name">none</span>&gt;</span>       # 第一次部署demo </span><br><span class="line">2         <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">3         <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">4         <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>回滚到上一个版本</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl rollout undo deployment/web</span><br><span class="line">deployment.apps/web rolled back</span><br><span class="line"></span><br><span class="line"># 滚动回滚 部署了新的pod</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME                   READY   STATUS        RESTARTS   AGE</span><br><span class="line">web-68d86dd855-pgjlq   0/1     Terminating   0          13m</span><br><span class="line">web-68d86dd855-pp8mv   0/1     Terminating   0          13m</span><br><span class="line">web-68d86dd855-pq6w6   0/1     Terminating   0          13m</span><br><span class="line">web-8598778cf-2m7lb    1/1     Running       0          9s</span><br><span class="line">web-8598778cf-fnjtd    1/1     Running       0          8s</span><br><span class="line">web-8598778cf-qjsd6    1/1     Running       0          10s</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME                  READY   STATUS    RESTARTS   AGE</span><br><span class="line">web-8598778cf-2m7lb   1/1     Running   0          14s</span><br><span class="line">web-8598778cf-fnjtd   1/1     Running   0          13s</span><br><span class="line">web-8598778cf-qjsd6   1/1     Running   0          15s</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>回滚到指定版本</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 我这个nginx 回滚到 java-demo  别忘记修改回端口</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl rollout undo deployment/web --to-revision=1</span><br><span class="line">deployment.apps/web rolled back</span><br><span class="line">[root@k8s-master1 demo]# kubectl edit svc/web</span><br><span class="line">service/web edited</span><br></pre></td></tr></table></figure>
+<h4 id="删除应用"><a href="#删除应用" class="headerlink" title="删除应用"></a>删除应用</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 删除pod还会拉起,因为创建的是deployment会保证副本数量</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete pod web-84c6fbbdcc-7dh5h</span><br><span class="line">pod "web-84c6fbbdcc-7dh5h" deleted</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE</span><br><span class="line">web-84c6fbbdcc-w2v5g   1/1     Running   0          3m33s</span><br><span class="line">web-84c6fbbdcc-w56vs   1/1     Running   0          4s</span><br><span class="line">web-84c6fbbdcc-xzglk   1/1     Running   0          3m30s</span><br><span class="line"></span><br><span class="line"># 需要删除deployment</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete deployment/web</span><br><span class="line">deployment.apps "web" deleted</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME                   READY   STATUS        RESTARTS   AGE</span><br><span class="line">web-84c6fbbdcc-w2v5g   0/1     Terminating   0          4m5s</span><br><span class="line">web-84c6fbbdcc-w56vs   0/1     Terminating   0          36s</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl apply -f web.yaml </span><br><span class="line">deployment.apps/web created</span><br><span class="line">[root@k8s-master1 demo]# kubectl rollout history deployment/web</span><br><span class="line">deployment.apps/web </span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># service 和 pod 是不同的一种组件,删除pod并不会影响已创建的svc,这种解耦太棒了</span><br><span class="line"># 删除svc</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete svc/web</span><br></pre></td></tr></table></figure>
+<h3 id="弹性伸缩-scale"><a href="#弹性伸缩-scale" class="headerlink" title="弹性伸缩 scale"></a>弹性伸缩 scale</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 根据活动扩容实例</span><br><span class="line">2. 传统的方式是虚拟机,准备扩容环境</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># kubectl scale 快速扩容 承担并发</span><br><span class="line">[root@k8s-master1 demo]# kubectl scale --help</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl scale --replicas=5 deployment/web </span><br><span class="line">deployment.apps/web scaled</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods -o wide</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE     IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">web-84c6fbbdcc-685nc   1/1     Running   0          5m41s   10.244.0.55   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-88289   1/1     Running   0          30s     10.244.1.57   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-9mdjv   1/1     Running   0          5m41s   10.244.0.56   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-dvdkn   1/1     Running   0          5m41s   10.244.1.55   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-fpwqt   1/1     Running   0          30s     10.244.1.56   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>如果集群的资源不够,单只扩容pod是不行的</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 增加nodes节点或者增加nodes的资源</span><br><span class="line">2. 如果扩容node节点 都是根据业务的量去扩容,并且提前规划</span><br><span class="line">3. 现在都是手动扩容,缩容,如何自动弹性实现</span><br><span class="line">4. 自动需要借助node的资源指标进行弹性扩容,比如cpu,内存等</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>手动缩容</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl scale --replicas=3 deployment/web </span><br><span class="line">deployment.apps/web scaled</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods -o wide</span><br><span class="line">NAME                   READY   STATUS        RESTARTS   AGE     IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">web-84c6fbbdcc-685nc   1/1     Running       0          9m36s   10.244.0.55   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-88289   0/1     Terminating   0          4m25s   10.244.1.57   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-9mdjv   1/1     Running       0          9m36s   10.244.0.56   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-dvdkn   1/1     Running       0          9m36s   10.244.1.55   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-fpwqt   0/1     Terminating   0          4m25s   10.244.1.56   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods -o wide</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE     IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">web-84c6fbbdcc-685nc   1/1     Running   0          9m41s   10.244.0.55   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-9mdjv   1/1     Running   0          9m41s   10.244.0.56   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">web-84c6fbbdcc-dvdkn   1/1     Running   0          9m41s   10.244.1.55   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="Deployment-和-ReplicaSet"><a href="#Deployment-和-ReplicaSet" class="headerlink" title="Deployment 和 ReplicaSet"></a>Deployment 和 ReplicaSet</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. 部署1个Deployment,会自动创建1个ReplicaSet和Pod</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get deploy,rs</span><br><span class="line">NAME                  READY   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">deployment.apps/web   3/3     3            3           12m</span><br><span class="line"></span><br><span class="line">NAME                             DESIRED   CURRENT   READY   AGE</span><br><span class="line">replicaset.apps/web-84c6fbbdcc   3         3         3       12m</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 部署Deployment -&gt; 创建RS -&gt; RS管理多个Pod</span><br><span class="line">2. RS会判断replicas: 3 副本数 也会获取当前Pod的副本数</span><br><span class="line">3. 如果少了一个 RS会帮助我们拉起</span><br><span class="line">4. RS 帮我们实现了控制副本个数 和 历史版本记录,rollout回滚找rs回滚</span><br><span class="line">5. 滚动更新会创建新的RS</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. Deployment -&gt; 创建RS -&gt; RS管理多个Pod</span><br><span class="line">2. 滚动更新 创建新的RS -&gt; 启动新的Pod 关闭之前rs中的1个,直到全部更新完成</span><br><span class="line">3. service 指向 pod不变</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 ~]# kubectl set image deployment/web java-demo=nginx:1.16</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get rs,deploy</span><br><span class="line">NAME                             DESIRED   CURRENT   READY   AGE</span><br><span class="line">replicaset.apps/web-68d86dd855   3         3         3       17s</span><br><span class="line">replicaset.apps/web-7bddf7b45f   0         0         0       2m</span><br><span class="line">replicaset.apps/web-84c6fbbdcc   0         0         0       107m</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl rollout history deployment/web</span><br><span class="line">deployment.apps/web </span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">2         <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">3         <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> kubernetes</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/08/k8s-06/" rel="next" title="06 k8s部署java应用 简易版本">
+                <i class="fa fa-chevron-left"></i> 06 k8s部署java应用 简易版本
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/10/k8s-base01/" rel="prev" title="01 容器，到底是怎么一回事儿？">
+                01 容器，到底是怎么一回事儿？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Deployment-控制器"><span class="nav-number">1.</span> <span class="nav-text">Deployment 控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pod与controllers的关系"><span class="nav-number">1.1.</span> <span class="nav-text">Pod与controllers的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deployment-功能与应用场景"><span class="nav-number">1.2.</span> <span class="nav-text">Deployment 功能与应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deployment-YAML文件字段解析"><span class="nav-number">1.3.</span> <span class="nav-text">Deployment YAML文件字段解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deployment-部署无状态应用"><span class="nav-number">1.4.</span> <span class="nav-text">Deployment 部署无状态应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#暴露应用"><span class="nav-number">1.5.</span> <span class="nav-text">暴露应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#升级与回滚"><span class="nav-number">1.6.</span> <span class="nav-text">升级与回滚</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#升级操作-set"><span class="nav-number">1.6.1.</span> <span class="nav-text">升级操作 set</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#回滚操作-rollout"><span class="nav-number">1.6.2.</span> <span class="nav-text">回滚操作 rollout</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除应用"><span class="nav-number">1.6.3.</span> <span class="nav-text">删除应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#弹性伸缩-scale"><span class="nav-number">1.7.</span> <span class="nav-text">弹性伸缩 scale</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deployment-和-ReplicaSet"><span class="nav-number">1.8.</span> <span class="nav-text">Deployment 和 ReplicaSet</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Nginx,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="11 Nginx + Lua">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/10/24/nginx-base11/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_133.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_134.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_135.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_136.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_137.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_138.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_139.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_140.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_141.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_142.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_143.png">
+<meta property="og:updated_time" content="2019-10-24T07:24:27.116Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="11 Nginx + Lua">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/10/24/nginx-base11/">
+
+
+
+
+
+  <title>11 Nginx + Lua | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/10/24/nginx-base11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">11 Nginx + Lua</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-24T07:42:38+08:00">
+                2019-10-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="Lua-脚本基础语法"><a href="#Lua-脚本基础语法" class="headerlink" title="Lua 脚本基础语法"></a>Lua 脚本基础语法</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Lua 是一种简洁、轻量、可扩展的脚本语言</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># Nginx+Lua优势</span><br><span class="line">充分的结合Nginx的并发处理epool优势和Lua的轻量实现简单的功能且高并发的场景</span><br><span class="line">统计IP</span><br><span class="line">统计用户信息</span><br><span class="line">安全WAF</span><br></pre></td></tr></table></figure>
+<h3 id="安装-lua"><a href="#安装-lua" class="headerlink" title="安装 lua"></a>安装 lua</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># CentOS 7.4 默认安装好</span><br><span class="line">[root@proxy conf.d]# yum install lua</span><br></pre></td></tr></table></figure>
+<h3 id="lua-的运行方式"><a href="#lua-的运行方式" class="headerlink" title="lua 的运行方式"></a>lua 的运行方式</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. 交互式</span><br><span class="line"></span><br><span class="line">[root@proxy conf.d]# lua</span><br><span class="line">Lua 5.1.4  Copyright (C) 1994-2008 Lua.org, PUC-Rio</span><br><span class="line">&gt; print('hello world')</span><br><span class="line">hello world</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">2. 非交互式,文件执行</span><br><span class="line"></span><br><span class="line">[root@proxy conf.d]# vim test.lua</span><br><span class="line">#!/usr/bin/lua</span><br><span class="line">print("hello world")</span><br><span class="line"></span><br><span class="line">[root@proxy conf.d]# lua test.lua </span><br><span class="line">hello world</span><br></pre></td></tr></table></figure>
+<h3 id="lua-的注释"><a href="#lua-的注释" class="headerlink" title="lua 的注释"></a>lua 的注释</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># -- 行注释</span><br><span class="line"></span><br><span class="line">#!/usr/bin/lua</span><br><span class="line">-- print("hello world")</span><br><span class="line">print("hello leo")</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 块注释 --[[ ... --]]</span><br><span class="line"></span><br><span class="line">#!/usr/bin/lua</span><br><span class="line"></span><br><span class="line">--[[</span><br><span class="line">print("hello world")</span><br><span class="line">print("hello leo")</span><br><span class="line">--]]</span><br><span class="line"></span><br><span class="line">print("hello lex")</span><br></pre></td></tr></table></figure>
+<h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy conf.d]# vim test.lua </span><br><span class="line"></span><br><span class="line">#!/usr/bin/lua</span><br><span class="line"></span><br><span class="line">--[[</span><br><span class="line">print("hello world")</span><br><span class="line">print("hello leo")</span><br><span class="line">--]]</span><br><span class="line"></span><br><span class="line">print("hello lex")</span><br><span class="line"></span><br><span class="line">name = 'leo'</span><br><span class="line">age = 28</span><br><span class="line"></span><br><span class="line">print("My name is:",name)</span><br><span class="line">print(age)</span><br><span class="line"></span><br><span class="line"># 布尔类型只有nil和false</span><br><span class="line"># 数字0,空字符串  都是true</span><br><span class="line"># lua中的变量如果没有特殊说明,	全是全局变量</span><br></pre></td></tr></table></figure>
+<h3 id="while-循环语句"><a href="#while-循环语句" class="headerlink" title="while 循环语句"></a>while 循环语句</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 语法</span><br><span class="line">while ... do</span><br><span class="line">...</span><br><span class="line">end</span><br><span class="line"># Lua没有++或是+=这样的操作</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy conf.d]# vim while100.lua</span><br><span class="line"></span><br><span class="line">#!/usr/bin/lua</span><br><span class="line">sum = 0</span><br><span class="line">num = 1</span><br><span class="line"></span><br><span class="line">while num <span class="tag">&lt;<span class="name">=</span> <span class="attr">100</span> <span class="attr">do</span></span></span><br><span class="line"><span class="tag">    <span class="attr">sum</span> = <span class="string">sum</span> + <span class="attr">num</span></span></span><br><span class="line"><span class="tag">    <span class="attr">num</span> = <span class="string">num</span> + <span class="attr">1</span></span></span><br><span class="line"><span class="tag"><span class="attr">end</span></span></span><br><span class="line"><span class="tag"><span class="attr">print</span>(<span class="attr">sum</span>)</span></span><br><span class="line"><span class="tag"></span></span><br><span class="line"><span class="tag"># 运行</span></span><br><span class="line"><span class="tag">[<span class="attr">root</span>@<span class="attr">proxy</span> <span class="attr">conf.d</span>]# <span class="attr">lua</span> <span class="attr">while100.lua</span> </span></span><br><span class="line"><span class="tag"><span class="attr">5050</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="for-循环"><a href="#for-循环" class="headerlink" title="for 循环"></a>for 循环</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 语法</span><br><span class="line">for ... do</span><br><span class="line">...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy conf.d]# vim for100.lua</span><br><span class="line"></span><br><span class="line">#!/usr/bin/lua</span><br><span class="line"></span><br><span class="line">sum = 0</span><br><span class="line"></span><br><span class="line">for i = 1,100 do</span><br><span class="line">    sum = sum + i</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">print(sum)</span><br><span class="line"></span><br><span class="line">[root@proxy conf.d]# lua for100.lua </span><br><span class="line">5050</span><br></pre></td></tr></table></figure>
+<h3 id="if-判断语句"><a href="#if-判断语句" class="headerlink" title="if 判断语句"></a>if 判断语句</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if...then</span><br><span class="line">elseif...then</span><br><span class="line">else</span><br><span class="line">...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># ~= 不等于</span><br><span class="line"># 字符串的拼接操作符 ".."</span><br><span class="line"># io库的分别从stdin和stdout读写，read和write函数</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy conf.d]# vim ifelse.lua</span><br><span class="line"></span><br><span class="line">#!/usr/bin/lua</span><br><span class="line"></span><br><span class="line">num = 30</span><br><span class="line">s='aspython'</span><br><span class="line"></span><br><span class="line">if num &gt; 50 then</span><br><span class="line">    print('&gt; 40')</span><br><span class="line">elseif s ~= 'aspython' then -- ~= 表示 !=</span><br><span class="line">    io.write('s is not aspython') -- 风骚的标准输出</span><br><span class="line">else</span><br><span class="line">    thisIsGlobal = 5 -- 驼峰式命名</span><br><span class="line">    local line = io.read()</span><br><span class="line">    -- .. 作为字符串连接符</span><br><span class="line">    print('凛冬将至' .. line)</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<h2 id="Nginx-加载-Lua环境"><a href="#Nginx-加载-Lua环境" class="headerlink" title="Nginx 加载 Lua环境"></a>Nginx 加载 Lua环境</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 阿里运测试环境 更换系统盘</span><br><span class="line">2. 默认情况下 Nginx 不支持 Lua 模块, 需要安装 LuaJIT 解释器, 并且需要重新编译 Nginx , 建议使用 openrestry</span><br><span class="line">3. LuaJIT Ngx_devel_kit 和 lua-nginx-module</span><br></pre></td></tr></table></figure>
+<h2 id="Nginx-编译安装"><a href="#Nginx-编译安装" class="headerlink" title="Nginx 编译安装"></a>Nginx 编译安装</h2><h3 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy etc]# yum -y install gcc gcc-c++ make pcre-devel zlib-devel openssl-devel</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 下载最新的 luajit 和 ngx_devel_kit 以及 lua-nginx-module</span><br><span class="line">[root@proxy ~]# mkdir -p /soft/src &amp;&amp; cd /soft/src</span><br><span class="line">[root@proxy ~]# wget http://luajit.org/download/LuaJIT-2.0.4.tar.gz</span><br><span class="line">[root@proxy ~]# wget https://github.com/simpl/ngx_devel_kit/archive/v0.2.19.tar.gz</span><br><span class="line">[root@proxy ~]# wget https://github.com/openresty/lua-nginx-module/archive/v0.10.13.tar.gz</span><br></pre></td></tr></table></figure>
+<h3 id="解压-ngx-devel-kit-和-lua-nginx-module"><a href="#解压-ngx-devel-kit-和-lua-nginx-module" class="headerlink" title="解压 ngx_devel_kit 和 lua-nginx-module"></a>解压 ngx_devel_kit 和 lua-nginx-module</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 解压后为ngx_devel_kit-0.2.19</span><br><span class="line">[root@nginx ~]# tar xf v0.2.19.tar.gz </span><br><span class="line"># 解压后为lua-nginx-module-0.9.16</span><br><span class="line">[root@nginx ~]# tar xf v0.10.13.tar.gz</span><br></pre></td></tr></table></figure>
+<h3 id="安装LuaJIT-Luajit是Lua即时编译器。"><a href="#安装LuaJIT-Luajit是Lua即时编译器。" class="headerlink" title="安装LuaJIT Luajit是Lua即时编译器。"></a>安装LuaJIT Luajit是Lua即时编译器。</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@nginx ~]# tar zxvf LuaJIT-2.0.4.tar.gz </span><br><span class="line">[root@nginx ~]# cd LuaJIT-2.0.4</span><br><span class="line">[root@nginx ~]# make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line"># 成功</span><br><span class="line">==== Successfully installed LuaJIT 2.0.4 to /usr/local ====</span><br></pre></td></tr></table></figure>
+<h3 id="安装-Nginx-并加载模块"><a href="#安装-Nginx-并加载模块" class="headerlink" title="安装 Nginx 并加载模块"></a>安装 Nginx 并加载模块</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@nginx ~]# cd /soft/src</span><br><span class="line">[root@nginx ~]# wget http://nginx.org/download/nginx-1.16.1.tar.gz</span><br><span class="line">[root@nginx ~]# tar xf nginx-1.16.1.tar.gz</span><br><span class="line">[root@nginx ~]# cd nginx-1.16.1</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 编译安装</span><br><span class="line">./configure --prefix=/etc/nginx --with-http_ssl_module \</span><br><span class="line">--with-http_stub_status_module --with-http_dav_module \</span><br><span class="line">--add-module=../ngx_devel_kit-0.2.19/ \</span><br><span class="line">--add-module=../lua-nginx-module-0.10.13 </span><br><span class="line"></span><br><span class="line">[root@proxy nginx-1.16.1]# make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 建立软链接, 不建立会出现share object错误</span><br><span class="line">[root@proxy lib64]# ln -s /usr/local/lib/libluajit-5.1.so.2 /lib64/libluajit-5.1.so.2</span><br></pre></td></tr></table></figure>
+<h3 id="验证-nginx-lua"><a href="#验证-nginx-lua" class="headerlink" title="验证 nginx+lua"></a>验证 nginx+lua</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy conf]# vim /etc/nginx/conf/nginx.conf</span><br><span class="line">        ...</span><br><span class="line">        location / &#123;</span><br><span class="line">            root   html;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        location /test &#123;</span><br><span class="line">            default_type text/html;</span><br><span class="line">            content_by_lua_block &#123;</span><br><span class="line">                ngx.say('hello world')</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@proxy conf]# /etc/nginx/sbin/nginx</span><br><span class="line">[root@proxy conf]# /etc/nginx/sbin/nginx -t</span><br><span class="line">[root@proxy conf]# /etc/nginx/sbin/nginx -s reload</span><br><span class="line"></span><br><span class="line"># 访问 </span><br><span class="line">http://60.205.217.112/test</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_133.png" width="50%"></p>
+<h3 id="直接部署春哥的开源项目OpenResty"><a href="#直接部署春哥的开源项目OpenResty" class="headerlink" title="直接部署春哥的开源项目OpenResty"></a>直接部署春哥的开源项目OpenResty</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">//安装依赖包 编译完成后就可以使用 </span><br><span class="line"># yum install -y readline-devel pcre-devel openssl-devel</span><br><span class="line"># cd /soft/src</span><br><span class="line">下载并编译安装openresty</span><br><span class="line"># wget https://openresty.org/download/ngx_openresty-1.9.3.2.tar.gz</span><br><span class="line"># tar zxf ngx_openresty-1.9.3.2.tar.gz</span><br><span class="line"># cd ngx_openresty-1.9.3.2</span><br><span class="line"># ./configure --prefix=/soft/openresty-1.9.3.2 \</span><br><span class="line">--with-luajit --with-http_stub_status_module \</span><br><span class="line">--with-pcre --with-pcre-jit</span><br><span class="line"># gmake &amp;&amp; gmake install</span><br><span class="line"># ln -s /soft/openresty-1.9.3.2/ /soft/openresty</span><br><span class="line"></span><br><span class="line">//测试openresty安装</span><br><span class="line"># vim /soft/openresty/nginx/conf/nginx.conf</span><br><span class="line">server &#123;</span><br><span class="line">    location /hello &#123;</span><br><span class="line">            default_type text/html;</span><br><span class="line">            content_by_lua_block &#123;</span><br><span class="line">                ngx.say("HelloWorld")</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Nginx-调用-Lua指令"><a href="#Nginx-调用-Lua指令" class="headerlink" title="Nginx 调用 Lua指令"></a>Nginx 调用 Lua指令</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Nginx调用Lua模块指令, Nginx的可插拔模块加载执行, 共11个处理阶段</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_134.png" width="50%"></p>
+<h2 id="Nginx-Lua实现代码灰度发布"><a href="#Nginx-Lua实现代码灰度发布" class="headerlink" title="Nginx+Lua实现代码灰度发布"></a>Nginx+Lua实现代码灰度发布</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">使用Nginx结合lua实现代码灰度发布,按照一定的关系区别，分不同的代码进行上线，使代码的发布能平滑过渡上线</span><br><span class="line"></span><br><span class="line">1. 用户的信息cookie等信息区别</span><br><span class="line">2. 根据用户的ip地址, 颗粒度更广</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_135.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">执行过程：</span><br><span class="line">1.用户请求到达前端代理Nginx, 内嵌的lua模块会解析Nginx配置文件中Lua脚本</span><br><span class="line">2.Lua脚本会获取客户端IP地址,查看Memcached缓存中是否存在该键值</span><br><span class="line">3.如果存在则执行@java_test,否则执行@java_prod</span><br><span class="line">4.如果是@java_test, 那么location会将请求转发至新版代码的集群组</span><br><span class="line">5.如果是@java_prod, 那么location会将请求转发至原始版代码集群组</span><br><span class="line">6.最后整个过程执行后结束</span><br></pre></td></tr></table></figure>
+<h3 id="实践环境准备"><a href="#实践环境准备" class="headerlink" title="实践环境准备"></a>实践环境准备</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CentOS7 Nginx+Lua+Memcached      172.17.70.227</span><br><span class="line">CentOS7 Tomcat集群 8080 prod      172.17.70.228</span><br><span class="line">CentOS7 Tomcat集群 9090 test      172.17.70.226</span><br></pre></td></tr></table></figure>
+<h3 id="安装两台服务器Tomcat-分别启动8080和9090端口"><a href="#安装两台服务器Tomcat-分别启动8080和9090端口" class="headerlink" title="安装两台服务器Tomcat,分别启动8080和9090端口"></a>安装两台服务器Tomcat,分别启动8080和9090端口</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@tomcat-node1-20 ~]# yum install java -y</span><br><span class="line">[root@tomcat-node1-20 ~]# mkdir /soft/src -p</span><br><span class="line">[root@tomcat-node1-20 ~]# cd /soft/src</span><br><span class="line">[root@nginx ~]# wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v9.0.7/bin/apache-tomcat-9.0.7.tar.gz</span><br><span class="line">[root@tomcat-node1-20 src]# tar xf apache-tomcat-9.0.7.tar.gz  -C /soft</span><br><span class="line">[root@tomcat-node1-20 soft]# cp -r apache-tomcat-9.0.7/ tomcat-8080</span><br><span class="line">[root@tomcat-node1-20 bin]# /soft/tomcat-8080/bin/startup.sh</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//注意tomcat默认监听在8080端口, 如果需要启动9090端口需要修改server.xml配置文件</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 先搞定8080 然后传过去</span><br><span class="line">[root@tomcat-node1 soft]# scp -r tomcat-8080 root@172.17.70.226:/soft</span><br><span class="line"></span><br><span class="line"># 修改端口</span><br><span class="line">[root@tomcat-node2 soft]# mv tomcat-8080 tomcat-9090</span><br><span class="line">[root@tomcat-node2 soft]# vim /soft/tomcat-9090/conf/server.xml </span><br><span class="line">    <span class="tag">&lt;<span class="name">Connector</span> <span class="attr">port</span>=<span class="string">"9090"</span> <span class="attr">protocol</span>=<span class="string">"HTTP/1.1"</span></span></span><br><span class="line"><span class="tag">    </span></span><br><span class="line"><span class="tag">[<span class="attr">root</span>@<span class="attr">tomcat-node2</span> <span class="attr">soft</span>]# <span class="attr">sh</span> <span class="attr">tomcat-9090</span>/<span class="attr">bin</span>/<span class="attr">startup.sh</span></span></span><br><span class="line"><span class="tag"><span class="attr">Using</span> <span class="attr">CATALINA_BASE:</span>   /<span class="attr">soft</span>/<span class="attr">tomcat-9090</span></span></span><br><span class="line"><span class="tag"><span class="attr">Using</span> <span class="attr">CATALINA_HOME:</span>   /<span class="attr">soft</span>/<span class="attr">tomcat-9090</span></span></span><br><span class="line"><span class="tag"><span class="attr">Using</span> <span class="attr">CATALINA_TMPDIR:</span> /<span class="attr">soft</span>/<span class="attr">tomcat-9090</span>/<span class="attr">temp</span></span></span><br><span class="line"><span class="tag"><span class="attr">Using</span> <span class="attr">JRE_HOME:</span>        /<span class="attr">usr</span></span></span><br><span class="line"><span class="tag"><span class="attr">Using</span> <span class="attr">CLASSPATH:</span>       /<span class="attr">soft</span>/<span class="attr">tomcat-9090</span>/<span class="attr">bin</span>/<span class="attr">bootstrap.jar:</span>/<span class="attr">soft</span>/<span class="attr">tomcat-9090</span>/<span class="attr">bin</span>/<span class="attr">tomcat-juli.jar</span></span></span><br><span class="line"><span class="tag"><span class="attr">Tomcat</span> <span class="attr">started.</span></span></span><br><span class="line"><span class="tag"> </span></span><br><span class="line"><span class="tag">[<span class="attr">root</span>@<span class="attr">tomcat-node2</span> <span class="attr">soft</span>]# <span class="attr">netstat</span> <span class="attr">-tnlp</span></span></span><br><span class="line"><span class="tag"><span class="attr">Active</span> <span class="attr">Internet</span> <span class="attr">connections</span> (<span class="attr">only</span> <span class="attr">servers</span>)</span></span><br><span class="line"><span class="tag"><span class="attr">Proto</span> <span class="attr">Recv-Q</span> <span class="attr">Send-Q</span> <span class="attr">Local</span> <span class="attr">Address</span>           <span class="attr">Foreign</span> <span class="attr">Address</span>         <span class="attr">State</span>       <span class="attr">PID</span>/<span class="attr">Program</span> <span class="attr">name</span>    </span></span><br><span class="line"><span class="tag"><span class="attr">tcp</span>        <span class="attr">0</span>      <span class="attr">0</span> <span class="attr">0.0.0.0:22</span>              <span class="attr">0.0.0.0:</span>*               <span class="attr">LISTEN</span>      <span class="attr">1108</span>/<span class="attr">sshd</span>           </span></span><br><span class="line"><span class="tag"><span class="attr">tcp</span>        <span class="attr">0</span>      <span class="attr">0</span> <span class="attr">0.0.0.0:9090</span>            <span class="attr">0.0.0.0:</span>*               <span class="attr">LISTEN</span>      <span class="attr">1533</span>/<span class="attr">java</span>           </span></span><br><span class="line"><span class="tag"><span class="attr">tcp</span>        <span class="attr">0</span>      <span class="attr">0</span> <span class="attr">127.0.0.1:8005</span>          <span class="attr">0.0.0.0:</span>*               <span class="attr">LISTEN</span>      <span class="attr">1533</span>/<span class="attr">java</span>           </span></span><br><span class="line"><span class="tag"><span class="attr">tcp</span>        <span class="attr">0</span>      <span class="attr">0</span> <span class="attr">0.0.0.0:8009</span>            <span class="attr">0.0.0.0:</span>*               <span class="attr">LISTEN</span>      <span class="attr">1533</span>/<span class="attr">java</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@tomcat-node1 ROOT]# cd /soft/tomcat-8080/webapps/ROOT/</span><br><span class="line">[root@tomcat-node1 ROOT]# rm -rf *</span><br><span class="line">[root@tomcat-node1 ROOT]# vim test.jsp </span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">%@</span> <span class="attr">page</span> <span class="attr">language</span>=<span class="string">"java"</span> <span class="attr">import</span>=<span class="string">"java.util.*"</span> <span class="attr">pageEncoding</span>=<span class="string">"utf-8"</span>%&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">HTML</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">HEAD</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">TITLE</span>&gt;</span>JSP 8080-Prod<span class="tag">&lt;/<span class="name">TITLE</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">HEAD</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">BODY</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h1</span>&gt;</span> JSP 8080-Prod <span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">%</span></span></span><br><span class="line"><span class="tag">            <span class="attr">Random</span> <span class="attr">rand</span> = <span class="string">new</span> <span class="attr">Random</span>();</span></span><br><span class="line">            out.println("&lt;h1&gt;Random number:&lt;/h1&gt;");</span><br><span class="line">            out.println(rand.nextInt(99)+100);</span><br><span class="line">        %&gt;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">BODY</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">HTML</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@tomcat-node2 ROOT]# cd /soft/tomcat-9090/webapps/ROOT/</span><br><span class="line">[root@tomcat-node2 ROOT]# rm -rf *</span><br><span class="line">[root@tomcat-node2 ROOT]# vim test.jsp </span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">%@</span> <span class="attr">page</span> <span class="attr">language</span>=<span class="string">"java"</span> <span class="attr">import</span>=<span class="string">"java.util.*"</span> <span class="attr">pageEncoding</span>=<span class="string">"utf-8"</span>%&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">HTML</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">HEAD</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">TITLE</span>&gt;</span>JSP 9090-Test<span class="tag">&lt;/<span class="name">TITLE</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">HEAD</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">BODY</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h1</span>&gt;</span> JSP 9090-Test <span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">%</span></span></span><br><span class="line"><span class="tag">            <span class="attr">Random</span> <span class="attr">rand</span> = <span class="string">new</span> <span class="attr">Random</span>();</span></span><br><span class="line">            out.println("&lt;h1&gt;Random number:&lt;/h1&gt;");</span><br><span class="line">            out.println(rand.nextInt(99)+100);</span><br><span class="line">        %&gt;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">BODY</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">HTML</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="配置-Memcached-并让其支持-Lua-调用"><a href="#配置-Memcached-并让其支持-Lua-调用" class="headerlink" title="配置 Memcached 并让其支持 Lua 调用"></a>配置 Memcached 并让其支持 Lua 调用</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 安装memcached服务</span><br><span class="line">[root@proxy conf]# yum install memcached -y</span><br><span class="line"></span><br><span class="line"># 配置memcached支持lua</span><br><span class="line">[root@proxy conf]# cd /soft/src</span><br><span class="line">[root@proxy src]# wget https://github.com/agentzh/lua-resty-memcached/archive/v0.11.tar.gz</span><br><span class="line">[root@proxy src]# mkdir -p /etc/nginx/lua</span><br><span class="line">[root@proxy src]# cp -r lua-resty-memcached-0.11/lib/resty/memcached.lua /etc/nginx/lua/</span><br><span class="line">[root@proxy src]# ls -l /etc/nginx/lua/memcached.lua</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 启动memcached</span><br><span class="line">[root@proxy src]# systemctl start memcached</span><br><span class="line">[root@proxy src]# systemctl enable memcached</span><br><span class="line">[root@proxy src]# systemctl status memcached</span><br></pre></td></tr></table></figure>
+<h3 id="配置-负载均衡调度"><a href="#配置-负载均衡调度" class="headerlink" title="配置 负载均衡调度"></a>配置 负载均衡调度</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 编译安装的 增加引用</span><br><span class="line">[root@proxy conf]# vim /etc/nginx/conf/nginx.conf</span><br><span class="line">include /etc/nginx/conf.d/*.conf;</span><br><span class="line"></span><br><span class="line"># 去掉默认的server cryl+v 选取删除行 shift+i # esc</span><br><span class="line">[root@proxy conf]# /etc/nginx/sbin/nginx -t</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy conf]# mkdir -p /etc/nginx/conf.d</span><br><span class="line">[root@proxy conf.d]# vim lua.conf </span><br><span class="line"></span><br><span class="line"># http</span><br><span class="line">lua_package_path "/etc/nginx/lua/memcached.lua";</span><br><span class="line"></span><br><span class="line">upstream java_prod &#123;</span><br><span class="line">    server 172.17.70.228:8080;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">upstream java_test &#123;</span><br><span class="line">    server 172.17.70.226:9090;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name 60.205.217.112;</span><br><span class="line"></span><br><span class="line">    location /hello &#123;</span><br><span class="line">        default_type 'text/plain';</span><br><span class="line">        content_by_lua 'ngx.say("hello ,lua scripts")';</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location /myip &#123;</span><br><span class="line">        default_type 'text/plain';</span><br><span class="line">        content_by_lua '</span><br><span class="line">            clientIP = ngx.req.get_headers()["x_forwarded_for"]</span><br><span class="line">            ngx.say("Forwarded_IP:",clientIP)</span><br><span class="line">            if clientIP == nli then</span><br><span class="line">                clientIP = ngx.var.remote_addr</span><br><span class="line">                ngx.say("Remote_IP:",clientIP)</span><br><span class="line">            end</span><br><span class="line">             ';</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        default_type 'text/plain';</span><br><span class="line">        content_by_lua_file /etc/nginx/lua/dep.lua;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location @java_prod &#123;</span><br><span class="line">        proxy_pass http://java_prod;</span><br><span class="line">        include /etc/nginx/conf.d/proxy_params;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location @java_test &#123;</span><br><span class="line">        proxy_pass http://java_test;</span><br><span class="line">        include /etc/nginx/conf.d/proxy_params;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># nginx反向代理tomcat,必须配置头部信息否则返回400错误</span><br><span class="line">[root@proxy conf.d]# vim /etc/nginx/conf.d/proxy_params </span><br><span class="line"></span><br><span class="line">proxy_redirect default;</span><br><span class="line">proxy_set_header Host $http_host;</span><br><span class="line">proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line"></span><br><span class="line">proxy_connect_timeout 30;</span><br><span class="line">proxy_send_timeout 60;</span><br><span class="line">proxy_read_timeout 60;</span><br><span class="line"></span><br><span class="line">proxy_buffer_size 32k;</span><br><span class="line">proxy_buffering on;</span><br><span class="line">proxy_buffers 4 128k;</span><br><span class="line">proxy_busy_buffers_size 256k;</span><br><span class="line">proxy_max_temp_file_size 256k;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy conf]# /etc/nginx/sbin/nginx -t</span><br><span class="line">[root@proxy conf]# /etc/nginx/sbin/nginx -s reload</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://60.205.217.112/test</span><br><span class="line">http://60.205.217.112/myip</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_136.png" width="50%"></p>
+<p><img src="/img/nginx_137.png" width="50%"></p>
+<h3 id="编写-Nginx-调用灰度发布Lua-脚本"><a href="#编写-Nginx-调用灰度发布Lua-脚本" class="headerlink" title="编写 Nginx 调用灰度发布Lua 脚本"></a>编写 Nginx 调用灰度发布Lua 脚本</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"># 编写 Nginx 调用灰度发布Lua 脚本</span><br><span class="line"># /etc/nginx/lua/dep.lua</span><br><span class="line"></span><br><span class="line">[root@proxy lua]# vim dep.lua </span><br><span class="line"></span><br><span class="line">--获取x-real-ip</span><br><span class="line">clientIP = ngx.req.get_headers()["X-Real-IP"]</span><br><span class="line"></span><br><span class="line">--如果IP为空-取x_forwarded_for</span><br><span class="line">if clientIP == nil then</span><br><span class="line">    clientIP = ngx.req.get_headers()["x_forwarded_for"]</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">--如果IP为空-取remote_addr</span><br><span class="line">if clientIP == nil then</span><br><span class="line">     clientIP = ngx.var.remote_addr</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">--定义本地,加载memcached</span><br><span class="line">    local memcached = require "resty.memcached"</span><br><span class="line">--实例化对象</span><br><span class="line">    local memc, err = memcached:new()</span><br><span class="line">--判断连接是否存在错误</span><br><span class="line">    if not memc then</span><br><span class="line">        ngx.say("failed to instantiate memc: ", err)</span><br><span class="line">        return</span><br><span class="line">    end</span><br><span class="line">--建立memcache连接</span><br><span class="line">    local ok, err = memc:connect("127.0.0.1", 11211)</span><br><span class="line">--无法连接往前端抛出错误信息</span><br><span class="line">    if not ok then</span><br><span class="line">        ngx.say("failed to connect: ", err)</span><br><span class="line">        return</span><br><span class="line">    end</span><br><span class="line">--获取对象中的ip-存在值赋给res</span><br><span class="line">    local res, flags, err = memc:get(clientIP)</span><br><span class="line">--</span><br><span class="line"> --ngx.say("value key: ",res,clientIP)</span><br><span class="line">    if err then</span><br><span class="line">        ngx.say("failed to get clientIP ", err)</span><br><span class="line">        return</span><br><span class="line">    end</span><br><span class="line">--如果值为1则调用local-@java_test</span><br><span class="line">    if res == "1" then</span><br><span class="line">        ngx.exec("@java_test")</span><br><span class="line">        return</span><br><span class="line">    end</span><br><span class="line">--否则调用local-@java_prod</span><br><span class="line">        ngx.exec("@java_prod")</span><br><span class="line">        return</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy lua]# /etc/nginx/sbin/nginx -s reload</span><br><span class="line"></span><br><span class="line">http://60.205.217.112/test.jsp</span><br></pre></td></tr></table></figure>
+<h3 id="灰度发布"><a href="#灰度发布" class="headerlink" title="灰度发布"></a>灰度发布</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 把IP 传给 memcached</span><br><span class="line"># 生产换将 需要得到IP地址库 用memcached管理地址页 导入</span><br><span class="line"></span><br><span class="line">[root@proxy logs]# telnet 127.0.0.1 11211</span><br><span class="line">Trying 127.0.0.1...</span><br><span class="line">Connected to 127.0.0.1.</span><br><span class="line">Escape character is '^]'.</span><br><span class="line">set 125.34.39.133 0 0 1</span><br><span class="line">1</span><br><span class="line">STORED</span><br><span class="line"></span><br><span class="line">http://60.205.217.112/test.jsp</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 剔除</span><br><span class="line">get 125.34.39.133</span><br><span class="line">VALUE 125.34.39.133 0 1</span><br><span class="line">1</span><br><span class="line">END</span><br><span class="line">delete 125.34.39.133</span><br><span class="line">DELETED</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_138.png" width="50%"></p>
+<h2 id="Nginx-Lua-实现WAF应用防火墙"><a href="#Nginx-Lua-实现WAF应用防火墙" class="headerlink" title="Nginx+Lua 实现WAF应用防火墙"></a>Nginx+Lua 实现WAF应用防火墙</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1.常见的恶意行为</span><br><span class="line">    1.爬虫行为和恶意抓取，资源盗取</span><br><span class="line">防护手段</span><br><span class="line">    1. 基础防盗链功能不让恶意用户能够轻易的爬取网站对外数据</span><br><span class="line">    2. access_moudle-&gt;对后台，部分用户服务的数据提供IP防护</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">2.常见的攻击手段</span><br><span class="line">    1. 后台密码撞库，通过猜测密码字典不断对后台系统登陆性尝试，获取后台登陆密码</span><br><span class="line">防护手段</span><br><span class="line">    1.后台登陆密码复杂度</span><br><span class="line">    2.使用access_module-对后台提供IP防控</span><br><span class="line">    3.预警机制</span><br><span class="line"></span><br><span class="line">文件上传漏洞,利用上传接口将恶意代码植入到服务器中，再通过url去访问执行代码</span><br><span class="line">执行方式 bgx.com/1.jpg/1.php</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">3.常见的攻击手段</span><br><span class="line">利用未过滤/未审核的用户输入进行Sql注入的攻击方法, 让应用运行本不应该运行的SQL代码</span><br><span class="line">防护手段</span><br><span class="line">    1.php配置开启安全相关限制</span><br><span class="line">    2.开发人员对sql提交进行审核,屏蔽常见的注入手段</span><br><span class="line">    3.Nginx+Lua构建WAF应用层防火墙, 防止Sql注入</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_139.png" width="50%"></p>
+<h3 id="模拟SQL注入攻击"><a href="#模拟SQL注入攻击" class="headerlink" title="模拟SQL注入攻击"></a>模拟SQL注入攻击</h3><ul>
+<li>快速安装lnmp架构</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy ~]# yum install mariadb mariadb-server  php php-fpm php-mysql -y</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># 配置MySQL</span><br><span class="line">[root@nginx ~]# systemctl start mariadb</span><br><span class="line">[root@proxy ~]# mysql -uroot </span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; create database info;</span><br><span class="line">MariaDB [(none)]&gt; use info;</span><br><span class="line">MariaDB [info]&gt; create table user(id int(11),username varchar(64), password varchar(64), email varchar(64));</span><br><span class="line">MariaDB [info]&gt; desc user;</span><br><span class="line">+----------+-------------+------+-----+---------+-------+</span><br><span class="line">| Field    | Type        | Null | Key | Default | Extra |</span><br><span class="line">+----------+-------------+------+-----+---------+-------+</span><br><span class="line">| id       | int(11)     | YES  |     | NULL    |       |</span><br><span class="line">| username | varchar(64) | YES  |     | NULL    |       |</span><br><span class="line">| password | varchar(64) | YES  |     | NULL    |       |</span><br><span class="line">| email    | varchar(64) | YES  |     | NULL    |       |</span><br><span class="line">+----------+-------------+------+-----+---------+-------+</span><br><span class="line"></span><br><span class="line">//插入数据</span><br><span class="line">MariaDB [info]&gt; insert into user (id,username,password,email) values(1,'bgx',('123'),'bgx@foxmail.com');</span><br><span class="line">MariaDB [info]&gt; select * from info.user;</span><br><span class="line">+------+----------+----------------------------------+-----------------+</span><br><span class="line">| id   | username | password                         | email           |</span><br><span class="line">+------+----------+----------------------------------+-----------------+</span><br><span class="line">|    1 | bgx      | 123                             | bgx@foxmail.com |</span><br><span class="line">+------+----------+----------------------------------+-----------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"># 配置php代码</span><br><span class="line">[root@proxy ~]# mkdir -p /soft/code</span><br><span class="line"></span><br><span class="line">[root@proxy ~]# vim /soft/code/login.html</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span> Sql注入演示场景 <span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"content-type"</span><span class="attr">content</span>=<span class="string">"text/html;charset=utf-8"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"sql.php"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">table</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span> 用 户: <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"username"</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span> 密 码: <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"password"</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"reset"</span> <span class="attr">value</span>=<span class="string">"重置"</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 被html调用的sql.php文件</span><br><span class="line"></span><br><span class="line">[root@proxy ~]# vi /soft/code/sql.php</span><br><span class="line"></span><br><span class="line"><span class="php"><span class="meta">&lt;?php</span></span></span><br><span class="line"><span class="php">        $conn = mysql_connect(<span class="string">"localhost"</span>,<span class="string">'root'</span>,<span class="string">''</span>) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">"数据库连接失败！"</span>);</span></span><br><span class="line"><span class="php">        mysql_select_db(<span class="string">"info"</span>,$conn) <span class="keyword">or</span> <span class="keyword">die</span> (<span class="string">"您选择的数据库不存在"</span>);</span></span><br><span class="line"><span class="php">        $name=$_POST[<span class="string">'username'</span>];</span></span><br><span class="line"><span class="php">        $pwd=$_POST[<span class="string">'password'</span>];</span></span><br><span class="line"><span class="php">        $sql=<span class="string">"select * from user where username='$name' and password='$pwd'"</span>;</span></span><br><span class="line"><span class="php">        <span class="keyword">echo</span> $sql.<span class="string">"&lt;br /&gt;"</span>;</span></span><br><span class="line"><span class="php">        $query=mysql_query($sql);</span></span><br><span class="line"><span class="php">        $arr=mysql_fetch_array($query);</span></span><br><span class="line"><span class="php">        <span class="keyword">if</span>($arr)&#123;</span></span><br><span class="line"><span class="php">                <span class="keyword">echo</span> <span class="string">"login success!&lt;br /&gt;"</span>;</span></span><br><span class="line"><span class="php">                <span class="keyword">echo</span> $arr[<span class="number">1</span>];</span></span><br><span class="line"><span class="php">                <span class="keyword">echo</span> $arr[<span class="number">3</span>].<span class="string">"&lt;br /&gt;&lt;br /&gt;"</span>;</span></span><br><span class="line"><span class="php">        &#125;<span class="keyword">else</span>&#123;</span></span><br><span class="line"><span class="php">                <span class="keyword">echo</span> <span class="string">"login failed!"</span>;</span></span><br><span class="line"><span class="php">        &#125;</span></span><br><span class="line"><span class="php"><span class="meta">?&gt;</span></span></span><br><span class="line"></span><br><span class="line">[root@proxy conf.d]# systemctl start php-fpm</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 配置Nginx + php</span><br><span class="line"></span><br><span class="line">[root@proxy conf.d]# vim phpserver.conf </span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">        server_name 60.205.217.112;</span><br><span class="line">        root /soft/code;</span><br><span class="line">        index index.html index.php;</span><br><span class="line"></span><br><span class="line">    location ~ \.php$ &#123;</span><br><span class="line">        fastcgi_pass   127.0.0.1:9000;</span><br><span class="line">        fastcgi_index  index.php;</span><br><span class="line">        fastcgi_param  SCRIPT_FILENAME  /soft/code/$fastcgi_script_name;</span><br><span class="line">        include        fastcgi_params;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">http://60.205.217.112/sql.php </span><br><span class="line">bgx / 123</span><br><span class="line"># sql注入</span><br><span class="line"># 用户名 ' or 1=1#'</span><br><span class="line"># pymysql时候遇到过,问题是由于自己拼接sql语句导致,可以用提供的拼接sql方法避免</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_140.png" width="50%"></p>
+<h2 id="使用lua解决此类安全问题"><a href="#使用lua解决此类安全问题" class="headerlink" title="使用lua解决此类安全问题"></a>使用lua解决此类安全问题</h2><p><img src="/img/nginx_141.png" width="50%"></p>
+<h3 id="部署Waf相关防护代码"><a href="#部署Waf相关防护代码" class="headerlink" title="部署Waf相关防护代码"></a>部署Waf相关防护代码</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># https://github.com/loveshell/ngx_lua_waf</span><br><span class="line"></span><br><span class="line">[root@proxy src]# yum install -y git</span><br><span class="line">[root@proxy src]# cd /soft/src/</span><br><span class="line"></span><br><span class="line"># 把ngx_lua_waf复制到nginx的目录下,解压命名为waf</span><br><span class="line">[root@proxy src]# cp -r ngx_lua_waf /etc/nginx/waf</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">//在nginx.conf的http段添加</span><br><span class="line"></span><br><span class="line">[root@proxy conf.d]# vim phpserver.conf </span><br><span class="line"></span><br><span class="line">lua_package_path "/etc/nginx/waf/?.lua";</span><br><span class="line">lua_shared_dict limit 10m;</span><br><span class="line">init_by_lua_file  /etc/nginx/waf/init.lua;</span><br><span class="line">access_by_lua_file /etc/nginx/waf/waf.lua;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">        server_name 60.205.217.112;</span><br><span class="line">        root /soft/code;</span><br><span class="line">        index index.html index.php;</span><br><span class="line"></span><br><span class="line">    location ~ \.php$ &#123;</span><br><span class="line">        fastcgi_pass   127.0.0.1:9000;</span><br><span class="line">        fastcgi_index  index.php;</span><br><span class="line">        fastcgi_param  SCRIPT_FILENAME  /soft/code/$fastcgi_script_name;</span><br><span class="line">        include        fastcgi_params;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy conf.d]# /etc/nginx/sbin/nginx -t</span><br><span class="line">[root@proxy conf.d]# /etc/nginx/sbin/nginx -s reload</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 配置config.lua里的waf规则目录(一般在waf/conf/目录下)</span><br><span class="line">[root@proxy waf]# vim /etc/nginx/waf/config.lua </span><br><span class="line"></span><br><span class="line">RulePath = "/etc/nginx/waf/wafconf/"</span><br><span class="line">attacklog = "on"</span><br><span class="line">logdir = "/etc/nginx/logs/hack/"</span><br><span class="line"></span><br><span class="line"># 绝对路径如有变动，需对应修改, 然后重启nginx即可</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy conf.d]# /etc/nginx/sbin/nginx -t</span><br><span class="line">[root@proxy conf.d]# /etc/nginx/sbin/nginx -s reload</span><br></pre></td></tr></table></figure>
+<h3 id="Nginx-lua防止Sql注入"><a href="#Nginx-lua防止Sql注入" class="headerlink" title="Nginx + lua防止Sql注入"></a>Nginx + lua防止Sql注入</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 添加规则</span><br><span class="line">vim /etc/nginx/waf/wafconf/post</span><br><span class="line">\sor\s+</span><br><span class="line"></span><br><span class="line">\s = 空格 or 空格 的</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_142.png" width="50%"></p>
+<h3 id="防止CC攻击"><a href="#防止CC攻击" class="headerlink" title="防止CC攻击"></a>防止CC攻击</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@nginx ~]# vim /etc/nginx/waf/config.lua</span><br><span class="line">CCDeny="on"</span><br><span class="line">CCrate="100/60"</span><br><span class="line">  --设置cc攻击频率，单位为秒.</span><br><span class="line">  --默认1分钟同一个IP只能请求同一个地址100次</span><br><span class="line">  </span><br><span class="line">[root@proxy conf.d]# /etc/nginx/sbin/nginx -t</span><br><span class="line">[root@proxy conf.d]# /etc/nginx/sbin/nginx -s reload</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 开个本地虚拟机 测试一下</span><br><span class="line">[root@linux-node1 ~]# yum install httpd-tools</span><br><span class="line">[root@linux-node1 ~]# ab -n 2000 -c 200 http://60.205.217.112/login.html</span><br><span class="line"></span><br><span class="line"># 本地再访问 超过限制就被拦截 其他IP没有影响</span><br><span class="line"># 手机还可以访问 说明其他IP 没有影响</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_143.png" width="50%"></p>
+<h2 id="nginx-lua-学习"><a href="#nginx-lua-学习" class="headerlink" title="nginx+lua 学习"></a>nginx+lua 学习</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/loveshell/ngx_lua_waf</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i> Nginx</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/24/nginx-base10/" rel="next" title="10 Nginx 构建动态网站架构 lnmt">
+                <i class="fa fa-chevron-left"></i> 10 Nginx 构建动态网站架构 lnmt
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/24/nginx-base12/" rel="prev" title="12 Nginx 性能优化与压测工具">
+                12 Nginx 性能优化与压测工具 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Lua-脚本基础语法"><span class="nav-number">1.</span> <span class="nav-text">Lua 脚本基础语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-lua"><span class="nav-number">1.1.</span> <span class="nav-text">安装 lua</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lua-的运行方式"><span class="nav-number">1.2.</span> <span class="nav-text">lua 的运行方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lua-的注释"><span class="nav-number">1.3.</span> <span class="nav-text">lua 的注释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量"><span class="nav-number">1.4.</span> <span class="nav-text">变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#while-循环语句"><span class="nav-number">1.5.</span> <span class="nav-text">while 循环语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#for-循环"><span class="nav-number">1.6.</span> <span class="nav-text">for 循环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#if-判断语句"><span class="nav-number">1.7.</span> <span class="nav-text">if 判断语句</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-加载-Lua环境"><span class="nav-number">2.</span> <span class="nav-text">Nginx 加载 Lua环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-编译安装"><span class="nav-number">3.</span> <span class="nav-text">Nginx 编译安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境准备"><span class="nav-number">3.1.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解压-ngx-devel-kit-和-lua-nginx-module"><span class="nav-number">3.2.</span> <span class="nav-text">解压 ngx_devel_kit 和 lua-nginx-module</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装LuaJIT-Luajit是Lua即时编译器。"><span class="nav-number">3.3.</span> <span class="nav-text">安装LuaJIT Luajit是Lua即时编译器。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Nginx-并加载模块"><span class="nav-number">3.4.</span> <span class="nav-text">安装 Nginx 并加载模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证-nginx-lua"><span class="nav-number">3.5.</span> <span class="nav-text">验证 nginx+lua</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#直接部署春哥的开源项目OpenResty"><span class="nav-number">3.6.</span> <span class="nav-text">直接部署春哥的开源项目OpenResty</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-调用-Lua指令"><span class="nav-number">4.</span> <span class="nav-text">Nginx 调用 Lua指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-Lua实现代码灰度发布"><span class="nav-number">5.</span> <span class="nav-text">Nginx+Lua实现代码灰度发布</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实践环境准备"><span class="nav-number">5.1.</span> <span class="nav-text">实践环境准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装两台服务器Tomcat-分别启动8080和9090端口"><span class="nav-number">5.2.</span> <span class="nav-text">安装两台服务器Tomcat,分别启动8080和9090端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-Memcached-并让其支持-Lua-调用"><span class="nav-number">5.3.</span> <span class="nav-text">配置 Memcached 并让其支持 Lua 调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-负载均衡调度"><span class="nav-number">5.4.</span> <span class="nav-text">配置 负载均衡调度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编写-Nginx-调用灰度发布Lua-脚本"><span class="nav-number">5.5.</span> <span class="nav-text">编写 Nginx 调用灰度发布Lua 脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#灰度发布"><span class="nav-number">5.6.</span> <span class="nav-text">灰度发布</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-Lua-实现WAF应用防火墙"><span class="nav-number">6.</span> <span class="nav-text">Nginx+Lua 实现WAF应用防火墙</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#模拟SQL注入攻击"><span class="nav-number">6.1.</span> <span class="nav-text">模拟SQL注入攻击</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用lua解决此类安全问题"><span class="nav-number">7.</span> <span class="nav-text">使用lua解决此类安全问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#部署Waf相关防护代码"><span class="nav-number">7.1.</span> <span class="nav-text">部署Waf相关防护代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-lua防止Sql注入"><span class="nav-number">7.2.</span> <span class="nav-text">Nginx + lua防止Sql注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#防止CC攻击"><span class="nav-number">7.3.</span> <span class="nav-text">防止CC攻击</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx-lua-学习"><span class="nav-number">8.</span> <span class="nav-text">nginx+lua 学习</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

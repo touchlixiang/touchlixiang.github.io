@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="docker,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 构建持续集成环境">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/11/01/docker-base09/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/timg_02.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_01.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_02.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_03.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_04.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_05.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_06.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_07.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_08.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_09.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_11.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_12.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_13.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_14.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_15.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_16.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_20.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_19.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_23.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_21.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_22.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_24.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_25.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_17.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_18.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_26.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_27.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_28.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_29.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_30.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_31.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_33.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_34.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_35.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_36.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_37.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_38.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_39.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/ci/cicd_40.png">
+<meta property="og:updated_time" content="2019-11-05T08:35:00.589Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker 构建持续集成环境">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/timg_02.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/11/01/docker-base09/">
+
+
+
+
+
+  <title>Docker 构建持续集成环境 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/11/01/docker-base09/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker 构建持续集成环境</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-01T09:20:33+08:00">
+                2019-11-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/timg_02.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="CI-CD介绍"><a href="#CI-CD介绍" class="headerlink" title="CI/CD介绍"></a>CI/CD介绍</h2><ol>
+<li>CI（持续集成）/CD（持续交付/持续部署）</li>
+</ol>
+<p><img src="/img/ci/cicd_01.png"></p>
+<h2 id="发布流程设计"><a href="#发布流程设计" class="headerlink" title="发布流程设计"></a>发布流程设计</h2><p><img src="/img/ci/cicd_02.png"></p>
+<h2 id="基础环境准备"><a href="#基础环境准备" class="headerlink" title="基础环境准备"></a>基础环境准备</h2><h3 id="docker服务器-与-Harbor"><a href="#docker服务器-与-Harbor" class="headerlink" title="docker服务器 与 Harbor"></a>docker服务器 与 Harbor</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Jenkins服务器      172.17.70.243</span><br><span class="line">Docker服务器       172.17.70.244</span><br><span class="line">Git/Harbor         172.17.70.242</span><br></pre></td></tr></table></figure>
+<ol>
+<li>docker 服务器 能够访问 Harbor仓库</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@Jenkins ~]# docker login 172.17.70.242</span><br><span class="line">[root@Docker ~]# docker login 172.17.70.242</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>每台服务器安装JAVA环境</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># 解压</span><br><span class="line">[root@server2 ~]# tar -zxvf jdk-8u231-linux-x64.tar.gz -C /usr/local/</span><br><span class="line">[root@server2 ~]# ls -l /usr/local/jdk1.8.0_231/</span><br><span class="line"></span><br><span class="line"># 配置环境变量</span><br><span class="line">[root@server2 local]# vim /etc/profile</span><br><span class="line"></span><br><span class="line">export JAVA_HOME=/usr/local/jdk1.8.0_231</span><br><span class="line">export PATH=$PATH:$JAVA_HOME/bin</span><br><span class="line">export CLASSPATH=.:$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/dt.jar:$CLASSPATH</span><br><span class="line"></span><br><span class="line">[root@server2 local]# source /etc/profile</span><br><span class="line"></span><br><span class="line"># 让设置生效</span><br><span class="line">[root@server2 local]# java -version</span><br><span class="line">java version "1.8.0_231"</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_231-b11)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.231-b11, mixed mode)</span><br></pre></td></tr></table></figure>
+<h3 id="部署-Git-服务器"><a href="#部署-Git-服务器" class="headerlink" title="部署 Git 服务器"></a>部署 Git 服务器</h3><ol>
+<li>部署仓库</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1. 安装Git</span><br><span class="line">yum install git</span><br><span class="line"></span><br><span class="line">2. 创建Git用户</span><br><span class="line">useradd git</span><br><span class="line">passwd git</span><br><span class="line"></span><br><span class="line">3. 创建仓库</span><br><span class="line">su - git</span><br><span class="line">mkdir solo.git </span><br><span class="line">cd solo.git/</span><br><span class="line"></span><br><span class="line"># 初始化仓库</span><br><span class="line">git --bare init</span><br><span class="line"></span><br><span class="line">[git@Git-Harbor solo.git]$ ls</span><br><span class="line">branches  config  description  HEAD  hooks  info  objects  refs</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>部署本地git 提交solo项目到git仓库</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">1. Jenkins服务器上安装git,下载solo项目有到服务器上,模拟开发上传到git仓库再</span><br><span class="line">[root@Jenkins opt]# yum install git</span><br><span class="line"></span><br><span class="line">2. 下载solo项目</span><br><span class="line">[root@Jenkins opt]# git clone https://github.com/b3log/solo.git</span><br><span class="line"># 本地工程路径: /opt/solo</span><br><span class="line"></span><br><span class="line">[root@Jenkins tmp]# git clone https://github.com/b3log/solo-skins.git</span><br><span class="line">[root@Jenkins tmp]# cd solo-skins/</span><br><span class="line">[root@Jenkins skins]# cd /opt/test/solo/src/main/webapp/skins</span><br><span class="line"># 复制所有皮肤到本地目录</span><br><span class="line">[root@Jenkins skins]# cp -r  /tmp/solo-skins/* .</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">3. 创建本地git目录 test</span><br><span class="line">[root@Jenkins opt]# mkdir test</span><br><span class="line">[root@Jenkins opt]# cd test/</span><br><span class="line"></span><br><span class="line"># 把git服务器上solo项目拉过来</span><br><span class="line">[root@Jenkins test]# git clone root@172.17.70.242:/home/git/solo.git</span><br><span class="line"></span><br><span class="line"># 在把本地写好的solo项目 git上去</span><br><span class="line">[root@Jenkins solo]# cd /opt/test/solo/</span><br><span class="line">[root@Jenkins test]# cp ../solo/* solo/ -rf</span><br><span class="line"></span><br><span class="line">[root@Jenkins solo]# cd /opt/test/solo</span><br><span class="line">[root@Jenkins solo]# ls -l</span><br><span class="line">total 428</span><br><span class="line">-rw-r--r-- 1 root root 141981 Nov  3 17:58 CHANGE_LOGS.html</span><br><span class="line">-rw-r--r-- 1 root root    519 Nov  3 17:58 Dockerfile</span><br><span class="line">-rw-r--r-- 1 root root   4486 Nov  3 17:58 gulpfile.js</span><br><span class="line">-rw-r--r-- 1 root root  34522 Nov  3 17:58 LICENSE</span><br><span class="line">-rw-r--r-- 1 root root    938 Nov  3 17:58 package.json</span><br><span class="line">-rw-r--r-- 1 root root 211486 Nov  3 17:58 package-lock.json</span><br><span class="line">-rw-r--r-- 1 root root  14647 Nov  3 17:58 pom.xml</span><br><span class="line">-rw-r--r-- 1 root root   1390 Nov  3 17:58 README.md</span><br><span class="line">drwxr-xr-x 2 root root   4096 Nov  3 17:58 scripts</span><br><span class="line">drwxr-xr-x 4 root root   4096 Nov  3 17:58 src</span><br><span class="line"></span><br><span class="line"># 提交到本地</span><br><span class="line">[root@Jenkins solo]# git config user.name "leo"</span><br><span class="line">[root@Jenkins solo]# git config user.email "365042337@qq.com"</span><br><span class="line">[root@Jenkins solo]# git add .</span><br><span class="line">[root@Jenkins solo]# git commit -m "all"</span><br><span class="line"></span><br><span class="line"># psuh到 git 服务器</span><br><span class="line">[root@Jenkins solo]# git push origin master</span><br><span class="line">root@172.17.70.242's password: </span><br><span class="line">Counting objects: 655, done.</span><br><span class="line">Delta compression using up to 2 threads.</span><br><span class="line">Compressing objects: 100% (641/641), done.</span><br><span class="line">Writing objects: 100% (655/655), 5.14 MiB | 9.80 MiB/s, done.</span><br><span class="line">Total 655 (delta 240), reused 0 (delta 0)</span><br><span class="line">To root@172.17.70.242:/home/git/solo.git</span><br><span class="line"> * [new branch]      master -&gt; master</span><br></pre></td></tr></table></figure>
+<h3 id="创建-自定义虚拟网络-solo"><a href="#创建-自定义虚拟网络-solo" class="headerlink" title="创建 自定义虚拟网络 solo"></a>创建 自定义虚拟网络 solo</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 在docker服务器上创建</span><br><span class="line">[root@Docker opt]# docker network create solo</span><br></pre></td></tr></table></figure>
+<h3 id="solo-部署-mysql服务器"><a href="#solo-部署-mysql服务器" class="headerlink" title="solo 部署 mysql服务器"></a>solo 部署 mysql服务器</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">--name solo_mysql \</span><br><span class="line">--net solo \</span><br><span class="line">-e MYSQL_ROOT_PASSWORD=123456 \</span><br><span class="line">-e MYSQL_DATABASE=solo mysql:5.6 --character-set-server=utf8</span><br></pre></td></tr></table></figure>
+<h3 id="修改-solo-源码中的数据库连接配置"><a href="#修改-solo-源码中的数据库连接配置" class="headerlink" title="修改 solo 源码中的数据库连接配置"></a>修改 solo 源码中的数据库连接配置</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 使用mysql容器名访问</span><br><span class="line">[root@Jenkins resources]# cd /opt/test/solo/src/main/resources</span><br><span class="line">[root@Jenkins resources]# sed -i 's#localhost#solo_mysql#g' local.properties </span><br><span class="line"></span><br><span class="line"># 提交到本地</span><br><span class="line">[root@Jenkins solo]# git config user.name "leo"</span><br><span class="line">[root@Jenkins solo]# git config user.email "365042337@qq.com"</span><br><span class="line">[root@Jenkins solo]# git add .</span><br><span class="line">[root@Jenkins solo]# git commit -m "all"</span><br><span class="line"></span><br><span class="line"># psuh到 git 服务器</span><br><span class="line">[root@Jenkins solo]# git push origin master</span><br></pre></td></tr></table></figure>
+<h3 id="部署-Harbor-镜像仓库"><a href="#部署-Harbor-镜像仓库" class="headerlink" title="部署 Harbor 镜像仓库"></a>部署 Harbor 镜像仓库</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1. 如果不使用https,docker服务器上别忘记配置信任</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_03.png"></p>
+<h2 id="Jenkins-安装"><a href="#Jenkins-安装" class="headerlink" title="Jenkins 安装"></a>Jenkins 安装</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 配置jenkins 服务器 与git服务器免交互</span><br><span class="line">[root@Jenkins jenkins]# ssh-keygen </span><br><span class="line">[root@Jenkins jenkins]# ssh-copy-id git@172.17.70.242</span><br><span class="line"># 不用输入密码 即可git</span><br><span class="line">[root@Jenkins jenkins]# git clone git@172.17.70.242:/home/git/solo.git</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># 使用jenkins容器</span><br><span class="line">[root@Jenkins solo]# cd /opt/</span><br><span class="line">[root@Jenkins opt]# mkdir jenkins</span><br><span class="line"></span><br><span class="line"># git  jenkins容器使用git拉取镜像</span><br><span class="line"># libltdl-dev jenkins使用宿主机的docker引擎</span><br><span class="line"></span><br><span class="line"># 先拉取最新jenkins版本</span><br><span class="line">[root@Jenkins jenkins]# docker pull jenkins/jenkins</span><br><span class="line"></span><br><span class="line">[root@Jenkins jenkins]# vim Dockerfile </span><br><span class="line"></span><br><span class="line">FROM jenkins/jenkins</span><br><span class="line">USER root</span><br><span class="line"># RUN echo '' &gt; /etc/apt/sources.list.d/jessie-backports.list &amp;&amp; \</span><br><span class="line">#   wget http://mirrors.163.com/.help/sources.list.jessie -O /etc/apt/sources.list</span><br><span class="line"></span><br><span class="line"># COPY sources.list.jessie /etc/apt/sources.list</span><br><span class="line"></span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install -y git libltdl-dev                                                      </span><br><span class="line"></span><br><span class="line">[root@Jenkins jenkins]# docker build -t jenkins:v1 .</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 启动</span><br><span class="line">[root@Jenkins jenkins]# docker run -d --name jenkins -p 8080:8080 -v /var/jenkins_home/:/var/jenkins_home -v /usr/local/apache-maven-3.5.0:/usr/local/maven -v /usr/local/jdk1.8.0_231/:/usr/local/jdk -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker -v ~/.ssh:/root/.ssh jenkins:v1</span><br><span class="line"></span><br><span class="line">[root@Jenkins jenkins]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                               NAMES</span><br><span class="line">1e37fe659cc2        jenkins:v1          "/bin/tini -- /usr/l…"   42 seconds ago      Up 41 seconds       0.0.0.0:8080-&gt;8080/tcp, 50000/tcp   jenkins</span><br><span class="line"></span><br><span class="line"># 安装 apache-maven-3.5.0-bin.tar</span><br><span class="line">[root@Jenkins opt]# tar -zxvf apache-maven-3.5.0-bin.tar.gz -C /usr/local/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 安装jenkins解锁</span><br><span class="line">[root@Jenkins secrets]# cat /var/jenkins_home/secrets/initialAdminPassword </span><br><span class="line">b4b2de84e81f45caae80a105a9460eba</span><br><span class="line"></span><br><span class="line"># 选择插件安装</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_04.png"></p>
+<h2 id="构建基础镜像"><a href="#构建基础镜像" class="headerlink" title="构建基础镜像"></a>构建基础镜像</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@Docker solo]# mkdir -p /opt/solo/</span><br><span class="line"></span><br><span class="line">[root@Docker solo]# vim Dockerfile </span><br><span class="line">FROM centos:7</span><br><span class="line">MAINTAINER leo 365042337@qq.com</span><br><span class="line">RUN yum install unzip iproute -y</span><br><span class="line">ENV JAVA_HOME /usr/local/jdk</span><br><span class="line">ADD apache-tomcat-8.5.47.tar.gz /usr/local/</span><br><span class="line">RUN mv /usr/local/apache-tomcat-8.5.47 /usr/local/tomcat &amp;&amp; \</span><br><span class="line">    sed -i '1a JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"' /usr/local/tomcat/bin/catalina.sh</span><br><span class="line">WORKDIR /usr/local/tomcat</span><br><span class="line">EXPOSE 8080</span><br><span class="line">ENTRYPOINT ["./bin/catalina.sh", "run"]</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 构建</span><br><span class="line">[root@Docker solo]# docker build -t  172.17.70.242/test/tomcat:v1 .</span><br><span class="line"># 推送 项目会基于这个tomcat构建服务</span><br><span class="line">[root@Docker solo]# docker push 172.17.70.242/test/tomcat:v1</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_05.png"></p>
+<h2 id="Jenkins基本配置"><a href="#Jenkins基本配置" class="headerlink" title="Jenkins基本配置"></a>Jenkins基本配置</h2><h3 id="全局工具配置-git-jdk-maven"><a href="#全局工具配置-git-jdk-maven" class="headerlink" title="全局工具配置 git jdk maven"></a>全局工具配置 git jdk maven</h3><p><img src="/img/ci/cicd_06.png"></p>
+<p><img src="/img/ci/cicd_07.png"></p>
+<p><img src="/img/ci/cicd_08.png"></p>
+<h3 id="系统配置"><a href="#系统配置" class="headerlink" title="系统配置"></a>系统配置</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># jenkins 安装ssh插件</span><br><span class="line"># 配置 SSH remote hosts</span><br><span class="line"># jenkins配置免交互 访问 docker主机</span><br><span class="line"></span><br><span class="line">[root@Jenkins solo]# ssh-copy-id root@172.17.70.244</span><br><span class="line"></span><br><span class="line"># 添加用户凭据 credentials -&gt; 全局 -&gt; 加入公钥</span><br><span class="line">[root@Jenkins solo]# cat /root/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_09.png"></p>
+<p><img src="/img/ci/cicd_11.png"></p>
+<p><img src="/img/ci/cicd_12.png"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">别忘记保存</span><br></pre></td></tr></table></figure>
+<h2 id="Jenkins创建项目"><a href="#Jenkins创建项目" class="headerlink" title="Jenkins创建项目"></a>Jenkins创建项目</h2><h3 id="安装-Maven-插件"><a href="#安装-Maven-插件" class="headerlink" title="安装 Maven 插件"></a>安装 Maven 插件</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Maven Integration</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_13.png"></p>
+<h3 id="创建sola项目"><a href="#创建sola项目" class="headerlink" title="创建sola项目"></a>创建sola项目</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. 配置好源码管理 jenkins到git 免交互访问</span><br><span class="line">git@172.17.70.242:/home/git/solo.git</span><br><span class="line"></span><br><span class="line">2. 每10分钟拉取一次代码</span><br><span class="line">*/30 * * * * </span><br><span class="line"></span><br><span class="line">3. 跳过项目的测试用例</span><br><span class="line">clean package -Dmaven.test.skip=true</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_14.png"></p>
+<p><img src="/img/ci/cicd_15.png"></p>
+<p><img src="/img/ci/cicd_16.png"></p>
+<h3 id="立即构建-测试一次"><a href="#立即构建-测试一次" class="headerlink" title="立即构建 测试一次"></a>立即构建 测试一次</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cd /var/jenkins_home/workspace/solo_blog/target</span><br><span class="line">[root@Jenkins target]# ls -l</span><br><span class="line">total 21880</span><br><span class="line">drwxr-xr-x  3 root root     4096 Nov  4 15:42 classes</span><br><span class="line">drwxr-xr-x  3 root root     4096 Nov  4 15:42 generated-sources</span><br><span class="line">drwxr-xr-x  2 root root     4096 Nov  4 15:42 maven-archiver</span><br><span class="line">drwxr-xr-x  3 root root     4096 Nov  4 15:42 maven-status</span><br><span class="line">drwxr-xr-x 12 root root     4096 Nov  4 15:42 solo</span><br><span class="line">-rw-r--r--  1 root root 22380877 Nov  4 15:42 solo.war              # 实际要部署的包</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_20.png"></p>
+<p><img src="/img/ci/cicd_19.png"></p>
+<h3 id="增加构建后操作"><a href="#增加构建后操作" class="headerlink" title="增加构建后操作"></a>增加构建后操作</h3><ol>
+<li>把项目打包到镜像 推送到镜像仓库</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 构建后 到当前目录 写dockerfile文件 构建镜像并推送到公共仓库</span><br><span class="line"></span><br><span class="line">cd $WORKSPACE</span><br><span class="line">docker login -u admin -p 123456 172.17.70.242</span><br><span class="line">cat &gt; Dockerfile &lt;&lt; EOF</span><br><span class="line"># BASE</span><br><span class="line">FROM 172.17.70.242/test/tomcat:v1</span><br><span class="line"># WHO</span><br><span class="line">MAINTAINER leo 365042337@qq.com</span><br><span class="line"># COPY</span><br><span class="line">COPY target/solo.war /tmp/ROOT.war</span><br><span class="line"># RUN </span><br><span class="line">RUN rm -rf /usr/local/tomcat/webapps/* &amp;&amp; \</span><br><span class="line">    unzip /tmp/ROOT.war -d /usr/local/tomcat/webapps/ROOT &amp;&amp; \</span><br><span class="line">    rm -f /tmp/ROOT.war</span><br><span class="line">    </span><br><span class="line">ENTRYPOINT ["/usr/local/tomcat/bin/catalina.sh", "run"]</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">docker build -t 172.17.70.242/test/solo:v1 .</span><br><span class="line">docker login -u admin -p 123456 172.17.70.242</span><br><span class="line">docker push 172.17.70.242/test/solo:v1</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_23.png"></p>
+<p><img src="/img/ci/cicd_21.png"></p>
+<p><img src="/img/ci/cicd_22.png"></p>
+<h3 id="项目镜像传给-docker服务器-运行"><a href="#项目镜像传给-docker服务器-运行" class="headerlink" title="项目镜像传给 docker服务器 运行"></a>项目镜像传给 docker服务器 运行</h3><ol>
+<li>使用项目构建后操作</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 远程登录docker服务器,然后拉取项目镜像 run</span><br><span class="line"># 1. 考虑镜像需要清理 容器需要清理 再拉取运行</span><br><span class="line"># 2. 挂上jdk 从而减少容器的大小</span><br><span class="line"># 3. 后期要考虑项目版本构建 每次的构建版本不同</span><br><span class="line"># 4. jenkins 判断状态码 删除没有的容器 echo$? = 1 所以加上 | true</span><br><span class="line"># --net solo 指定自定义网络是因为solo需要mysql 在docker服务上启动了一个</span><br><span class="line"></span><br><span class="line">docker rmi -f 172.17.70.242/test/solo:v1 | true</span><br><span class="line">docker rm -f solo | true</span><br><span class="line">docker login -u admin -p 123456 172.17.70.242</span><br><span class="line">docker run -d -it --name solo --net solo -p 88:8080 -v /usr/local/jdk1.8.0_231:/usr/local/jdk 172.17.70.242/test/solo:v1</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_24.png"></p>
+<h3 id="构建后查看"><a href="#构建后查看" class="headerlink" title="构建后查看"></a>构建后查看</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@Docker ~]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                  NAMES</span><br><span class="line">cc910d9d1bb9        172.17.70.242/test/solo:v1   "/usr/local/tomcat/b…"   8 seconds ago       Up 7 seconds        0.0.0.0:88-&gt;8080/tcp   solo</span><br><span class="line">8395404a43b5        mysql:5.6                    "docker-entrypoint.s…"   13 hours ago        Up 11 minutes       3306/tcp               solo_mysql</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_25.png"></p>
+<h3 id="测试maven-构建-solo项目"><a href="#测试maven-构建-solo项目" class="headerlink" title="测试maven 构建 solo项目"></a>测试maven 构建 solo项目</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 仅仅是测试</span><br><span class="line">[root@Jenkins solo]# /usr/local/apache-maven-3.5.0/bin/mvn clean package -Dmaven.test.skip=true</span><br><span class="line"></span><br><span class="line"># 依赖是再  pom.xml 文件中指定好的 第一次拉取需要下载 形成缓存</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_17.png"></p>
+<p><img src="/img/ci/cicd_18.png"></p>
+<h2 id="使用-pipeline-构建项目"><a href="#使用-pipeline-构建项目" class="headerlink" title="使用 pipeline 构建项目"></a>使用 pipeline 构建项目</h2><h3 id="把整体工作放在流水线中"><a href="#把整体工作放在流水线中" class="headerlink" title="把整体工作放在流水线中"></a>把整体工作放在流水线中</h3><p><img src="/img/ci/cicd_26.png"></p>
+<p><img src="/img/ci/cicd_27.png"></p>
+<h3 id="基础使用-阶段演示"><a href="#基础使用-阶段演示" class="headerlink" title="基础使用 阶段演示"></a>基础使用 阶段演示</h3><p><img src="/img/ci/cicd_28.png"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">node &#123;</span><br><span class="line"></span><br><span class="line">   stage('git check') &#123;</span><br><span class="line">        sh "echo 1"</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   stage('build') &#123;</span><br><span class="line">        sh "echo 2"</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   stage('deploy') &#123;</span><br><span class="line">        sh "echo 3"</span><br><span class="line">   &#125;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_29.png"></p>
+<h3 id="使用pipeline的优点"><a href="#使用pipeline的优点" class="headerlink" title="使用pipeline的优点"></a>使用pipeline的优点</h3><ol>
+<li>项目发布可视化，明确阶段，方便问题处理</li>
+<li>jenkinsfile文件管理整个项目的生命周期</li>
+<li>jenkinsfile可以放到整个项目代码中版本管理</li>
+<li>使用pipeline 是ci/cd 最佳实践</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 构建过程更加清晰可见</span><br><span class="line">2. 每个阶段都可以查看过程日志,可以更清晰的定位问题</span><br><span class="line">3. 通过脚本实现各个环节</span><br><span class="line">4. 可以放到git仓库中,从仓库中后去直接构建</span><br><span class="line">5. 可以与项目放在一起 项目周期一致</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_30.png"></p>
+<h3 id="配置-solo-pipeline"><a href="#配置-solo-pipeline" class="headerlink" title="配置 solo pipeline"></a>配置 solo pipeline</h3><h4 id="丢弃旧的构建"><a href="#丢弃旧的构建" class="headerlink" title="丢弃旧的构建"></a>丢弃旧的构建</h4><p><img src="/img/ci/cicd_31.png"></p>
+<h4 id="代码版本参数"><a href="#代码版本参数" class="headerlink" title="代码版本参数"></a>代码版本参数</h4><p><img src="/img/ci/cicd_33.png"></p>
+<h4 id="maven的配置"><a href="#maven的配置" class="headerlink" title="maven的配置"></a>maven的配置</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 我这个jenkins是容器启动的 挂载了本地的maven环境</span><br><span class="line">2.  -v /usr/local/apache-maven-3.5.0:/usr/local/maven</span><br><span class="line">3. maven是要用的的是容器路径 /usr/local/maven</span><br><span class="line">4. jdk也是 /usr/local/jdk</span><br><span class="line">5. 这些环境与jenkins的全局工具配置路径一致就可以找到</span><br></pre></td></tr></table></figure>
+<h4 id="流水线脚本"><a href="#流水线脚本" class="headerlink" title="流水线脚本"></a>流水线脚本</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 这里我发现 我的jenkins是容器安装的...没法指定node也没办法远程 我就吧docker先部署到本地了 ，后面我在想办法改回来</span><br><span class="line">[root@Jenkins local]# docker network create solo</span><br><span class="line"></span><br><span class="line">docker run -d \</span><br><span class="line">--name solo_mysql \</span><br><span class="line">--net solo \</span><br><span class="line">-e MYSQL_ROOT_PASSWORD=123456 \</span><br><span class="line">-e MYSQL_DATABASE=solo mysql:5.6 --character-set-server=utf8</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">node &#123;   // 指定Slave标签 我这用的master 上面有git和maven环境</span><br><span class="line">   // 拉取代码</span><br><span class="line">   stage('Git Checkout') &#123;  // 别忘记设置ssh免登录 访问到git服务器  Tag是根据版本号码进行构建自定义传值</span><br><span class="line">        checkout([$class: 'GitSCM', branches: [[name: '$Tag']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'git@172.17.70.242:/home/git/solo.git']]])</span><br><span class="line">   &#125;</span><br><span class="line">   // 代码编译</span><br><span class="line">   stage('Maven Build') &#123;</span><br><span class="line">        sh '''</span><br><span class="line">        export JAVA_HOME=/usr/local/jdk</span><br><span class="line">		/usr/local/maven/bin/mvn clean package -Dmaven.test.skip=true</span><br><span class="line">        '''</span><br><span class="line">   &#125;</span><br><span class="line">   // 项目打包到镜像并推送到镜像仓库</span><br><span class="line">   // REPOSITORY = 镜像仓库地址 项目名/版本号</span><br><span class="line">   stage('Build and Push Image') &#123;</span><br><span class="line">sh '''</span><br><span class="line">REPOSITORY=172.17.70.242/test/solo:$&#123;Tag&#125;</span><br><span class="line">cat &gt; Dockerfile &lt;&lt; EOF</span><br><span class="line">FROM 172.17.70.242/test/tomcat:v1</span><br><span class="line">MAINTAINER leo 365042337@qq.com</span><br><span class="line">RUN rm -rf /usr/local/tomcat/webapps/*</span><br><span class="line">COPY target/solo.war /usr/local/tomcat/webapps/ROOT.war</span><br><span class="line">ENTRYPOINT ["/usr/local/tomcat/bin/catalina.sh", "run"]</span><br><span class="line">EOF</span><br><span class="line">docker build -t $REPOSITORY .</span><br><span class="line">docker login -u admin -p 123456 172.17.70.242</span><br><span class="line">docker push $REPOSITORY</span><br><span class="line">'''</span><br><span class="line">   &#125;</span><br><span class="line">   // 部署到Docker主机</span><br><span class="line">   stage('Deploy to Docker') &#123;</span><br><span class="line">        sh '''</span><br><span class="line">        REPOSITORY=172.17.70.242/test/solo:$&#123;Tag&#125;</span><br><span class="line">        docker rm -f blog-solo |true</span><br><span class="line">        docker image rm $REPOSITORY |true</span><br><span class="line">		docker login -u admin -p 123456 172.17.70.242</span><br><span class="line">		docker run -d --name blog-solo --net solo -p 88:8080 -v /usr/local/jdk1.8.0_231:/usr/local/jdk $REPOSITORY</span><br><span class="line">        '''</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 查看git配置</span><br><span class="line">[root@Jenkins solo]# cd /opt/test/solo/</span><br><span class="line">[root@Jenkins solo]# cat .git/config </span><br><span class="line">[core]</span><br><span class="line">	repositoryformatversion = 0</span><br><span class="line">	filemode = true</span><br><span class="line">	bare = false</span><br><span class="line">	logallrefupdates = true</span><br><span class="line">[remote "origin"]</span><br><span class="line">	url = root@172.17.70.242:/home/git/solo.git</span><br><span class="line">	fetch = +refs/heads/*:refs/remotes/origin/*</span><br><span class="line">[branch "master"]</span><br><span class="line">	remote = origin</span><br><span class="line">	merge = refs/heads/master</span><br><span class="line">[user]</span><br><span class="line">	name = leo</span><br><span class="line">	email = 365042337@qq.com</span><br></pre></td></tr></table></figure>
+<h4 id="模拟版本发布"><a href="#模拟版本发布" class="headerlink" title="模拟版本发布"></a>模拟版本发布</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># 创建个文件 形成新版本代码</span><br><span class="line">[root@Jenkins solo]# touch src/main/webapp/test01</span><br><span class="line"></span><br><span class="line"># 提交到本地</span><br><span class="line">[root@Jenkins solo]# git add .</span><br><span class="line"></span><br><span class="line">[root@Jenkins solo]# git commit -m "test01"</span><br><span class="line">[master 2602e3a] test01</span><br><span class="line"> 1 file changed, 0 insertions(+), 0 deletions(-)</span><br><span class="line"> create mode 100644 src/main/webapp/test01</span><br><span class="line"></span><br><span class="line"># 打tag</span><br><span class="line">[root@Jenkins solo]# git tag 1.0.3</span><br><span class="line"></span><br><span class="line"># push 到主分支</span><br><span class="line">[root@Jenkins solo]# git push origin 1.0.3</span><br><span class="line">root@172.17.70.242's password: </span><br><span class="line">Counting objects: 10, done.</span><br><span class="line">Delta compression using up to 2 threads.</span><br><span class="line">Compressing objects: 100% (5/5), done.</span><br><span class="line">Writing objects: 100% (6/6), 438 bytes | 0 bytes/s, done.</span><br><span class="line">Total 6 (delta 3), reused 0 (delta 0)</span><br><span class="line">To root@172.17.70.242:/home/git/solo.git</span><br><span class="line"> * [new tag]         1.0.3 -&gt; 1.0.3</span><br></pre></td></tr></table></figure>
+<h4 id="开始构建"><a href="#开始构建" class="headerlink" title="开始构建"></a>开始构建</h4><p><img src="/img/ci/cicd_34.png"></p>
+<p><img src="/img/ci/cicd_35.png"></p>
+<p><img src="/img/ci/cicd_36.png"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 容器启动</span><br><span class="line">[root@Jenkins local]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                               NAMES</span><br><span class="line">46bdaf3cb6cc        172.17.70.242/test/solo:1.0.3   "/usr/local/tomcat/b…"   21 seconds ago      Up 20 seconds       0.0.0.0:88-&gt;8080/tcp                blog-solo</span><br><span class="line">6c856f6c9f08        mysql:5.6                       "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes        3306/tcp                            solo_mysql</span><br><span class="line">8bfb5bbc017e        jenkins:v1                      "/sbin/tini -- /usr/…"   19 hours ago        Up 4 hours          0.0.0.0:8080-&gt;8080/tcp, 50000/tcp   jenkins</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 进入容器 查看是否存在新版本文件</span><br><span class="line">[root@Jenkins local]# docker exec -it blog-solo bash</span><br><span class="line"></span><br><span class="line">[root@46bdaf3cb6cc tomcat]# cat webapps/ROOT/test01</span><br></pre></td></tr></table></figure>
+<h2 id="Consul-容器服务自动注册与发现"><a href="#Consul-容器服务自动注册与发现" class="headerlink" title="Consul 容器服务自动注册与发现"></a>Consul 容器服务自动注册与发现</h2><h3 id="安装与部署"><a href="#安装与部署" class="headerlink" title="安装与部署"></a>安装与部署</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">1、介绍</span><br><span class="line">Consul是一个分布式、高可用性，在基础设施中发现和配置服务的工具。 </span><br><span class="line"></span><br><span class="line">2、安装</span><br><span class="line">下载二进制Consul包：https://www.consul.io/downloads.html</span><br><span class="line"># unzip consul_0.9.2_linux_amd64.zip</span><br><span class="line"># mv consul /usr/bin</span><br><span class="line"></span><br><span class="line">3、部署</span><br><span class="line">consul agent -server -bootstrap -ui -data-dir=/var/lib/consul-data -bind=172.17.70.243 -client=0.0.0.0 -node=server01</span><br><span class="line"></span><br><span class="line"># server 模式启动 集群的主节点 存储数据 处理请求 </span><br><span class="line"># ui  web管理系统</span><br><span class="line"># data-dir= 数据目录</span><br><span class="line"># bind 绑定地址</span><br><span class="line"># node 节点名</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@Jenkins opt]# ls -l consul_0.9.2_linux_amd64.zip </span><br><span class="line">[root@Jenkins opt]# unzip consul_0.9.2_linux_amd64.zip </span><br><span class="line"></span><br><span class="line">[root@Jenkins opt]# mv consul /usr/bin</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 后台启动 端口8500 </span><br><span class="line"></span><br><span class="line">[root@Jenkins opt]# nohup consul agent -server -bootstrap -ui -data-dir=/var/lib/consul-data -bind=172.17.70.243 -client=0.0.0.0 -node=server01 &amp;&gt;/var/log/caonsul.log &amp;</span><br><span class="line">[root@Jenkins opt]# tailf /var/log/caonsul.log </span><br><span class="line"># web访问</span><br><span class="line">http://39.106.100.108:8500/ui/dc1/services</span><br></pre></td></tr></table></figure>
+<h3 id="基础使用"><a href="#基础使用" class="headerlink" title="基础使用"></a>基础使用</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">查看集群信息：</span><br><span class="line">consul members</span><br><span class="line">consul info |grep leader</span><br><span class="line">consul catalog services</span><br><span class="line"></span><br><span class="line">通过HTTP API获取集群信息：</span><br><span class="line">curl 127.0.0.1:8500/v1/status/peers # 集群server成员</span><br><span class="line">curl 127.0.0.1:8500/v1/status/leader # 集群Raft leader</span><br><span class="line">curl 127.0.0.1:8500/v1/catalog/services # 注册的所有服务</span><br><span class="line">curl 127.0.0.1:8500/v1/catalog/services/nginx # 服务信息</span><br><span class="line">curl 127.0.0.1:8500/v1/catalog/nodes # 集群节点详细信息</span><br><span class="line"></span><br><span class="line">服务注册：</span><br><span class="line">curl -X PUT -d \</span><br><span class="line">'&#123;"id": "jetty","name": "service_name","address": "192.168.0.212","port": 8080,"tags": ["test"],"checks": [&#123;"http": </span><br><span class="line">"http://192.168.0.212:8080/","interval": "5s"&#125;]&#125;' \</span><br><span class="line">http://192.168.0.211:8500/v1/agent/service/register</span><br></pre></td></tr></table></figure>
+<h3 id="实现容器服务自动加入Nginx集群-Docker-Registrator-Consul"><a href="#实现容器服务自动加入Nginx集群-Docker-Registrator-Consul" class="headerlink" title="实现容器服务自动加入Nginx集群 Docker + Registrator + Consul"></a>实现容器服务自动加入Nginx集群 Docker + Registrator + Consul</h3><ol>
+<li>consul-template：一个守护程序，用于实时查询consul集群数据，并更新文件系统上的任意数量的指定模板，生成配置文件，更新完成后可以选择运行任何Shell命令。<ul>
+<li>让它生成nginx配置文件 从集群中拿去 再去放入nginx里 执行重载</li>
+</ul>
+</li>
+<li>gliderlabs/registrator：检查容器运行状态自动注册和注销Docker容器的服务到服务配置中心。目前支持Consul、etcd和SkyDNS2。<ul>
+<li>检查容器服务状态、注销和配置服务中心 运行在docker主机，如果创建新的docker就捕捉出来，注册到Consul</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/hashicorp/consul-template</span><br><span class="line">https://releases.hashicorp.com/consul-template/0.19.3/consul-template_0.19.3_linux_amd64.zip</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><p>模拟在一台docker主机上跑多个nginx服务</p>
+</li>
+<li><p>让他们自动加入一个nginx LB上</p>
+</li>
+</ol>
+<p><img src="/img/ci/cicd_37.png"></p>
+<h3 id="registrator-容器部署"><a href="#registrator-容器部署" class="headerlink" title="registrator 容器部署"></a>registrator 容器部署</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Docker主机启动注册器</span><br><span class="line"># 172.17.70.244</span><br><span class="line"># registrator</span><br><span class="line"># docker服务</span><br><span class="line"></span><br><span class="line"># docker run -d --name=registrator --net=host -v /var/run/docker.sock:/tmp/docker.sock --restart=always gliderlabs/registrator:latest -ip=172.17.70.244 consul://172.17.70.243:8500</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@Docker ~]# docker run -d --name=registrator --net=host --volume=/var/run/docker.sock:/tmp/docker.sock gliderlabs/registrator:latest consul://172.17.70.243:8500</span><br><span class="line">[root@Docker ~]# docker logs registrator</span><br><span class="line">[root@Docker ~]# docker run -it -d -p 88:80 nginx:1.16</span><br><span class="line"></span><br><span class="line">[root@Docker ~]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE                           COMMAND                  CREATED              STATUS              PORTS                NAMES</span><br><span class="line">27bc99e5993e        nginx:1.16                      "nginx -g 'daemon of…"   About a minute ago   Up About a minute   0.0.0.0:88-&gt;80/tcp   cranky_rosalind</span><br><span class="line">deca47a38063        gliderlabs/registrator:latest   "/bin/registrator co…"   3 minutes ago        Up 3 minutes                             registrator</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_38.png"></p>
+<ol>
+<li>他会自动将本地的容器 注册到 consul中</li>
+</ol>
+<h3 id="安装-nginx"><a href="#安装-nginx" class="headerlink" title="安装 nginx"></a>安装 nginx</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 172.17.70.243  </span><br><span class="line"># consul</span><br><span class="line"># nginx</span><br><span class="line"># consul-template 需要与nginx负载节点一起 本地配置文件生成 加载nginx </span><br><span class="line"></span><br><span class="line">[root@Jenkins ~]# yum install nginx</span><br><span class="line"></span><br><span class="line"># 修改配置文件 先把/etc/nginx/nginx.conf下的80监听注释掉</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_39.png"></p>
+<h3 id="安装-consul-template"><a href="#安装-consul-template" class="headerlink" title="安装 consul-template"></a>安装 consul-template</h3><ol>
+<li>需要与nginx同一台机器</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@Jenkins opt]# unzip consul-template_0.19.3_linux_amd64.zip </span><br><span class="line">[root@Jenkins opt]# mv consul-template /usr/bin/</span><br><span class="line"></span><br><span class="line">[root@Jenkins consul_nginx]# vim  nginx.ctmpl</span><br><span class="line"></span><br><span class="line">upstream http_backend &#123;</span><br><span class="line">  # ip_hash;</span><br><span class="line">  &#123;&#123;range service "nginx"&#125;&#125;</span><br><span class="line">  server &#123;&#123; .Address &#125;&#125;:&#123;&#123; .Port &#125;&#125;;</span><br><span class="line">  &#123;&#123; end &#125;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">  listen 80;</span><br><span class="line">  server_name localhost;</span><br><span class="line">  location / &#123;</span><br><span class="line">    proxy_pass http://http_backend;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># &#123;&#123;range service "nginx"&#125;&#125; 获取  consul 下 nginx名字 循环获取IP地址和端口</span><br></pre></td></tr></table></figure>
+<h3 id="生成配置文件-并-reload-nginx"><a href="#生成配置文件-并-reload-nginx" class="headerlink" title="生成配置文件 并 reload nginx"></a>生成配置文件 并 reload nginx</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">[root@Jenkins consul_nginx]# cd /opt/consul_nginx</span><br><span class="line">[root@Jenkins consul_nginx]# consul-template -consul-addr 39.106.100.108:8500 -template "./nginx.ctmpl:/etc/nginx/conf.d/site.conf:nginx -s reload"</span><br><span class="line"></span><br><span class="line"># 自定生成了配置文件 并加入了 docker的nginx地址 </span><br><span class="line"></span><br><span class="line">[root@Jenkins ~]# vim /etc/nginx/conf.d/site.conf </span><br><span class="line"></span><br><span class="line">upstream http_backend &#123;</span><br><span class="line">  # ip_hash;</span><br><span class="line"></span><br><span class="line">  server 172.17.70.243:88;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">  listen 80;</span><br><span class="line">  server_name localhost;</span><br><span class="line">  location / &#123;</span><br><span class="line">    proxy_pass http://http_backend;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 再启动一个docker</span><br><span class="line">[root@Docker ~]# docker run -it -d -p 89:80 nginx:1.16</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 查看配置文件是否自动添加</span><br><span class="line">[root@Jenkins nginx]# cat /etc/nginx/conf.d/site.conf </span><br><span class="line">upstream http_backend &#123;</span><br><span class="line">  # ip_hash;</span><br><span class="line">  </span><br><span class="line">  server 172.17.70.243:88;</span><br><span class="line">  </span><br><span class="line">  server 172.17.70.243:89;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123; </span><br><span class="line">  listen 80; </span><br><span class="line">  server_name localhost;</span><br><span class="line">  location / &#123;</span><br><span class="line">    proxy_pass http://http_backend;</span><br><span class="line">  &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/img/ci/cicd_40.png"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/01/docker-base08/" rel="next" title="Docker 项目打包部署">
+                <i class="fa fa-chevron-left"></i> Docker 项目打包部署
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/05/k8s-01/" rel="prev" title="01 Kubernetes 概述">
+                01 Kubernetes 概述 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CI-CD介绍"><span class="nav-number">1.</span> <span class="nav-text">CI/CD介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发布流程设计"><span class="nav-number">2.</span> <span class="nav-text">发布流程设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础环境准备"><span class="nav-number">3.</span> <span class="nav-text">基础环境准备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#docker服务器-与-Harbor"><span class="nav-number">3.1.</span> <span class="nav-text">docker服务器 与 Harbor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署-Git-服务器"><span class="nav-number">3.2.</span> <span class="nav-text">部署 Git 服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-自定义虚拟网络-solo"><span class="nav-number">3.3.</span> <span class="nav-text">创建 自定义虚拟网络 solo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#solo-部署-mysql服务器"><span class="nav-number">3.4.</span> <span class="nav-text">solo 部署 mysql服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改-solo-源码中的数据库连接配置"><span class="nav-number">3.5.</span> <span class="nav-text">修改 solo 源码中的数据库连接配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署-Harbor-镜像仓库"><span class="nav-number">3.6.</span> <span class="nav-text">部署 Harbor 镜像仓库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jenkins-安装"><span class="nav-number">4.</span> <span class="nav-text">Jenkins 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建基础镜像"><span class="nav-number">5.</span> <span class="nav-text">构建基础镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jenkins基本配置"><span class="nav-number">6.</span> <span class="nav-text">Jenkins基本配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全局工具配置-git-jdk-maven"><span class="nav-number">6.1.</span> <span class="nav-text">全局工具配置 git jdk maven</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统配置"><span class="nav-number">6.2.</span> <span class="nav-text">系统配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jenkins创建项目"><span class="nav-number">7.</span> <span class="nav-text">Jenkins创建项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Maven-插件"><span class="nav-number">7.1.</span> <span class="nav-text">安装 Maven 插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建sola项目"><span class="nav-number">7.2.</span> <span class="nav-text">创建sola项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#立即构建-测试一次"><span class="nav-number">7.3.</span> <span class="nav-text">立即构建 测试一次</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#增加构建后操作"><span class="nav-number">7.4.</span> <span class="nav-text">增加构建后操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目镜像传给-docker服务器-运行"><span class="nav-number">7.5.</span> <span class="nav-text">项目镜像传给 docker服务器 运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建后查看"><span class="nav-number">7.6.</span> <span class="nav-text">构建后查看</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试maven-构建-solo项目"><span class="nav-number">7.7.</span> <span class="nav-text">测试maven 构建 solo项目</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-pipeline-构建项目"><span class="nav-number">8.</span> <span class="nav-text">使用 pipeline 构建项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#把整体工作放在流水线中"><span class="nav-number">8.1.</span> <span class="nav-text">把整体工作放在流水线中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基础使用-阶段演示"><span class="nav-number">8.2.</span> <span class="nav-text">基础使用 阶段演示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用pipeline的优点"><span class="nav-number">8.3.</span> <span class="nav-text">使用pipeline的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-solo-pipeline"><span class="nav-number">8.4.</span> <span class="nav-text">配置 solo pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#丢弃旧的构建"><span class="nav-number">8.4.1.</span> <span class="nav-text">丢弃旧的构建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码版本参数"><span class="nav-number">8.4.2.</span> <span class="nav-text">代码版本参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#maven的配置"><span class="nav-number">8.4.3.</span> <span class="nav-text">maven的配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流水线脚本"><span class="nav-number">8.4.4.</span> <span class="nav-text">流水线脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟版本发布"><span class="nav-number">8.4.5.</span> <span class="nav-text">模拟版本发布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开始构建"><span class="nav-number">8.4.6.</span> <span class="nav-text">开始构建</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Consul-容器服务自动注册与发现"><span class="nav-number">9.</span> <span class="nav-text">Consul 容器服务自动注册与发现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装与部署"><span class="nav-number">9.1.</span> <span class="nav-text">安装与部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基础使用"><span class="nav-number">9.2.</span> <span class="nav-text">基础使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现容器服务自动加入Nginx集群-Docker-Registrator-Consul"><span class="nav-number">9.3.</span> <span class="nav-text">实现容器服务自动加入Nginx集群 Docker + Registrator + Consul</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#registrator-容器部署"><span class="nav-number">9.4.</span> <span class="nav-text">registrator 容器部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-nginx"><span class="nav-number">9.5.</span> <span class="nav-text">安装 nginx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-consul-template"><span class="nav-number">9.6.</span> <span class="nav-text">安装 consul-template</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成配置文件-并-reload-nginx"><span class="nav-number">9.7.</span> <span class="nav-text">生成配置文件 并 reload nginx</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="k8s,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="07 K8S 微服务容器化迁移">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/12/30/k8s-base09/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_137.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_138.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_139.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_140.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_141.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_142.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_143.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_144.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_145.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_146.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_147.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_148.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_149.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_150.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_151.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_152.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_153.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_154.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_155.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_156.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_157.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_158.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_159.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_160.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_161.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_162.png">
+<meta property="og:updated_time" content="2019-12-31T03:10:19.950Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="07 K8S 微服务容器化迁移">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/12/30/k8s-base09/">
+
+
+
+
+
+  <title>07 K8S 微服务容器化迁移 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/12/30/k8s-base09/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">07 K8S 微服务容器化迁移</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-30T08:01:51+08:00">
+                2019-12-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/k8s/" itemprop="url" rel="index">
+                    <span itemprop="name">k8s</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="从运维角度看微服务"><a href="#从运维角度看微服务" class="headerlink" title="从运维角度看微服务"></a>从运维角度看微服务</h2><h3 id="微服务特点"><a href="#微服务特点" class="headerlink" title="微服务特点"></a>微服务特点</h3><ol>
+<li>服务组件化<br>每个服务独立开发、部署，有效避免一个服务的修改引起整个系统重新部署。<br>哪个服务出现问题,修改后重新部署,不影响整个业务。</li>
+<li>技术栈灵活<br>约定通信方式，使得服务本身功能实现对技术要求不再那么敏感。<br>不再采用一种语言开发，通过对接接口互相访问。</li>
+<li>独立部署<br>每个微服务独立部署，加快部署速度，方便扩展。</li>
+<li>扩展性强<br>每个微服务可以部署多个，并且有负载均衡能力。</li>
+<li>独立数据<br>每个微服务有独立的基本组件，例如数据库、缓存等。</li>
+</ol>
+<h3 id="微服务不足"><a href="#微服务不足" class="headerlink" title="微服务不足"></a>微服务不足</h3><ol>
+<li>沟通成本</li>
+<li>数据一致性</li>
+<li>运维成本</li>
+<li>内部架构复杂性</li>
+<li>大量服务如何治理</li>
+<li>如何部署</li>
+<li>如何监控</li>
+<li>数据和事务</li>
+</ol>
+<h3 id="单体应用-vs-微服务"><a href="#单体应用-vs-微服务" class="headerlink" title="单体应用 vs 微服务"></a>单体应用 vs 微服务</h3><p><img src="/img/k8s/k8s_137.png" width="50%">  </p>
+<ol>
+<li>将一套业务 按功能拆分 每个服务处理自己的业务</li>
+<li>每个业务都由独立的数据库        </li>
+<li>都通过 apigateway 网关 分发到独立的服务 ，路由转发</li>
+<li>如何互相找到对方,通过注册中心，请求会去询问注册中心向哪里转发</li>
+</ol>
+<p><strong>单体架构优势</strong>：</p>
+<ol>
+<li>易于部署</li>
+<li>易于测试</li>
+</ol>
+<p><strong>单体架构不足</strong>：</p>
+<ol>
+<li>代码膨胀，难以维护</li>
+<li>构建、部署成本大</li>
+<li>新人上手难</li>
+</ol>
+<p><strong>k8s治理微服务</strong>：</p>
+<ol>
+<li>产品迭代</li>
+<li>无状态</li>
+<li>有状态很少应用 </li>
+<li>把每个微服务作为一个镜像去部署管理、迭代</li>
+</ol>
+<p><strong>SOA面向服务</strong>：</p>
+<ol>
+<li>把每个功能做成api</li>
+<li>每次增加功能服务都要让其他服务去感知</li>
+<li>微服务可以通过 注册中心 感知</li>
+<li>SOA可能需要人工干预，细腻度比微服务大一些</li>
+</ol>
+<h3 id="Java-微服务框架"><a href="#Java-微服务框架" class="headerlink" title="Java 微服务框架"></a>Java 微服务框架</h3><ol>
+<li>Spring Boot  </li>
+<li><font color="red">Spring Cloud </font>          (Spring生态技术栈,Spring Boot的升级完善，应用最多)</li>
+<li>Dubbo                                           (阿里云开源 )</li>
+</ol>
+<h2 id="在K8S平台部署微服务考虑的问题"><a href="#在K8S平台部署微服务考虑的问题" class="headerlink" title="在K8S平台部署微服务考虑的问题"></a>在K8S平台部署微服务考虑的问题</h2><h3 id="微服务架构图"><a href="#微服务架构图" class="headerlink" title="微服务架构图"></a>微服务架构图</h3><p><img src="/img/k8s/k8s_138.png" width="50%">  </p>
+<ol>
+<li>用户通过手机或者浏览器访问域名</li>
+<li>访问域名到达前端(前后端分离),访问功能调用对应业务逻辑处理</li>
+<li>访问功能的时候,通过负载均衡到达网关，网关作为微服务的入口,认证过滤降级都在这个层面实现,类似nginx的location</li>
+<li>网关根据用户请求的url匹配，去注册中心去找提供相应的服务</li>
+<li>注册中心保存了所有微服务的信息</li>
+<li>每个微服务的数据都保存在自己的数据库中</li>
+<li>配置中心存储每个微服务的配置数据，集中化管理</li>
+</ol>
+<h3 id="微服务架构的理解"><a href="#微服务架构的理解" class="headerlink" title="微服务架构的理解"></a>微服务架构的理解</h3><ol>
+<li>微服务间如何通信？<ul>
+<li>REST API，RPC，MQ</li>
+</ul>
+</li>
+<li>微服务如何发现彼此？  <ul>
+<li>注册中心</li>
+</ul>
+</li>
+<li>组件之间怎么个调用关系？ <ul>
+<li>查看商品 -&gt; 订单 -&gt; 库存 -&gt; 支付  </li>
+<li>链路跟踪 打点 判断一个请求经过哪些环节</li>
+</ul>
+</li>
+<li>哪个服务作为整个网站入口？<ul>
+<li>网关 作为 服务端入口</li>
+<li>前端 作为 用户访问入口</li>
+</ul>
+</li>
+<li>哪些微服务需要对外访问？ <ul>
+<li>前端程序调用服务端接口api，前端和网关都需要暴露</li>
+</ul>
+</li>
+<li>微服务怎么部署？更新？扩容？<ul>
+<li>java 应用 ，微服务jar包,更新jar包,再启动一个jar包服务</li>
+</ul>
+</li>
+<li>区分有状态应用与无状态应用<ul>
+<li>网关,微服务都是无状态的,包括注册中心</li>
+<li>有状态的都进行持久化,数据库,redis,MQ,分布式存储都按照传统部署</li>
+</ul>
+</li>
+</ol>
+<h3 id="为什么要用注册中心"><a href="#为什么要用注册中心" class="headerlink" title="为什么要用注册中心"></a>为什么要用注册中心</h3><p><img src="/img/k8s/k8s_139.png" width="50%"> </p>
+<p><strong>微服务太多面临的问题</strong>：</p>
+<ol>
+<li>怎么记录一个微服务多个副本接口地址？ 新加入的服务如何让其他业务动态感知到</li>
+<li>怎么实现一个微服务多个副本负载均衡？ </li>
+<li>怎么判断一个微服务副本是否可用？     SOA的需要监控http,lv做健康检查</li>
+<li>主流注册中心：Eureka，Nacos</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 注册中心主要解决: 每个微服务之间如何交互</span><br><span class="line"># Eureka 去年年中闭源</span><br><span class="line"># Nacos 阿里开源 部署维护基本一样</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># SOA</span><br><span class="line">用户 -&gt; 前端 -&gt; api -&gt; </span><br><span class="line">                      lv                -&gt; DB数据</span><br><span class="line">                            -&gt; api1  </span><br><span class="line">                            -&gt; api2</span><br></pre></td></tr></table></figure>
+<p><strong>Eureka注册中心</strong> </p>
+<ol>
+<li>每启动一个微服务都会被注册到Eureka中</li>
+<li>Eureka不单存储信息,还提供负载均衡功能，检查接口是否可用</li>
+<li>请求访问注册中心的服务,响应给请求的客户端,客户端再去请求微服务</li>
+<li>客户端都集成在程序中</li>
+</ol>
+<h3 id="项目迁移到K8S平台是怎样的流程"><a href="#项目迁移到K8S平台是怎样的流程" class="headerlink" title="项目迁移到K8S平台是怎样的流程"></a>项目迁移到K8S平台是怎样的流程</h3><p><img src="/img/k8s/k8s_140.png" width="50%"> </p>
+<h4 id="制作镜像"><a href="#制作镜像" class="headerlink" title="制作镜像"></a>制作镜像</h4><ol>
+<li>镜像作为交付物</li>
+</ol>
+<p><img src="/img/k8s/k8s_141.png" width="50%"> </p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 基础镜像 CentOS</span><br><span class="line">2. 运行环境 基础镜像+ java、php、python </span><br><span class="line">3. 项目环境 基础镜像+运行环境+项目代码</span><br></pre></td></tr></table></figure>
+<h4 id="控制器管理Pod"><a href="#控制器管理Pod" class="headerlink" title="控制器管理Pod"></a>控制器管理Pod</h4><ol>
+<li><font color="red"> Deployment：无状态部署 </font></li>
+<li>StatefulSet：有状态部署</li>
+<li>DaemonSet：守护进程部署</li>
+<li>Job &amp; CronJob：批处理</li>
+</ol>
+<h4 id="暴露应用"><a href="#暴露应用" class="headerlink" title="暴露应用"></a>暴露应用</h4><p><img src="/img/k8s/k8s_142.png" width="50%"> </p>
+<ol>
+<li>微服务之间都是通过注册中心通信,而不是走service,所以不大多数微服务不需要service</li>
+<li>网关和前端需要ingress暴露</li>
+</ol>
+<h4 id="对外发布应用"><a href="#对外发布应用" class="headerlink" title="对外发布应用"></a>对外发布应用</h4><p><img src="/img/k8s/k8s_143.png" width="50%"> </p>
+<h4 id="Pod-数据持久化"><a href="#Pod-数据持久化" class="headerlink" title="Pod 数据持久化"></a>Pod 数据持久化</h4><p><img src="/img/k8s/k8s_144.png" width="50%"> </p>
+<p><strong>容器部署过程中一般有以下三种数据</strong>：</p>
+<ol>
+<li>启动时需要的初始数据，可以是配置文件 configmap,secret</li>
+<li>启动过程中产生的临时数据，该临时数据需要多个容器间共享</li>
+<li>启动过程中产生的持久化数据</li>
+</ol>
+<h4 id="日志与监控"><a href="#日志与监控" class="headerlink" title="日志与监控"></a>日志与监控</h4><p><strong>主流方案</strong>：</p>
+<ol>
+<li>Filebeat+ELK</li>
+<li>Prometheus+Grafana</li>
+</ol>
+<h3 id="传统部署与K8S部署区别"><a href="#传统部署与K8S部署区别" class="headerlink" title="传统部署与K8S部署区别"></a>传统部署与K8S部署区别</h3><p><img src="/img/k8s/k8s_145.png" width="50%"> </p>
+<p><img src="/img/k8s/k8s_146.png" width="50%"> </p>
+<h2 id="在K8S平台部署-Spring-Cloud-微服务项目"><a href="#在K8S平台部署-Spring-Cloud-微服务项目" class="headerlink" title="在K8S平台部署 Spring Cloud 微服务项目"></a>在K8S平台部署 Spring Cloud 微服务项目</h2><h3 id="熟悉Spring-Cloud微服务项目"><a href="#熟悉Spring-Cloud微服务项目" class="headerlink" title="熟悉Spring Cloud微服务项目"></a>熟悉Spring Cloud微服务项目</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 项目代码地址 </span><br><span class="line">https://github.com/lizhenliang/simple-microservice</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_147.png" width="50%"> </p>
+<p><img src="/img/k8s/k8s_148.png" width="50%"> </p>
+<ol>
+<li>portal 域名 让用户访问</li>
+<li>portal 访问 ingress 暴露的域名 </li>
+<li>域名指向网关</li>
+</ol>
+<h3 id="代码编译构建"><a href="#代码编译构建" class="headerlink" title="代码编译构建"></a>代码编译构建</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 将代码拉取到部署服务器</span><br><span class="line">git clone https://github.com/lizhenliang/simple-microservice.git</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 simple-microservice-dev1]# pwd</span><br><span class="line">/opt/microservic-code/simple-microservice-dev1</span><br><span class="line">[root@k8s-master1 simple-microservice-dev1]# ls -l</span><br><span class="line"># 源码目录 </span><br><span class="line">drwxr-xr-x 4 root root  4096 Jul 28 11:56 basic-common         # 公共依赖</span><br><span class="line">drwxr-xr-x 2 root root  4096 Jul 28 11:56 db                   # 数据库sql </span><br><span class="line">drwxr-xr-x 3 root root  4096 Jul 28 11:56 eureka-service       # 配置中心</span><br><span class="line">drwxr-xr-x 3 root root  4096 Jul 28 11:56 gateway-service      # zuul 网关 微服务统一入口认证</span><br><span class="line">-rw-r--r-- 1 root root 11357 Jul 28 11:56 LICENSE</span><br><span class="line">-rw-r--r-- 1 root root   420 Jul 28 11:56 lombok.config</span><br><span class="line">drwxr-xr-x 4 root root  4096 Jul 28 11:56 order-service        # order 订单服务</span><br><span class="line">-rw-r--r-- 1 root root  5419 Jul 28 11:56 pom.xml</span><br><span class="line">drwxr-xr-x 3 root root  4096 Jul 28 11:56 portal-service       # 前端 </span><br><span class="line">drwxr-xr-x 4 root root  4096 Jul 28 11:56 product-service      # product 商品服务</span><br><span class="line">-rw-r--r-- 1 root root    24 Jul 28 11:56 README.md</span><br><span class="line">drwxr-xr-x 4 root root  4096 Jul 28 11:56 stock-service        # stock 库存服务</span><br></pre></td></tr></table></figure>
+<h4 id="查看-gateway-配置文件"><a href="#查看-gateway-配置文件" class="headerlink" title="查看 gateway 配置文件"></a>查看 gateway 配置文件</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 resources]# cd /opt/microservic-code/simple-microservice-dev1/gateway-service/src/main/resources</span><br><span class="line">[root@k8s-master1 resources]# ls -l</span><br><span class="line">total 12</span><br><span class="line">-rw-r--r-- 1 root root 902 Jul 28 11:56 application-dev.yml</span><br><span class="line">-rw-r--r-- 1 root root 912 Jul 28 11:56 application-fat.yml</span><br><span class="line">-rw-r--r-- 1 root root  95 Jul 28 11:56 application.yml</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 resources]# cat application.yml </span><br><span class="line">server:</span><br><span class="line">  port: 9999               # 微服务端口</span><br><span class="line">spring:</span><br><span class="line">  profiles:                # 配置文件</span><br><span class="line">    active: fat            # fat | dev 指定哪个名字使用哪个配置文件 不同环境区分</span><br><span class="line">  application:</span><br><span class="line">    name: @artifactId@</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 不同环境区分 </span><br><span class="line"># 微服务都是jar包,如果修改配置文件也不能进去解压修改比较麻烦 </span><br><span class="line"># 2种方法</span><br><span class="line">1. java -jar -Dspring.profiles.active=dev xxx.jar</span><br><span class="line">2. 采用配置中心: apollo,disconf(百度) 为所有微服务的配置做集中管理,运维部署服务端,开发继承agent</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 resources]# cat application-fat.yml </span><br><span class="line">spring:</span><br><span class="line">  cloud:</span><br><span class="line">    gateway:</span><br><span class="line">      discovery:</span><br><span class="line">        locator:</span><br><span class="line">          #开启以服务id去注册中心上获取转发地址</span><br><span class="line">          enabled: true</span><br><span class="line">          ##小写serviceId</span><br><span class="line">          lower-case-service-id: true</span><br><span class="line">      # gateway 网关 路由规则 根据请求的url转发</span><br><span class="line">      routes:</span><br><span class="line">        - id: product-service</span><br><span class="line">          uri: lb://product-service</span><br><span class="line">          filters:</span><br><span class="line">            - StripPrefix=1</span><br><span class="line">          predicates:</span><br><span class="line">            - Path=/product/**</span><br><span class="line"></span><br><span class="line">        - id: order-service</span><br><span class="line">          uri: lb://order-service</span><br><span class="line">          filters:</span><br><span class="line">            - StripPrefix=1</span><br><span class="line">          predicates:</span><br><span class="line">            - Path=/order/**</span><br><span class="line"></span><br><span class="line">        - id: stock-service</span><br><span class="line">          uri: lb://stock-service</span><br><span class="line">          filters:</span><br><span class="line">            - StripPrefix=1</span><br><span class="line">          predicates:</span><br><span class="line">            - Path=/stock/**</span><br><span class="line"># 指定 eureka</span><br><span class="line">eureka:</span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: true</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: true</span><br><span class="line">    fetch-registry: true</span><br><span class="line">    service-url:</span><br><span class="line">      defaultZone: http://127.0.0.1:$&#123;server.port&#125;/eureka/</span><br></pre></td></tr></table></figure>
+<h4 id="查看微服务的配置文件"><a href="#查看微服务的配置文件" class="headerlink" title="查看微服务的配置文件"></a>查看微服务的配置文件</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"># 查看商品微服务的配置文件</span><br><span class="line">[root@k8s-master1 simple-microservice-dev1]# cd product-service/</span><br><span class="line">[root@k8s-master1 product-service]# ls -l</span><br><span class="line">pom.xml  </span><br><span class="line">product-service-api   # 进一步解耦 实际的api</span><br><span class="line">product-service-biz   # 公共依赖 打包在这里</span><br><span class="line"></span><br><span class="line"># 查看biz</span><br><span class="line">[root@k8s-master1 resources]# cd /opt/microservic-code/simple-microservice-dev1/product-service/product-service-biz/src/main/resources</span><br><span class="line"></span><br><span class="line"># 微服务配置文件</span><br><span class="line">[root@k8s-master1 resources]# vim application.yml </span><br><span class="line"></span><br><span class="line">server:</span><br><span class="line">  port: 8010</span><br><span class="line">spring:</span><br><span class="line">  profiles:</span><br><span class="line">    active: fat</span><br><span class="line">  application:</span><br><span class="line">    name: product-service</span><br><span class="line"></span><br><span class="line"># 连接数据库和其他配置</span><br><span class="line">[root@k8s-master1 resources]# cat application-fat.yml </span><br><span class="line">spring:</span><br><span class="line">  datasource:</span><br><span class="line">    url: jdbc:mysql://192.168.31.70:3306/tb_product?characterEncoding=utf-8</span><br><span class="line">    username: root</span><br><span class="line">    password: 123456</span><br><span class="line">    driver-class-name: com.mysql.jdbc.Driver</span><br><span class="line"></span><br><span class="line"># 连接 eureka</span><br><span class="line">eureka:</span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: true</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: true</span><br><span class="line">    fetch-registry: true</span><br><span class="line">    service-url:</span><br><span class="line">      defaultZone: http://127.0.0.1:$&#123;server.port&#125;/eureka/</span><br><span class="line"></span><br><span class="line"># 其他微服务基本一致</span><br></pre></td></tr></table></figure>
+<h4 id="查看-eureka-配置文件"><a href="#查看-eureka-配置文件" class="headerlink" title="查看 eureka 配置文件"></a>查看 eureka 配置文件</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 simple-microservice-dev1]# cd eureka-service/src/main/resources/</span><br><span class="line">[root@k8s-master1 resources]# ls -l</span><br><span class="line">total 12</span><br><span class="line">-rw-r--r-- 1 root root 356 Jul 28 11:56 application-dev.yml</span><br><span class="line">-rw-r--r-- 1 root root 337 Jul 28 11:56 application-fat.yml</span><br><span class="line">-rw-r--r-- 1 root root 105 Jul 28 11:56 application.yml</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 resources]# vim application.yml </span><br><span class="line"></span><br><span class="line">server:</span><br><span class="line">  port: 8888</span><br><span class="line">spring:</span><br><span class="line">  application:</span><br><span class="line">    name: legendshop-basic-eureka</span><br><span class="line">  profiles:</span><br><span class="line">    active: dev</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 resources]# cat application-dev.yml </span><br><span class="line">eureka:</span><br><span class="line">  server:</span><br><span class="line">    renewal-percent-threshold: 0.9</span><br><span class="line">    enable-self-preservation: false</span><br><span class="line">    eviction-interval-timer-in-ms: 40000</span><br><span class="line">  instance:</span><br><span class="line">    hostname: 127.0.0.1</span><br><span class="line">    # 重要: 采用 ip 注册 ,默认可能是主机名,但是k8s中pod的主机名是不能通信的，所以需要使用pod的ip注册</span><br><span class="line">    prefer-ip-address: true</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: false</span><br><span class="line">    serviceUrl:</span><br><span class="line">      defaultZone: http://$&#123;eureka.instance.hostname&#125;:$&#123;server.port&#125;/eureka/</span><br><span class="line">    fetch-registry: false</span><br></pre></td></tr></table></figure>
+<h4 id="完成代码的编译构建"><a href="#完成代码的编译构建" class="headerlink" title="完成代码的编译构建"></a>完成代码的编译构建</h4><ol>
+<li>以上看的都是程序开发的源码，现在查看编译构建状态的代码 dev2</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># Maven项目对象模型(POM)，可以通过一小段描述信息来管理项目的构建，报告和文档的项目管理工具软件</span><br><span class="line"># -P 选择要编译的对象</span><br><span class="line">mvn clean package -D maven.test.skip=true -P prod</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>dev2中有构建脚本 dockerfile</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 gateway-service]# cd /opt/microservic-code/simple-microservice-dev2/gateway-service</span><br><span class="line">[root@k8s-master1 gateway-service]# ls -l</span><br><span class="line">total 12</span><br><span class="line">-rw-r--r-- 1 root root  239 Jul 28 11:56 Dockerfile</span><br><span class="line">-rw-r--r-- 1 root root 1094 Jul 28 11:56 pom.xml</span><br><span class="line">drwxr-xr-x 3 root root 4096 Jul 28 11:56 src</span><br><span class="line"></span><br><span class="line"># 一般情况开发写,定义如何构建镜像 </span><br><span class="line"># jdk镜像 一般也可以自己自己定制，可以尝试docker仓库中的</span><br><span class="line">[root@k8s-master1 gateway-service]# cat Dockerfile </span><br><span class="line">FROM java:8-jdk-alpine</span><br><span class="line">LABEL maintainer lizhenliang/www.ctnrs.com</span><br><span class="line"># 镜像时区 </span><br><span class="line">RUN  apk add -U tzdata &amp;&amp; \</span><br><span class="line">     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</span><br><span class="line">COPY ./target/gateway-service.jar ./</span><br><span class="line">EXPOSE 9999</span><br><span class="line">CMD java -jar /gateway-service.jar</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"># 单独测试打包 和 整个项目打包</span><br><span class="line">[root@k8s-master1 simple-microservice-dev2]# ls -l </span><br><span class="line">total 60</span><br><span class="line">drwxr-xr-x 4 root root  4096 Jul 28 11:56 basic-common</span><br><span class="line">drwxr-xr-x 2 root root  4096 Jul 28 11:56 db</span><br><span class="line">drwxr-xr-x 3 root root  4096 Jul 28 11:56 eureka-service</span><br><span class="line">drwxr-xr-x 3 root root  4096 Jul 28 11:56 gateway-service</span><br><span class="line">-rw-r--r-- 1 root root 11357 Jul 28 11:56 LICENSE</span><br><span class="line">-rw-r--r-- 1 root root   420 Jul 28 11:56 lombok.config</span><br><span class="line">drwxr-xr-x 4 root root  4096 Jul 28 11:56 order-service</span><br><span class="line">-rw-r--r-- 1 root root  5419 Jul 28 11:56 pom.xml</span><br><span class="line">drwxr-xr-x 3 root root  4096 Jul 28 11:56 portal-service</span><br><span class="line">drwxr-xr-x 4 root root  4096 Jul 28 11:56 product-service</span><br><span class="line">-rw-r--r-- 1 root root    24 Jul 28 11:56 README.md</span><br><span class="line">drwxr-xr-x 4 root root  4096 Jul 28 11:56 stock-service</span><br><span class="line"></span><br><span class="line"># 这个路径下的 pom.xml 完成整个项目打包</span><br><span class="line"># 实际的生产环境是 发布哪个微服务 打包哪个</span><br><span class="line"># 老师整个没解决好依赖 所有整个打包</span><br><span class="line"># 需要jdk+maven环境</span><br><span class="line">[root@k8s-master1 simple-microservice-dev2]# yum install java-1.8.0-openjdk maven </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># mvn构建打包</span><br><span class="line">[root@k8s-master1 simple-microservice-dev2]# mvn clean package -D maven.test.skip=true</span><br><span class="line"></span><br><span class="line">[INFO] simple-microservice ............................... SUCCESS [6.338s]</span><br><span class="line">[INFO] basic-common ...................................... SUCCESS [0.001s]</span><br><span class="line">[INFO] basic-common-core ................................. SUCCESS [1:34.738s]</span><br><span class="line">[INFO] gateway-service ................................... SUCCESS [56.667s]</span><br><span class="line">[INFO] eureka-service .................................... SUCCESS [3.798s]</span><br><span class="line">[INFO] product-service ................................... SUCCESS [0.001s]</span><br><span class="line">[INFO] product-service-api ............................... SUCCESS [0.281s]</span><br><span class="line">[INFO] stock-service ..................................... SUCCESS [0.001s]</span><br><span class="line">[INFO] stock-service-api ................................. SUCCESS [0.249s]</span><br><span class="line">[INFO] product-service-biz ............................... SUCCESS [1.349s]</span><br><span class="line">[INFO] stock-service-biz ................................. SUCCESS [0.329s]</span><br><span class="line">[INFO] order-service ..................................... SUCCESS [0.001s]</span><br><span class="line">[INFO] order-service-api ................................. SUCCESS [0.202s]</span><br><span class="line">[INFO] order-service-biz ................................. SUCCESS [0.643s]</span><br><span class="line">[INFO] basic-common-bom .................................. SUCCESS [0.001s]</span><br><span class="line">[INFO] portal-service .................................... SUCCESS [1.272s]</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] BUILD SUCCESS</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Total time: 2:46.295s</span><br><span class="line">[INFO] Finished at: Mon Dec 30 15:36:50 CST 2019</span><br><span class="line">[INFO] Final Memory: 74M/383M</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"># 项目目录下出现 target 目录 </span><br><span class="line">[root@k8s-master1 simple-microservice-dev2]# cd gateway-service/</span><br><span class="line">[root@k8s-master1 gateway-service]# ls</span><br><span class="line">Dockerfile  pom.xml  src  target</span><br></pre></td></tr></table></figure>
+<h3 id="构建项目镜像并推送到镜像仓库"><a href="#构建项目镜像并推送到镜像仓库" class="headerlink" title="构建项目镜像并推送到镜像仓库"></a>构建项目镜像并推送到镜像仓库</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"># 当前是手动构建 使用脚本循环创建</span><br><span class="line"># 每个微服务都由一个docker 镜像</span><br><span class="line"># 先准备好 harbor 镜像仓库</span><br><span class="line"></span><br><span class="line"># 登录镜像仓库</span><br><span class="line">[root@k8s-master1 k8s]# docker login 172.17.70.252</span><br><span class="line"></span><br><span class="line"># 查看脚本</span><br><span class="line">[root@k8s-master1 k8s]# vim docker_build.sh </span><br><span class="line"></span><br><span class="line">#!/bin/bash</span><br><span class="line"># 镜像仓库地址</span><br><span class="line">docker_registry=172.17.70.252</span><br><span class="line"># kubectl create secret docker-registry registry-pull-secret --docker-server=$docker_registry --docker-username=admin --docker-password=lx@68328153 --docker-email=admin@ctnrs.com -n ms</span><br><span class="line"></span><br><span class="line"># 服务列表</span><br><span class="line">service_list="eureka-service gateway-service order-service product-service stock-service portal-service"</span><br><span class="line">service_list=$&#123;1:-$&#123;service_list&#125;&#125;</span><br><span class="line">work_dir=$(dirname $PWD)</span><br><span class="line">current_dir=$PWD</span><br><span class="line"></span><br><span class="line"># mvn 构建</span><br><span class="line">cd $work_dir</span><br><span class="line">mvn clean package -Dmaven.test.skip=true</span><br><span class="line"></span><br><span class="line"># 循环每个服务 进入目录 先查看是否有 biz 有的话进入 </span><br><span class="line"># 推送镜像 microservice 镜像仓库</span><br><span class="line">for service in $service_list; do</span><br><span class="line">   cd $work_dir/$service</span><br><span class="line">   if ls |grep biz &amp;&gt;/dev/null; then</span><br><span class="line">      cd $&#123;service&#125;-biz</span><br><span class="line">   fi</span><br><span class="line">   service=$&#123;service%-*&#125;</span><br><span class="line">   image_name=$docker_registry/microservice/$&#123;service&#125;:$(date +%F-%H-%M-%S)</span><br><span class="line">   docker build -t $&#123;image_name&#125; .</span><br><span class="line">   docker push $&#123;image_name&#125;</span><br><span class="line">   # sed -i -r "s#(image: )(.*)#\1$image_name#" $&#123;current_dir&#125;/$&#123;service&#125;.yaml</span><br><span class="line">   # kubectl apply -f $&#123;current_dir&#125;/$&#123;service&#125;.yaml</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line"># 执行 </span><br><span class="line">[root@k8s-master1 k8s]# sh docker_build.sh</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_149.png" width="50%"> </p>
+<h2 id="部署Spring-Cloud项目"><a href="#部署Spring-Cloud项目" class="headerlink" title="部署Spring Cloud项目"></a>部署Spring Cloud项目</h2><h3 id="部署环境要求"><a href="#部署环境要求" class="headerlink" title="部署环境要求"></a>部署环境要求</h3><ol>
+<li>CoreDNS</li>
+<li>Ingress Controller</li>
+<li>MySQL</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master2 tomcat-java-demo]# yum -y install mariadb mariadb-server</span><br><span class="line">[root@k8s-master2 tomcat-java-demo]# systemctl start mariadb</span><br><span class="line">[root@k8s-master2 tomcat-java-demo]# systemctl enable mariadb</span><br><span class="line">[root@k8s-master2 tomcat-java-demo]# mysql_secure_installation</span><br><span class="line"></span><br><span class="line"># 授权访问用户</span><br><span class="line">[root@k8s-master2 tomcat-java-demo]# mysql -uroot -p</span><br><span class="line">MariaDB [(none)]&gt; grant all on *.* to 'root'@'%' identified by '123456';</span><br></pre></td></tr></table></figure>
+<h3 id="架构图"><a href="#架构图" class="headerlink" title="架构图"></a>架构图</h3><ol>
+<li>eureka 有状态部署</li>
+<li>gateway portal 需要对外暴露</li>
+<li>微服务通过注册中心，无需service </li>
+</ol>
+<p><img src="/img/k8s/k8s_150.png" width="50%"> </p>
+<h3 id="服务编排"><a href="#服务编排" class="headerlink" title="服务编排"></a>服务编排</h3><ol>
+<li>每个微服务都需要yaml部署文件</li>
+<li>别忘记更换镜像地址</li>
+</ol>
+<h4 id="gateway"><a href="#gateway" class="headerlink" title="gateway"></a>gateway</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">cd /opt/microservic-code/simple-microservice-dev3/k8s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 k8s]# cat gateway.yaml </span><br><span class="line">---</span><br><span class="line">apiVersion: extensions/v1beta1</span><br><span class="line">kind: Ingress</span><br><span class="line">metadata:</span><br><span class="line">  name: gateway </span><br><span class="line">  namespace: ms </span><br><span class="line">spec:</span><br><span class="line">  rules:</span><br><span class="line">    - host: gateway.ctnrs.com </span><br><span class="line">      http:</span><br><span class="line">        paths:</span><br><span class="line">        - path: /</span><br><span class="line">          backend:</span><br><span class="line">            serviceName: gateway</span><br><span class="line">            servicePort: 9999</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: gateway</span><br><span class="line">  namespace: ms</span><br><span class="line">spec:</span><br><span class="line">  ports:</span><br><span class="line">  - port: 9999 </span><br><span class="line">    name: gateway</span><br><span class="line">  selector:</span><br><span class="line">    project: ms</span><br><span class="line">    app: gateway</span><br><span class="line">---</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment </span><br><span class="line">metadata:</span><br><span class="line">  name: gateway</span><br><span class="line">  namespace: ms </span><br><span class="line">spec:</span><br><span class="line">  replicas: 2</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      project: ms</span><br><span class="line">      app: gateway</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        project: ms </span><br><span class="line">        app: gateway</span><br><span class="line">    spec:</span><br><span class="line">      imagePullSecrets:</span><br><span class="line">      - name: registry-pull-secret</span><br><span class="line">      containers:</span><br><span class="line">      - name: gateway</span><br><span class="line">        image: 172.17.70.252/microservice/gateway:2019-12-30-16-00-51</span><br><span class="line">        imagePullPolicy: Always</span><br><span class="line">        ports:</span><br><span class="line">          - protocol: TCP</span><br><span class="line">            containerPort: 9999 </span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 0.5</span><br><span class="line">            memory: 256Mi</span><br><span class="line">          limits:</span><br><span class="line">            cpu: 1</span><br><span class="line">            memory: 1Gi</span><br><span class="line">        readinessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 9999</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br><span class="line">        livenessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 9999</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br></pre></td></tr></table></figure>
+<h4 id="portal"><a href="#portal" class="headerlink" title="portal"></a>portal</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 k8s]# cat portal.yaml </span><br><span class="line">apiVersion: extensions/v1beta1</span><br><span class="line">kind: Ingress</span><br><span class="line">metadata:</span><br><span class="line">  name: portal </span><br><span class="line">  namespace: ms </span><br><span class="line">spec:</span><br><span class="line">  rules:</span><br><span class="line">    - host: portal.ctnrs.com </span><br><span class="line">      http:</span><br><span class="line">        paths:</span><br><span class="line">        - path: /</span><br><span class="line">          backend:</span><br><span class="line">            serviceName: portal </span><br><span class="line">            servicePort: 8080</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: portal</span><br><span class="line">  namespace: ms</span><br><span class="line">spec:</span><br><span class="line">  ports:</span><br><span class="line">  - port: 8080</span><br><span class="line">    name: portal </span><br><span class="line">  selector:</span><br><span class="line">    project: ms</span><br><span class="line">    app: portal</span><br><span class="line">---</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment </span><br><span class="line">metadata:</span><br><span class="line">  name: portal</span><br><span class="line">  namespace: ms </span><br><span class="line">spec:</span><br><span class="line">  replicas: 2</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      project: ms</span><br><span class="line">      app: portal</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        project: ms </span><br><span class="line">        app: portal</span><br><span class="line">    spec:</span><br><span class="line">      imagePullSecrets:</span><br><span class="line">      - name: registry-pull-secret</span><br><span class="line">      containers:</span><br><span class="line">      - name: portal</span><br><span class="line">        image: 172.17.70.252/microservice/portal:2019-12-30-16-01-04</span><br><span class="line">        imagePullPolicy: Always</span><br><span class="line">        ports:</span><br><span class="line">          - protocol: TCP</span><br><span class="line">            containerPort: 8080 </span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 0.5</span><br><span class="line">            memory: 256Mi</span><br><span class="line">          limits:</span><br><span class="line">            cpu: 1</span><br><span class="line">            memory: 1Gi</span><br><span class="line">        readinessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8080</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br><span class="line">        livenessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8080</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br></pre></td></tr></table></figure>
+<h4 id="eureka"><a href="#eureka" class="headerlink" title="eureka"></a>eureka</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"># StatefulSet </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 k8s]# cat eureka.yaml </span><br><span class="line">---</span><br><span class="line">apiVersion: extensions/v1beta1</span><br><span class="line">kind: Ingress</span><br><span class="line">metadata:</span><br><span class="line">  name: eureka </span><br><span class="line">  namespace: ms </span><br><span class="line">spec:</span><br><span class="line">  rules:</span><br><span class="line">    - host: eureka.ctnrs.com </span><br><span class="line">      http:</span><br><span class="line">        paths:</span><br><span class="line">        - path: /</span><br><span class="line">          backend:</span><br><span class="line">            serviceName: eureka </span><br><span class="line">            servicePort: 8888</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: eureka</span><br><span class="line">  namespace: ms</span><br><span class="line">spec:</span><br><span class="line">  clusterIP: None</span><br><span class="line">  ports:</span><br><span class="line">  - port: 8888</span><br><span class="line">    name: eureka </span><br><span class="line">  selector:</span><br><span class="line">    project: ms</span><br><span class="line">    app: eureka</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: StatefulSet</span><br><span class="line">metadata:</span><br><span class="line">  name: eureka</span><br><span class="line">  namespace: ms </span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      project: ms</span><br><span class="line">      app: eureka</span><br><span class="line">  serviceName: "eureka"</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        project: ms </span><br><span class="line">        app: eureka</span><br><span class="line">    spec:</span><br><span class="line">      imagePullSecrets:</span><br><span class="line">      - name: registry-pull-secret</span><br><span class="line">      containers:</span><br><span class="line">      - name: eureka</span><br><span class="line">        image: 172.17.70.252/microservice/eureka:2019-12-30-15-56-33</span><br><span class="line">        ports:</span><br><span class="line">          - protocol: TCP</span><br><span class="line">            containerPort: 8888</span><br><span class="line">        # 变量 MY_POD_NAME 是 内置变量 metadata.name = eureka-0(0-2) 由于是 StatefulSet </span><br><span class="line">        env:</span><br><span class="line">          - name: MY_POD_NAME</span><br><span class="line">            valueFrom:</span><br><span class="line">              fieldRef:</span><br><span class="line">                fieldPath: metadata.name</span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 0.5</span><br><span class="line">            memory: 256Mi</span><br><span class="line">          limits:</span><br><span class="line">            cpu: 1 </span><br><span class="line">            memory: 1Gi</span><br><span class="line">        readinessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8888</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br><span class="line">        livenessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8888</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 用在这里 </span><br><span class="line">[root@k8s-master1 k8s]# cat ../eureka-service/Dockerfile </span><br><span class="line">FROM java:8-jdk-alpine</span><br><span class="line">LABEL maintainer lizhenliang/www.ctnrs.com</span><br><span class="line">RUN  apk add -U tzdata &amp;&amp; \</span><br><span class="line">     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</span><br><span class="line">COPY ./target/eureka-service.jar ./</span><br><span class="line">EXPOSE 8888</span><br><span class="line">CMD java -jar -Deureka.instance.hostname=$&#123;MY_POD_NAME&#125;.eureka.ms /eureka-service.jar</span><br><span class="line"></span><br><span class="line"># 启动的时候指定了 hostname=eureka-0(0-2)</span><br><span class="line"># 实例名 = eureka-0.eureka.ms</span><br></pre></td></tr></table></figure>
+<h4 id="order"><a href="#order" class="headerlink" title="order"></a>order</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 k8s]# cat order.yaml </span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment </span><br><span class="line">metadata:</span><br><span class="line">  name: order</span><br><span class="line">  namespace: ms </span><br><span class="line">spec:</span><br><span class="line">  replicas: 2</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      project: ms</span><br><span class="line">      app: order</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        project: ms </span><br><span class="line">        app: order</span><br><span class="line">    spec:</span><br><span class="line">      imagePullSecrets:</span><br><span class="line">      - name: registry-pull-secret</span><br><span class="line">      containers:</span><br><span class="line">      - name: order</span><br><span class="line">        image: 172.17.70.252/microservice/order:2019-12-30-16-00-54</span><br><span class="line">        imagePullPolicy: Always</span><br><span class="line">        ports:</span><br><span class="line">          - protocol: TCP</span><br><span class="line">            containerPort: 8020 </span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 0.5</span><br><span class="line">            memory: 256Mi</span><br><span class="line">          limits:</span><br><span class="line">            cpu: 1</span><br><span class="line">            memory: 1Gi</span><br><span class="line">        readinessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8020</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br><span class="line">        livenessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8020</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br></pre></td></tr></table></figure>
+<h4 id="product"><a href="#product" class="headerlink" title="product"></a>product</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 k8s]# cat product.yaml </span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment </span><br><span class="line">metadata:</span><br><span class="line">  name: product</span><br><span class="line">  namespace: ms </span><br><span class="line">spec:</span><br><span class="line">  replicas: 2</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      project: ms</span><br><span class="line">      app: product</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        project: ms </span><br><span class="line">        app: product</span><br><span class="line">    spec:</span><br><span class="line">      imagePullSecrets:</span><br><span class="line">      - name: registry-pull-secret</span><br><span class="line">      containers:</span><br><span class="line">      - name: product</span><br><span class="line">        image: 172.17.70.252/microservice/product:2019-12-30-16-00-57</span><br><span class="line">        imagePullPolicy: Always</span><br><span class="line">        ports:</span><br><span class="line">          - protocol: TCP</span><br><span class="line">            containerPort: 8010 </span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 0.5</span><br><span class="line">            memory: 256Mi</span><br><span class="line">          limits:</span><br><span class="line">            cpu: 1</span><br><span class="line">            memory: 1Gi</span><br><span class="line">        readinessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8010</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br><span class="line">        livenessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8010</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br></pre></td></tr></table></figure>
+<h4 id="stock"><a href="#stock" class="headerlink" title="stock"></a>stock</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 k8s]# cat stock.yaml </span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment </span><br><span class="line">metadata:</span><br><span class="line">  name: stock</span><br><span class="line">  namespace: ms </span><br><span class="line">spec:</span><br><span class="line">  replicas: 2</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      project: ms</span><br><span class="line">      app: stock</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        project: ms </span><br><span class="line">        app: stock</span><br><span class="line">    spec:</span><br><span class="line">      imagePullSecrets:</span><br><span class="line">      - name: registry-pull-secret</span><br><span class="line">      containers:</span><br><span class="line">      - name: stock</span><br><span class="line">        image: 172.17.70.252/microservice/stock:2019-12-30-16-01-01</span><br><span class="line">        imagePullPolicy: Always</span><br><span class="line">        ports:</span><br><span class="line">          - protocol: TCP</span><br><span class="line">            containerPort: 8030</span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 0.5</span><br><span class="line">            memory: 256Mi</span><br><span class="line">          limits:</span><br><span class="line">            cpu: 1</span><br><span class="line">            memory: 1Gi</span><br><span class="line">        readinessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8030</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br><span class="line">        livenessProbe:</span><br><span class="line">          tcpSocket:</span><br><span class="line">            port: 8030</span><br><span class="line">          initialDelaySeconds: 60</span><br><span class="line">          periodSeconds: 10</span><br></pre></td></tr></table></figure>
+<h3 id="导入数据库文件到MySQL"><a href="#导入数据库文件到MySQL" class="headerlink" title="导入数据库文件到MySQL"></a>导入数据库文件到MySQL</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 db]# scp *.sql root@172.17.70.252:/tmp</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; create database tb_order CHARACTER SET utf8mb4;</span><br><span class="line">MariaDB [(none)]&gt; create database tb_stock CHARACTER SET utf8mb4;</span><br><span class="line">MariaDB [(none)]&gt; create database tb_product CHARACTER SET utf8mb4; </span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; use tb_order;</span><br><span class="line">MariaDB [tb_order]&gt; source /tmp/order.sql;</span><br><span class="line"></span><br><span class="line">MariaDB [tb_order]&gt; use tb_stock;</span><br><span class="line">MariaDB [tb_stock]&gt; source /tmp/stock.sql;</span><br><span class="line"></span><br><span class="line">MariaDB [tb_stock]&gt; use tb_product;</span><br><span class="line">MariaDB [tb_product]&gt; source /tmp/product.sql;</span><br></pre></td></tr></table></figure>
+<h3 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h3><ol>
+<li>根据实际配置修改配置文件</li>
+<li>eureka的连裤串 </li>
+<li>mysql连库串 大多在微服务上</li>
+<li>如果有修改 需要重新执行脚本打包镜像，还要修改部署的yaml文件，手动很麻烦</li>
+<li>eureka的连库串 = StatefulSet 有状态部署 </li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">cd /opt/microservic-code/simple-microservice-dev3/eureka-service/src/main/resources</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 resources]# cat application.yml </span><br><span class="line">server:</span><br><span class="line">  port: 8888</span><br><span class="line">spring:</span><br><span class="line">  application:</span><br><span class="line">    name: eureka-server</span><br><span class="line">  profiles:</span><br><span class="line">    active: fat</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 resources]# cat application-fat.yml </span><br><span class="line">eureka:</span><br><span class="line">  server:</span><br><span class="line">    renewal-percent-threshold: 0.9</span><br><span class="line">    enable-self-preservation: false</span><br><span class="line">    eviction-interval-timer-in-ms: 40000</span><br><span class="line">  instance:</span><br><span class="line">    hostname: 127.0.0.1</span><br><span class="line">    prefer-ip-address: false</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: true</span><br><span class="line">    serviceUrl:</span><br><span class="line">      defaultZone: http://eureka-0.eureka.ms:$&#123;server.port&#125;/eureka/,http://eureka-1.eureka.ms:$&#123;server.port&#125;/eureka/,http://eureka-2.eureka.ms:$&#123;server.port&#125;/eureka/</span><br><span class="line">    fetch-registry: true</span><br><span class="line"></span><br><span class="line"># 通过有状态部署 得到的 eureka-0 eureka-1 eureka-2  这个信息dev2还是开发人员的地址</span><br><span class="line"># 数据库也要修改</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"># gateway</span><br><span class="line">[root@k8s-master1 resources]# cd /opt/microservic-code/simple-microservice-dev3/gateway-service/src/main/resources</span><br><span class="line">[root@k8s-master1 resources]# cat application-fat.yml </span><br><span class="line">spring:</span><br><span class="line">  cloud:</span><br><span class="line">    gateway:</span><br><span class="line">      discovery:</span><br><span class="line">        locator:</span><br><span class="line">          #开启以服务id去注册中心上获取转发地址</span><br><span class="line">          enabled: true</span><br><span class="line">          ##小写serviceId</span><br><span class="line">          lower-case-service-id: true</span><br><span class="line">      routes:</span><br><span class="line">        - id: product-service</span><br><span class="line">          uri: lb://product-service</span><br><span class="line">          filters:</span><br><span class="line">            - StripPrefix=1</span><br><span class="line">          predicates:</span><br><span class="line">            - Path=/product/**</span><br><span class="line"></span><br><span class="line">        - id: order-service</span><br><span class="line">          uri: lb://order-service</span><br><span class="line">          filters:</span><br><span class="line">            - StripPrefix=1</span><br><span class="line">          predicates:</span><br><span class="line">            - Path=/order/**</span><br><span class="line"></span><br><span class="line">        - id: stock-service</span><br><span class="line">          uri: lb://stock-service</span><br><span class="line">          filters:</span><br><span class="line">            - StripPrefix=1</span><br><span class="line">          predicates:</span><br><span class="line">            - Path=/stock/**</span><br><span class="line"></span><br><span class="line">eureka:</span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: true</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: true</span><br><span class="line">    fetch-registry: true</span><br><span class="line">    service-url:</span><br><span class="line">      defaultZone: http://eureka-0.eureka.ms:8888/eureka,http://eureka-1.eureka.ms:8888/eureka,http://eureka-2.eureka.ms:8888/eureka</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># portal</span><br><span class="line">[root@k8s-master1 resources]# cd /opt/microservic-code/simple-microservice-dev3/portal-service/src/main/resources</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 resources]# cat application-fat.yml </span><br><span class="line">eureka:</span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: true</span><br><span class="line">  client:</span><br><span class="line">    service-url:</span><br><span class="line">      defaultZone: http://eureka-0.eureka.ms:8888/eureka,http://eureka-1.eureka.ms:8888/eureka,http://eureka-2.eureka.ms:8888/eureka</span><br><span class="line">    register-with-eureka: true</span><br><span class="line">    fetch-registry: true</span><br><span class="line"></span><br><span class="line">spring:</span><br><span class="line">  freemarker:</span><br><span class="line">    allow-request-override: false</span><br><span class="line">    allow-session-override: false</span><br><span class="line">    cache: true</span><br><span class="line">    charset: UTF-8</span><br><span class="line">    check-template-location: true</span><br><span class="line">    content-type: text/html</span><br><span class="line">    enabled: true</span><br><span class="line">    expose-request-attributes: false</span><br><span class="line">    expose-session-attributes: false</span><br><span class="line">    expose-spring-macro-helpers: true</span><br><span class="line">    prefer-file-system-access: true</span><br><span class="line">    suffix: .ftl</span><br><span class="line">    template-loader-path: classpath:/templates/</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># order</span><br><span class="line">[root@k8s-master1 resources]# cd /opt/microservic-code/simple-microservice-dev3/order-service/order-service-biz/src/main/resources</span><br><span class="line">[root@k8s-master1 resources]# vim application-fat.yml </span><br><span class="line"></span><br><span class="line">spring:</span><br><span class="line">  datasource:</span><br><span class="line">    url: jdbc:mysql://172.17.70.252:3306/tb_order?characterEncoding=utf-8</span><br><span class="line">    username: root</span><br><span class="line">    password: 123456</span><br><span class="line">    driver-class-name: com.mysql.jdbc.Driver</span><br><span class="line"></span><br><span class="line">eureka:</span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: true</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: true</span><br><span class="line">    fetch-registry: true</span><br><span class="line">    service-url:</span><br><span class="line">      defaultZone: http://eureka-0.eureka.ms:8888/eureka,http://eureka-1.eureka.ms:8888/eureka,http://eureka-2.eureka.ms:8888/eureka</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># product</span><br><span class="line">[root@k8s-master1 resources]# cd /opt/microservic-code/simple-microservice-dev3/product-service/product-service-biz/src/main/resources</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 resources]# vim application-fat.yml </span><br><span class="line"></span><br><span class="line">spring:</span><br><span class="line">  datasource:</span><br><span class="line">    url: jdbc:mysql://172.17.70.252:3306/tb_product?characterEncoding=utf-8</span><br><span class="line">    username: root</span><br><span class="line">    password: 123456</span><br><span class="line">    driver-class-name: com.mysql.jdbc.Driver</span><br><span class="line"></span><br><span class="line">eureka:</span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: true</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: true</span><br><span class="line">    fetch-registry: true</span><br><span class="line">    service-url:</span><br><span class="line">      defaultZone: http://eureka-0.eureka.ms:8888/eureka,http://eureka-1.eureka.ms:8888/eureka,http://eureka-2.eureka.ms:8888/eureka</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># stock</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 resources]# cd /opt/microservic-code/simple-microservice-dev3/stock-service/stock-service-biz/src/main/resources</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 resources]# vim application-fat.yml </span><br><span class="line"></span><br><span class="line">spring:</span><br><span class="line">  datasource:</span><br><span class="line">    url: jdbc:mysql://172.17.70.252:3306/tb_stock?characterEncoding=utf-8</span><br><span class="line">    username: root</span><br><span class="line">    password: 123456</span><br><span class="line">    driver-class-name: com.mysql.jdbc.Driver</span><br><span class="line"></span><br><span class="line">eureka:</span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: true</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: true</span><br><span class="line">    fetch-registry: true</span><br><span class="line">    service-url:</span><br><span class="line">      defaultZone: http://eureka-0.eureka.ms:8888/eureka,http://eureka-1.eureka.ms:8888/eureka,http://eureka-2.eureka.ms:8888/eureka</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 1. 有修改执行 重新生成镜像</span><br><span class="line">[root@k8s-master1 k8s]# sh docker_build.sh </span><br><span class="line"># 2. 需要对应所有yaml修改镜像名称</span><br></pre></td></tr></table></figure>
+<h3 id="部署资源"><a href="#部署资源" class="headerlink" title="部署资源"></a>部署资源</h3><h4 id="创建-命名空间"><a href="#创建-命名空间" class="headerlink" title="创建 命名空间"></a>创建 命名空间</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 k8s]# kubectl create ns ms</span><br><span class="line">namespace/ms created</span><br><span class="line">[root@k8s-master1 k8s]# kubectl get ns</span><br><span class="line">NAME                   STATUS   AGE</span><br><span class="line">default                Active   13d</span><br><span class="line">ingress-nginx          Active   13d</span><br><span class="line">kube-node-lease        Active   13d</span><br><span class="line">kube-public            Active   13d</span><br><span class="line">kube-system            Active   13d</span><br><span class="line">kubernetes-dashboard   Active   13d</span><br><span class="line">ms                     Active   4s</span><br></pre></td></tr></table></figure>
+<h4 id="创建镜像仓库资源凭证"><a href="#创建镜像仓库资源凭证" class="headerlink" title="创建镜像仓库资源凭证"></a>创建镜像仓库资源凭证</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 k8s]# kubectl create secret docker-registry registry-pull-secret --docker-server=172.17.70.252 --docker-username=admin --docker-password=lx@68328153 --docker-email=admin@ctnrs.com -n ms</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 k8s]# kubectl get secret -n ms</span><br><span class="line">NAME                   TYPE                                  DATA   AGE</span><br><span class="line">default-token-jt5r5    kubernetes.io/service-account-token   3      77s</span><br><span class="line">registry-pull-secret   kubernetes.io/dockerconfigjson        1      11s</span><br></pre></td></tr></table></figure>
+<h4 id="部署-eureka"><a href="#部署-eureka" class="headerlink" title="部署 eureka"></a>部署 eureka</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 有状态应用部署 会一个一个启动 </span><br><span class="line"># 健康检查 70秒 </span><br><span class="line">[root@k8s-master1 k8s]# kubectl apply -f eureka.yaml </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 k8s]# kubectl get pods -n ms</span><br><span class="line">NAME       READY   STATUS    RESTARTS   AGE</span><br><span class="line">eureka-0   0/1     Running   0          4s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 k8s]# kubectl get pods -n ms -o wide</span><br><span class="line">NAME       READY   STATUS    RESTARTS   AGE     IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">eureka-0   1/1     Running   0          3m41s   10.244.0.79    k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">eureka-1   1/1     Running   0          2m35s   10.244.1.88    k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">eureka-2   1/1     Running   0          82s     10.244.2.123   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 k8s]# kubectl exec -it eureka-0 sh -n ms</span><br><span class="line">/ # nslookup eureka</span><br><span class="line">nslookup: can't resolve '(null)': Name does not resolve</span><br><span class="line"></span><br><span class="line">Name:      eureka</span><br><span class="line">Address 1: 10.244.0.79 eureka-0.eureka.ms.svc.cluster.local</span><br><span class="line">Address 2: 10.244.1.88 eureka-1.eureka.ms.svc.cluster.local</span><br><span class="line">Address 3: 10.244.2.123 eureka-2.eureka.ms.svc.cluster.local</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># 访问管理页面</span><br><span class="line">[root@k8s-master1 k8s]# kubectl get pods,svc,ingress -n ms -o wide</span><br><span class="line"></span><br><span class="line">NAME                        HOSTS              ADDRESS   PORTS   AGE</span><br><span class="line">ingress.extensions/eureka   eureka.ctnrs.com             80      13m</span><br><span class="line"></span><br><span class="line"># 三个node节点都可以访问 </span><br><span class="line">[root@k8s-master1 k8s]# kubectl get pods -n ingress-nginx </span><br><span class="line">NAME                             READY   STATUS    RESTARTS   AGE</span><br><span class="line">nginx-ingress-controller-cc7p6   1/1     Running   5          6d6h</span><br><span class="line">nginx-ingress-controller-gjrb8   1/1     Running   5          6d6h</span><br><span class="line">nginx-ingress-controller-mwqcv   1/1     Running   5          6d6h</span><br><span class="line"></span><br><span class="line"># 绑定hosts 访问 管理页面</span><br><span class="line">60.205.217.112 eureka.ctnrs.com</span><br><span class="line"></span><br><span class="line"># 刷新会换成另外一个节点地址 ingress -&gt; pod</span><br><span class="line"># unavailable-replicas 有显示 说明集群节点有问题 </span><br><span class="line"># 可用的节点 是其他两个节点</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_151.png" width="50%">  </p>
+<p><img src="/img/k8s/k8s_152.png" width="50%">  </p>
+<h4 id="部署-gateway"><a href="#部署-gateway" class="headerlink" title="部署 gateway"></a>部署 gateway</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 资源不太够 我就部署一个副本</span><br><span class="line">[root@k8s-master1 k8s]# kubectl apply -f gateway.yaml</span><br></pre></td></tr></table></figure>
+<h4 id="部署-portal"><a href="#部署-portal" class="headerlink" title="部署 portal"></a>部署 portal</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 k8s]# kubectl apply -f portal.yaml</span><br></pre></td></tr></table></figure>
+<h4 id="部署所有微服务"><a href="#部署所有微服务" class="headerlink" title="部署所有微服务"></a>部署所有微服务</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 如果测试的资源不足 可以用1个副本</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 k8s]# kubectl apply -f stock.yaml </span><br><span class="line">[root@k8s-master1 k8s]# kubectl apply -f product.yaml </span><br><span class="line">[root@k8s-master1 k8s]# kubectl apply -f order.yaml</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_153.png" width="50%"></p>
+<h4 id="部署的服务-都被注册中心发现"><a href="#部署的服务-都被注册中心发现" class="headerlink" title="部署的服务 都被注册中心发现"></a>部署的服务 都被注册中心发现</h4><p><img src="/img/k8s/k8s_154.png" width="50%"></p>
+<h4 id="测试访问-portal"><a href="#测试访问-portal" class="headerlink" title="测试访问 portal"></a>测试访问 portal</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 加入hosts </span><br><span class="line">47.240.14.16 eureka.ctnrs.com portal.ctnrs.com gateway.ctnrs.com</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_155.png" width="50%"></p>
+<p><img src="/img/k8s/k8s_156.png" width="50%"></p>
+<p><img src="/img/k8s/k8s_157.png" width="50%"></p>
+<h4 id="程序调用gateway域名的位置"><a href="#程序调用gateway域名的位置" class="headerlink" title="程序调用gateway域名的位置"></a>程序调用gateway域名的位置</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 都是前端程序调用</span><br><span class="line"># 现有节点可以随意扩容</span><br><span class="line">[root@k8s-master1 simple-microservice-dev3]# grep gateway. -r portal-service/src/main/resources/</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_158.png" width="50%"></p>
+<h4 id="在K8S中部署Eureka集群"><a href="#在K8S中部署Eureka集群" class="headerlink" title="在K8S中部署Eureka集群"></a>在K8S中部署Eureka集群</h4><ol>
+<li>相互注册</li>
+<li>提供健康检查，podIP检查，如果不正常就不会将客户端的请求发送给它</li>
+<li>剔除一个eureka，集群也可正常工作</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 如果直接对接k8s</span><br><span class="line"># service -- eureka</span><br><span class="line"># ingress -- gateway</span><br><span class="line"># configmap -- 配置中心</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_159.png" width="50%"></p>
+<h2 id="生产环境踩坑经验分享"><a href="#生产环境踩坑经验分享" class="headerlink" title="生产环境踩坑经验分享"></a>生产环境踩坑经验分享</h2><h3 id="限制了容器资源，还经常被杀死"><a href="#限制了容器资源，还经常被杀死" class="headerlink" title="限制了容器资源，还经常被杀死"></a>限制了容器资源，还经常被杀死</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">env:</span><br><span class="line">  - name: MY_POD_NAME</span><br><span class="line">    valueFrom:</span><br><span class="line">      fieldRef:</span><br><span class="line">        fieldPath: metadata.name</span><br><span class="line"></span><br><span class="line">resources:</span><br><span class="line">  requests:</span><br><span class="line">    cpu: 0.5</span><br><span class="line">    memory: 256Mi</span><br><span class="line">  limits:</span><br><span class="line">    cpu: 1</span><br><span class="line">    memory: 1Gi</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. k8s部署java应用 ，docker不能自动发现java设置的内存，jvm限制无用</span><br><span class="line">2. java内存不够会继续申请，k8s的limits 如果超出限制会直接kill 变成OOM状态</span><br><span class="line">3. 所以这个限制必须让java设置，到达内存最大不去申请</span><br><span class="line"></span><br><span class="line">4. jdk1.8之前需要 </span><br><span class="line">5. 在Dockerfile 启动命令里 加上限制内存参数，对内存回收利用 </span><br><span class="line">6. CMD java -jar $JAVA_OPTS /gateway-service.jar</span><br><span class="line">7. jdk1.9以上会自动识别。1.8用的比较多 要手动指定</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_160.png" width="50%"></p>
+<p><img src="/img/k8s/k8s_161.png" width="50%"></p>
+<h3 id="滚动更新之健康检查重要性"><a href="#滚动更新之健康检查重要性" class="headerlink" title="滚动更新之健康检查重要性"></a>滚动更新之健康检查重要性</h3><ol>
+<li>误判健康检查的失败，需要根据应用启动时间判断</li>
+<li>java启动时间较慢 最好设置一分钟或以上</li>
+<li>readinessProbe 就绪检查 它检查的是Ready 1/1 准备就绪才会分配流量,否则不会被访问到。微服务不受service控制，所以加不加无所谓</li>
+<li>livenessProbe  存活检查 判断pod中的应用是否启动成功，比如判断服务端口，如果不成功会根据拉起策略重建，直到启动成功为止</li>
+<li>具体要看java服务的启动时间来设置 </li>
+<li>periodSeconds 周期,每间隔10秒来判断一次,可以设置较长</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">readinessProbe:</span><br><span class="line">  tcpSocket:</span><br><span class="line">    port: 9999</span><br><span class="line">  initialDelaySeconds: 60</span><br><span class="line">  periodSeconds: 10</span><br><span class="line">livenessProbe:</span><br><span class="line">  tcpSocket:</span><br><span class="line">    port: 9999</span><br><span class="line">  initialDelaySeconds: 60</span><br><span class="line">  periodSeconds: 10</span><br></pre></td></tr></table></figure>
+<h3 id="滚动更新之流量丢失"><a href="#滚动更新之流量丢失" class="headerlink" title="滚动更新之流量丢失"></a>滚动更新之流量丢失</h3><ol>
+<li>运行的服务pod 已经被注册到 注册中心里了</li>
+<li>如果滚动更新 已分配的流量怎么办</li>
+<li>只能为每个pod 增加退出时间，让pod等待退出时间 再去销毁</li>
+<li>滚动更新是突然kill 没有更新提示,kill之后根据退出时间等待销毁</li>
+<li>优雅退出</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://mp.weixin.qq.com/s?__biz=MzAwNTM5Njk3Mw==&amp;mid=2247487699&amp;idx=1&amp;sn=7bf9c62b02e017de5666ab4ade9ef3d1&amp;chksm=9b1c1051ac6b99476bf665bf1e10ac3aca9b0b995c2da944909621660547f2dd382845302aba&amp;mpshare=1&amp;scene=23&amp;srcid=&amp;sharer_sharetime=1577617482898&amp;sharer_shareid=e3aed5c2fdec06d648a99b41c36fe174#rd</span><br></pre></td></tr></table></figure>
+<h3 id="配置中心-和-注册中心-和-数据库"><a href="#配置中心-和-注册中心-和-数据库" class="headerlink" title="配置中心 和 注册中心 和 数据库"></a>配置中心 和 注册中心 和 数据库</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 配置中心 apollo 安装服务端，配置文件在里面配置好</span><br><span class="line">2. 开发人员 将客户端植入到程序里 实时连接，如果有新的事件触发会更新</span><br><span class="line">3. 配置中心 是有状态的 保存配置文件</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. eureka 可以部署在pod中，也可以部署在pod之外,只要网络互通即可</span><br><span class="line">2. 网关使用 spring-cloud-zuul</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 还是建议微服务中的数据存储使用原先的数据库存储，而不是使用有状态部署</span><br><span class="line">2. 使用k8s部署存储会有运维成本，之前怎么维护就怎么维护</span><br><span class="line">3. k8s适用于 无状态应用，有状态的应用不经常变动,放在k8s中意义不大,测试环境倒是可以考虑快速启动</span><br></pre></td></tr></table></figure>
+<h3 id="增加pod流程"><a href="#增加pod流程" class="headerlink" title="增加pod流程"></a>增加pod流程</h3><ol>
+<li>新增的pod会先加入 eureka里</li>
+<li>如果有客户端去请求 eureka 查询这个pod所在的后面业务功能IP，eureka健康检查通过新的pod的后就可以响应回去</li>
+<li>gateway就作为请求的客户端，根据url查询对应的pod,eureka查询出对应的ip根据负载均衡策略给gateway,gateway再去响应。</li>
+</ol>
+<p><img src="/img/k8s/k8s_162.png" width="50%"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/24/k8s-12/" rel="next" title="12 k8s 日志收集">
+                <i class="fa fa-chevron-left"></i> 12 k8s 日志收集
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/30/k8s-base10/" rel="prev" title="k8s-base10">
+                k8s-base10 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#从运维角度看微服务"><span class="nav-number">1.</span> <span class="nav-text">从运维角度看微服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#微服务特点"><span class="nav-number">1.1.</span> <span class="nav-text">微服务特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#微服务不足"><span class="nav-number">1.2.</span> <span class="nav-text">微服务不足</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#单体应用-vs-微服务"><span class="nav-number">1.3.</span> <span class="nav-text">单体应用 vs 微服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-微服务框架"><span class="nav-number">1.4.</span> <span class="nav-text">Java 微服务框架</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在K8S平台部署微服务考虑的问题"><span class="nav-number">2.</span> <span class="nav-text">在K8S平台部署微服务考虑的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#微服务架构图"><span class="nav-number">2.1.</span> <span class="nav-text">微服务架构图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#微服务架构的理解"><span class="nav-number">2.2.</span> <span class="nav-text">微服务架构的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要用注册中心"><span class="nav-number">2.3.</span> <span class="nav-text">为什么要用注册中心</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目迁移到K8S平台是怎样的流程"><span class="nav-number">2.4.</span> <span class="nav-text">项目迁移到K8S平台是怎样的流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#制作镜像"><span class="nav-number">2.4.1.</span> <span class="nav-text">制作镜像</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#控制器管理Pod"><span class="nav-number">2.4.2.</span> <span class="nav-text">控制器管理Pod</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#暴露应用"><span class="nav-number">2.4.3.</span> <span class="nav-text">暴露应用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对外发布应用"><span class="nav-number">2.4.4.</span> <span class="nav-text">对外发布应用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pod-数据持久化"><span class="nav-number">2.4.5.</span> <span class="nav-text">Pod 数据持久化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#日志与监控"><span class="nav-number">2.4.6.</span> <span class="nav-text">日志与监控</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#传统部署与K8S部署区别"><span class="nav-number">2.5.</span> <span class="nav-text">传统部署与K8S部署区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在K8S平台部署-Spring-Cloud-微服务项目"><span class="nav-number">3.</span> <span class="nav-text">在K8S平台部署 Spring Cloud 微服务项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#熟悉Spring-Cloud微服务项目"><span class="nav-number">3.1.</span> <span class="nav-text">熟悉Spring Cloud微服务项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码编译构建"><span class="nav-number">3.2.</span> <span class="nav-text">代码编译构建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#查看-gateway-配置文件"><span class="nav-number">3.2.1.</span> <span class="nav-text">查看 gateway 配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看微服务的配置文件"><span class="nav-number">3.2.2.</span> <span class="nav-text">查看微服务的配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看-eureka-配置文件"><span class="nav-number">3.2.3.</span> <span class="nav-text">查看 eureka 配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#完成代码的编译构建"><span class="nav-number">3.2.4.</span> <span class="nav-text">完成代码的编译构建</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建项目镜像并推送到镜像仓库"><span class="nav-number">3.3.</span> <span class="nav-text">构建项目镜像并推送到镜像仓库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署Spring-Cloud项目"><span class="nav-number">4.</span> <span class="nav-text">部署Spring Cloud项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#部署环境要求"><span class="nav-number">4.1.</span> <span class="nav-text">部署环境要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#架构图"><span class="nav-number">4.2.</span> <span class="nav-text">架构图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务编排"><span class="nav-number">4.3.</span> <span class="nav-text">服务编排</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#gateway"><span class="nav-number">4.3.1.</span> <span class="nav-text">gateway</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#portal"><span class="nav-number">4.3.2.</span> <span class="nav-text">portal</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eureka"><span class="nav-number">4.3.3.</span> <span class="nav-text">eureka</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#order"><span class="nav-number">4.3.4.</span> <span class="nav-text">order</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#product"><span class="nav-number">4.3.5.</span> <span class="nav-text">product</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stock"><span class="nav-number">4.3.6.</span> <span class="nav-text">stock</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#导入数据库文件到MySQL"><span class="nav-number">4.4.</span> <span class="nav-text">导入数据库文件到MySQL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改配置文件"><span class="nav-number">4.5.</span> <span class="nav-text">修改配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署资源"><span class="nav-number">4.6.</span> <span class="nav-text">部署资源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-命名空间"><span class="nav-number">4.6.1.</span> <span class="nav-text">创建 命名空间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建镜像仓库资源凭证"><span class="nav-number">4.6.2.</span> <span class="nav-text">创建镜像仓库资源凭证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署-eureka"><span class="nav-number">4.6.3.</span> <span class="nav-text">部署 eureka</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署-gateway"><span class="nav-number">4.6.4.</span> <span class="nav-text">部署 gateway</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署-portal"><span class="nav-number">4.6.5.</span> <span class="nav-text">部署 portal</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署所有微服务"><span class="nav-number">4.6.6.</span> <span class="nav-text">部署所有微服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署的服务-都被注册中心发现"><span class="nav-number">4.6.7.</span> <span class="nav-text">部署的服务 都被注册中心发现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试访问-portal"><span class="nav-number">4.6.8.</span> <span class="nav-text">测试访问 portal</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#程序调用gateway域名的位置"><span class="nav-number">4.6.9.</span> <span class="nav-text">程序调用gateway域名的位置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在K8S中部署Eureka集群"><span class="nav-number">4.6.10.</span> <span class="nav-text">在K8S中部署Eureka集群</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生产环境踩坑经验分享"><span class="nav-number">5.</span> <span class="nav-text">生产环境踩坑经验分享</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#限制了容器资源，还经常被杀死"><span class="nav-number">5.1.</span> <span class="nav-text">限制了容器资源，还经常被杀死</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#滚动更新之健康检查重要性"><span class="nav-number">5.2.</span> <span class="nav-text">滚动更新之健康检查重要性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#滚动更新之流量丢失"><span class="nav-number">5.3.</span> <span class="nav-text">滚动更新之流量丢失</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置中心-和-注册中心-和-数据库"><span class="nav-number">5.4.</span> <span class="nav-text">配置中心 和 注册中心 和 数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#增加pod流程"><span class="nav-number">5.5.</span> <span class="nav-text">增加pod流程</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

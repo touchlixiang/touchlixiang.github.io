@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="kubernetes,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="03 kubectl 管理命令">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/11/07/k8s-03/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_23.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_24.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_71.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_25.png">
+<meta property="og:updated_time" content="2019-11-22T02:32:57.584Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="03 kubectl 管理命令">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/11/07/k8s-03/">
+
+
+
+
+
+  <title>03 kubectl 管理命令 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/11/07/k8s-03/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">03 kubectl 管理命令</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-07T12:08:22+08:00">
+                2019-11-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<p><img src="/img/k8s/k8s_23.png"></p>
+<h2 id="kubectl-命令行管理工具"><a href="#kubectl-命令行管理工具" class="headerlink" title="kubectl 命令行管理工具"></a>kubectl 命令行管理工具</h2><ol>
+<li>标记红色为常用 必须记住</li>
+</ol>
+<h2 id="kubectl-工具管理-集群应用"><a href="#kubectl-工具管理-集群应用" class="headerlink" title="kubectl 工具管理 集群应用"></a>kubectl 工具管理 集群应用</h2><ol>
+<li>k8s 会帮我们调度到node上</li>
+<li>k8s 镜像交付物 CI环境 打包到镜像仓库 </li>
+<li>应用程序的生命周期 - 基于镜像</li>
+</ol>
+<h3 id="创建-run"><a href="#创建-run" class="headerlink" title="创建 run"></a>创建 run</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># --replicas=3 副本个数,一般保持在2个以上</span><br><span class="line">[root@k8s-master1 ~]# kubectl run mynginx --replicas=3 --image=nginx:1.14 --port=80</span><br><span class="line"></span><br><span class="line"># deploy = deployment 默认创建的控制器</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods,deploy</span><br><span class="line">NAME                           READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/mynginx-559f66f86b-j4q5m   1/1     Running   0          6m</span><br><span class="line">pod/mynginx-559f66f86b-q5lpf   1/1     Running   0          6m</span><br><span class="line">pod/mynginx-559f66f86b-xltps   1/1     Running   0          6m</span><br><span class="line"></span><br><span class="line">NAME                      READY   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">deployment.apps/mynginx   3/3     3            3           6m</span><br></pre></td></tr></table></figure>
+<h3 id="发布-expose"><a href="#发布-expose" class="headerlink" title="发布 expose"></a>发布 expose</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 将项目暴露出去:</span><br><span class="line">1. --type=NodePort          是service 的一种类型 </span><br><span class="line">2. --port=80                集群内容访问端口</span><br><span class="line">3. --target-port=80         容器端口</span><br><span class="line">4. --name=nginx-service     service的name</span><br><span class="line">5. 生产环境无法使用外网，如果有外网可以用域名接下到nodeip+端口访问</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 ~]# kubectl expose deploy/mynginx --port=80 --type=NodePort --target-port=80 --name=nginx-service</span><br><span class="line">service/nginx-service exposed</span><br><span class="line"></span><br><span class="line"># 查看暴露的service</span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods,svc</span><br><span class="line">NAME                           READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/mynginx-559f66f86b-j4q5m   1/1     Running   0          10m</span><br><span class="line">pod/mynginx-559f66f86b-q5lpf   1/1     Running   0          10m</span><br><span class="line">pod/mynginx-559f66f86b-xltps   1/1     Running   0          10m</span><br><span class="line"></span><br><span class="line">NAME                    TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">service/kubernetes      ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        5d22h</span><br><span class="line">service/nginx-service   NodePort    10.0.0.190   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:30540/TCP   13s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 访问 任意一个node的ip+外部随机端口(30540)</span><br><span class="line">[root@k8s-master1 ~]# curl 172.17.70.253:30540</span><br><span class="line">[root@k8s-master1 ~]# curl 172.17.70.254:30540</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 查看日志</span><br><span class="line">[root@k8s-master tmp]# kubectl get pods</span><br><span class="line">NAME                     READY   STATUS    RESTARTS   AGE</span><br><span class="line">busybox                  1/1     Running   5          5h35m</span><br><span class="line">nginx-59d795d786-bsfwv   1/1     Running   0          10m</span><br><span class="line">nginx-59d795d786-jtrzh   1/1     Running   0          10m</span><br><span class="line">nginx-59d795d786-nck54   1/1     Running   0          10m</span><br><span class="line">web-866f97c649-mksh6     1/1     Running   0          6h1m</span><br><span class="line">[root@k8s-master tmp]# kubectl logs nginx-59d795d786-bsfwv</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 查看事件</span><br><span class="line">[root@k8s-master1 ~]# kubectl describe pod mynginx-559f66f86b-xltps</span><br><span class="line">Events:</span><br><span class="line">  Type    Reason     Age        From                Message</span><br><span class="line">  ----    ------     ----       ----                -------</span><br><span class="line">  Normal  Scheduled  <span class="tag">&lt;<span class="name">unknown</span>&gt;</span>  default-scheduler   Successfully assigned default/mynginx-559f66f86b-xltps to k8s-node2</span><br><span class="line">  Normal  Pulled     17m        kubelet, k8s-node2  Container image "nginx:1.14" already present on machine</span><br><span class="line">  Normal  Created    17m        kubelet, k8s-node2  Created container mynginx</span><br><span class="line">  Normal  Started    17m        kubelet, k8s-node2  Started container mynginx</span><br></pre></td></tr></table></figure>
+<h3 id="更新-set"><a href="#更新-set" class="headerlink" title="更新 set"></a>更新 set</h3><ol>
+<li>ci 打包 升级 </li>
+<li>更新到最新版本，滚动更新 一个一个</li>
+<li>回滚和更新的时候 注意pod的IP地址，每次都不一致,是因为重新创建了新的pod 但是service保持了pod的访问</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 查看一个pod的信息 得到镜像版本</span><br><span class="line">[root@k8s-master1 ~]# kubectl describe pod mynginx-559f66f86b-xltps</span><br><span class="line"></span><br><span class="line"># 通过image 更新</span><br><span class="line"># mynginx 是容器名</span><br><span class="line">[root@k8s-master1 ~]# kubectl set image deployment/mynginx mynginx=nginx:1.16</span><br><span class="line">deployment.apps/mynginx image updated</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods</span><br><span class="line">NAME                       READY   STATUS    RESTARTS   AGE</span><br><span class="line">mynginx-579d45d79b-4msl2   1/1     Running   0          73s</span><br><span class="line">mynginx-579d45d79b-hb9g5   1/1     Running   0          70s</span><br><span class="line">mynginx-579d45d79b-j426j   1/1     Running   0          71s</span><br><span class="line"></span><br><span class="line"># 滚动更新 其实就是创建了新的容器</span><br><span class="line">[root@k8s-master1 ~]# kubectl describe pod mynginx-579d45d79b-4msl2</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_24.png"></p>
+<h3 id="回滚-rollout"><a href="#回滚-rollout" class="headerlink" title="回滚 rollout"></a>回滚 rollout</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"># 查看当前项目的版本</span><br><span class="line">[root@k8s-master1 ~]# kubectl rollout history deployment/mynginx</span><br><span class="line">deployment.apps/mynginx </span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">2         <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 回到上一个版本 感觉是把上一个版本重新部署一次</span><br><span class="line">[root@k8s-master1 ~]# kubectl rollout undo deployment/mynginx</span><br><span class="line">deployment.apps/mynginx rolled back</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods</span><br><span class="line">NAME                       READY   STATUS        RESTARTS   AGE</span><br><span class="line">mynginx-559f66f86b-6vt4z   1/1     Running       0          3s</span><br><span class="line">mynginx-559f66f86b-7674b   1/1     Running       0          4s</span><br><span class="line">mynginx-559f66f86b-flxn5   1/1     Running       0          2s</span><br><span class="line">mynginx-579d45d79b-4msl2   0/1     Terminating   0          5m25s</span><br><span class="line">mynginx-579d45d79b-hb9g5   0/1     Terminating   0          5m22s</span><br><span class="line">mynginx-579d45d79b-j426j   0/1     Terminating   0          5m23s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods</span><br><span class="line">NAME                       READY   STATUS    RESTARTS   AGE</span><br><span class="line">mynginx-559f66f86b-6vt4z   1/1     Running   0          41s</span><br><span class="line">mynginx-559f66f86b-7674b   1/1     Running   0          42s</span><br><span class="line">mynginx-559f66f86b-flxn5   1/1     Running   0          40s</span><br><span class="line"></span><br><span class="line"># 查看镜像版本</span><br><span class="line">[root@k8s-master1 ~]# kubectl describe pod mynginx-559f66f86b-6vt4z</span><br></pre></td></tr></table></figure>
+<h3 id="删除-delete"><a href="#删除-delete" class="headerlink" title="删除 delete"></a>删除 delete</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 ~]# kubectl delete deployment/mynginx</span><br><span class="line">deployment.apps "mynginx" deleted</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl delete svc/nginx-service</span><br><span class="line">service "nginx-service" deleted</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods,svc</span><br><span class="line">NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE</span><br><span class="line">service/kubernetes   ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP   5d22h</span><br></pre></td></tr></table></figure>
+<h2 id="kubectl-工具远程连接-K8S集群"><a href="#kubectl-工具远程连接-K8S集群" class="headerlink" title="kubectl 工具远程连接 K8S集群"></a>kubectl 工具远程连接 K8S集群</h2><ol>
+<li>现在所有的管理都在 master 上操作 无法在别的服务器上管理 比如node</li>
+<li>如何在其他服务器上使用kubectl </li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 先将kubectl命令发送到 node1上</span><br><span class="line">[root@k8s-master1 ~]# scp /usr/local/bin/kubectl root@172.17.70.253:/usr/bin/kubectl</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 测试使用</span><br><span class="line"># master上启动了apiserver,监听端口是 127.0.0.1:8080</span><br><span class="line"># 而node上没有启动无法连接apiserver服务</span><br><span class="line">[root@k8s-node1 ~]# kubectl get nodes</span><br><span class="line">The connection to the server localhost:8080 was refused - did you specify the right host or port?</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# netstat -tnlp | grep 8080</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 一般情况下，在k8smaster节点上集群管理工具kubectl是连接的本地http8080端口和apiserver进行通讯的,</span><br><span class="line"># 当然也可以通过https端口进行通讯前提是要生成证书。</span><br><span class="line"># 所以说kubectl不一定部署在master上，只要能和apiserver进行通讯，那么你可以将kubectl部署在任何一台你想连接到集群的主机上</span><br><span class="line"># 生成 kubeconfig配置文件，包含连接apiserver的配置文件</span><br></pre></td></tr></table></figure>
+<h3 id="生成admin证书"><a href="#生成admin证书" class="headerlink" title="生成admin证书"></a>生成admin证书</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"># 生成admin证书,我之前已经生成了ca证书</span><br><span class="line">[root@k8s-master1 TLS]# mkdir -p /opt/TLS/admin</span><br><span class="line">[root@k8s-master1 admin]# cp ../k8s/ca*.pem .</span><br><span class="line">[root@k8s-master1 admin]# cp ../k8s/ca-config.json .</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># 证书配置</span><br><span class="line">cat &gt; admin-csr.json &lt;&lt;EOF</span><br><span class="line">&#123;</span><br><span class="line">  "CN": "admin",</span><br><span class="line">  "hosts": [],</span><br><span class="line">  "key": &#123;</span><br><span class="line">    "algo": "rsa",</span><br><span class="line">    "size": 2048</span><br><span class="line">  &#125;,</span><br><span class="line">  "names": [</span><br><span class="line">    &#123;</span><br><span class="line">      "C": "CN",</span><br><span class="line">      "L": "BeiJing",</span><br><span class="line">      "ST": "BeiJing",</span><br><span class="line">      "O": "system:masters",</span><br><span class="line">      "OU": "System"</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 admin]# ls -l</span><br><span class="line">total 16</span><br><span class="line">-rw-r--r-- 1 root root  229 Nov 19 10:21 admin-csr.json</span><br><span class="line">-rw-r--r-- 1 root root  294 Nov 19 10:23 ca-config.json</span><br><span class="line">-rw------- 1 root root 1675 Nov 19 10:18 ca-key.pem</span><br><span class="line">-rw-r--r-- 1 root root 1359 Nov 19 10:18 ca.pem</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 生成证书</span><br><span class="line">[root@k8s-master1 admin]# cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 admin]# ls -l</span><br><span class="line">total 28</span><br><span class="line">-rw-r--r-- 1 root root 1009 Nov 19 10:23 admin.csr</span><br><span class="line">-rw-r--r-- 1 root root  229 Nov 19 10:21 admin-csr.json</span><br><span class="line">-rw------- 1 root root 1679 Nov 19 10:23 admin-key.pem</span><br><span class="line">-rw-r--r-- 1 root root 1399 Nov 19 10:23 admin.pem</span><br><span class="line">-rw-r--r-- 1 root root  294 Nov 19 10:23 ca-config.json</span><br><span class="line">-rw------- 1 root root 1675 Nov 19 10:18 ca-key.pem</span><br><span class="line">-rw-r--r-- 1 root root 1359 Nov 19 10:18 ca.pem</span><br><span class="line"></span><br><span class="line"># 拷贝证书以及相关kubectl到目标机器</span><br><span class="line">[root@k8s-master1 admin]# scp /usr/local/bin/kubectl root@172.17.70.253:/usr/bin/kubectl   </span><br><span class="line">[root@k8s-master1 admin]# scp admin*.pem 172.17.70.253:/opt/kubernetes/ssl</span><br></pre></td></tr></table></figure>
+<h3 id="kubectl配置文件"><a href="#kubectl配置文件" class="headerlink" title="kubectl配置文件"></a>kubectl配置文件</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># 在node上执行</span><br><span class="line"># 生成kubectl配置文件 地址可以是vip</span><br><span class="line"># ca.pem	    CA根证书</span><br><span class="line"># admin.pem	    kubectl的TLS认证证书，具有admin权限</span><br><span class="line"># admin-key.pem	kubectl的TLS认证私钥</span><br><span class="line"></span><br><span class="line"># 进入证书目录</span><br><span class="line">[root@k8s-node1 ssl]# cd /opt/kubernetes/ssl</span><br><span class="line"></span><br><span class="line"># 设置连接api的地址 </span><br><span class="line">kubectl config set-cluster kubernetes --server=https://172.17.70.251:6443 --embed-certs=true --certificate-authority=ca.pem --kubeconfig=config</span><br><span class="line"></span><br><span class="line"># 设置用户项中cluster-admin用户证书认证字段</span><br><span class="line">kubectl config set-credentials cluster-admin --certificate-authority=ca.pem --embed-certs=true --client-key=admin-key.pem --client-certificate=admin.pem --kubeconfig=config</span><br><span class="line"></span><br><span class="line"># 设置默认上下文</span><br><span class="line">kubectl config set-context default --cluster=kubernetes --user=cluster-admin --kubeconfig=config</span><br><span class="line"></span><br><span class="line"># 设置当前环境的default</span><br><span class="line">kubectl config use-context default --kubeconfig=config</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 测试</span><br><span class="line">[root@k8s-node1 ssl]# kubectl --kubeconfig=./config get nodes</span><br><span class="line">NAME        STATUS   ROLES    AGE     VERSION</span><br><span class="line">k8s-node1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   5d18h   v1.16.0</span><br><span class="line">k8s-node2   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   5d18h   v1.16.0</span><br><span class="line"></span><br><span class="line"># 优化</span><br><span class="line">[root@k8s-node1 ssl]# mv config /root/.kube/config</span><br><span class="line">[root@k8s-node1 ssl]# kubectl get nodes</span><br><span class="line">NAME        STATUS   ROLES    AGE     VERSION</span><br><span class="line">k8s-node1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   5d18h   v1.16.0</span><br><span class="line">k8s-node2   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   5d18h   v1.16.0</span><br></pre></td></tr></table></figure>
+<h2 id="YAML配置文件管理资源"><a href="#YAML配置文件管理资源" class="headerlink" title="YAML配置文件管理资源"></a>YAML配置文件管理资源</h2><h3 id="语法格式"><a href="#语法格式" class="headerlink" title="语法格式"></a>语法格式</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">YAML 是一种简洁的非标记语言。</span><br><span class="line"></span><br><span class="line">语法格式：</span><br><span class="line">• 缩进表示层级关系</span><br><span class="line">• 不支持制表符“tab”缩进，使用空格缩进</span><br><span class="line">• 通常开头缩进 2 个空格</span><br><span class="line">• 字符后缩进 1 个空格，如冒号、逗号等</span><br><span class="line">• “---” 表示YAML格式，一个文件的开始</span><br><span class="line">• “#”注释</span><br></pre></td></tr></table></figure>
+<h3 id="使用yaml文件创建资源对象"><a href="#使用yaml文件创建资源对象" class="headerlink" title="使用yaml文件创建资源对象"></a>使用yaml文件创建资源对象</h3><ol>
+<li>通过文件描述创建的资源</li>
+<li>yaml可以留存复用，命令要写很多 </li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 参考文档 </span><br><span class="line"># 去官网搜索想要的内容 如 deployment</span><br><span class="line">https://kubernetes.io/docs/concepts/workloads/controllers/deployment/</span><br></pre></td></tr></table></figure>
+<h4 id="deployment"><a href="#deployment" class="headerlink" title="deployment"></a>deployment</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# mkdir -p /opt/demo/ ;cd /opt/demo/</span><br><span class="line"># 查看api的版本</span><br><span class="line">[root@k8s-master1 demo]# kubectl api-versions </span><br><span class="line"> </span><br><span class="line">[root@k8s-master demo]# vim nginx-deployment.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1                     # 指定api版本</span><br><span class="line">kind: Deployment                        # 资源名</span><br><span class="line">metadata:                               # 元数据信息</span><br><span class="line">  name: nginx-deployment                # 名称</span><br><span class="line">  labels:</span><br><span class="line">    app: nginx                          # 标签名</span><br><span class="line">spec:   </span><br><span class="line">  replicas: 3                           # 副本数</span><br><span class="line">  selector:                             # 标签选择器</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: nginx                        # 通过app:nginx 关联pod</span><br><span class="line">      </span><br><span class="line">  template:                             # 被管理的对象,实际的容器</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: nginx                      # 关联上面控制器的标签</span><br><span class="line">    spec:                              </span><br><span class="line">      containers:                       # 容器</span><br><span class="line">      - name: nginx                     # name</span><br><span class="line">        image: nginx:1.16               # 镜像名</span><br><span class="line">        ports:                          # 端口</span><br><span class="line">        - containerPort: 80</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 创建</span><br><span class="line">[root@k8s-master1 demo]# kubectl create -f nginx-deployment.yaml </span><br><span class="line">deployment.apps/nginx-deployment created</span><br><span class="line"></span><br><span class="line"># 查看pod</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pod,deploy -o wide</span><br><span class="line">NAME                                    READY   STATUS    RESTARTS   AGE    IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">pod/nginx-deployment-594cc45b78-2clch   1/1     Running   0          5m1s   10.244.0.24   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pod/nginx-deployment-594cc45b78-h9h8b   1/1     Running   0          5m1s   10.244.0.23   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pod/nginx-deployment-594cc45b78-rqcld   1/1     Running   0          5m1s   10.244.1.19   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">NAME                               READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS   IMAGES       SELECTOR</span><br><span class="line">deployment.apps/nginx-deployment   3/3     3            3           5m1s   nginx        nginx:1.16   app=nginx</span><br></pre></td></tr></table></figure>
+<h4 id="service"><a href="#service" class="headerlink" title="service"></a>service</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 官网文档</span><br><span class="line">https://kubernetes.io/zh/docs/concepts/services-networking/service/</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># service 暴露</span><br><span class="line">[root@k8s-master1 demo]# vim nginx-service.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service                      # 资源对象</span><br><span class="line">metadata:                          # 源数据</span><br><span class="line">  name: nginx-service              # name</span><br><span class="line">  labels:                          # 标签  关联 pod </span><br><span class="line">  app: nginx</span><br><span class="line">spec:</span><br><span class="line">  type: NodePort</span><br><span class="line">  selector:                        # 选择器 指定上面的service 标签</span><br><span class="line">    app: nginx</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80</span><br><span class="line">    targetPort: 80</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl create -f nginx-service.yaml</span><br><span class="line">service/nginx-service created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods,svc,deploy -o wide</span><br><span class="line">NAME                                    READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">pod/nginx-deployment-594cc45b78-2clch   1/1     Running   0          20m   10.244.0.24   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pod/nginx-deployment-594cc45b78-h9h8b   1/1     Running   0          20m   10.244.0.23   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pod/nginx-deployment-594cc45b78-rqcld   1/1     Running   0          20m   10.244.1.19   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">NAME                    TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE   SELECTOR</span><br><span class="line">service/kubernetes      ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        8d    <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">service/nginx-service   NodePort    10.0.0.146   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:31291/TCP   96s   app=nginx</span><br><span class="line"></span><br><span class="line">NAME                               READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES       SELECTOR</span><br><span class="line">deployment.apps/nginx-deployment   3/3     3            3           20m   nginx        nginx:1.16   app=nginx</span><br><span class="line"></span><br><span class="line">http://39.106.100.108:31291/</span><br><span class="line">http://39.106.168.181:31291/</span><br></pre></td></tr></table></figure>
+<h4 id="整合到一起"><a href="#整合到一起" class="headerlink" title="整合到一起"></a>整合到一起</h4><ol>
+<li>kubectl 是通过一条命令去创建资源对象</li>
+<li>yaml文件 有利于留存复用,通过描述创建资源对象</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 删除 pod和service</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pod,svc,deploy</span><br><span class="line">NAME                                    READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/nginx-deployment-594cc45b78-2clch   1/1     Running   0          26m</span><br><span class="line">pod/nginx-deployment-594cc45b78-h9h8b   1/1     Running   0          26m</span><br><span class="line">pod/nginx-deployment-594cc45b78-rqcld   1/1     Running   0          26m</span><br><span class="line"></span><br><span class="line">NAME                    TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">service/kubernetes      ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        8d</span><br><span class="line">service/nginx-service   NodePort    10.0.0.146   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:31291/TCP   7m49s</span><br><span class="line"></span><br><span class="line">NAME                               READY   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">deployment.apps/nginx-deployment   3/3     3            3           26m</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete service/nginx-service </span><br><span class="line">service "nginx-service" deleted</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete deployment.apps/nginx-deployment</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># 整合到一起</span><br><span class="line">[root@k8s-master1 demo]# vim nginx-deployment.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: nginx-deployment</span><br><span class="line">  labels:</span><br><span class="line">    app: nginx</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: nginx</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: nginx</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: nginx</span><br><span class="line">        image: nginx:1.16</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 80</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: nginx-service</span><br><span class="line">  labels:</span><br><span class="line">    app: nginx</span><br><span class="line">spec:</span><br><span class="line">  type: NodePort</span><br><span class="line">  selector:</span><br><span class="line">    app: nginx</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80</span><br><span class="line">    targetPort: 80</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 创建并查看</span><br><span class="line">[root@k8s-master1 demo]# kubectl create -f nginx-deployment.yaml </span><br><span class="line">deployment.apps/nginx-deployment created</span><br><span class="line">service/nginx-service created</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pod,svc,deploy</span><br><span class="line">NAME                                    READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/nginx-deployment-594cc45b78-2wc5c   1/1     Running   0          4s</span><br><span class="line">pod/nginx-deployment-594cc45b78-mmr9p   1/1     Running   0          4s</span><br><span class="line">pod/nginx-deployment-594cc45b78-vs7wh   1/1     Running   0          4s</span><br><span class="line"></span><br><span class="line">NAME                    TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">service/kubernetes      ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        8d</span><br><span class="line">service/nginx-service   NodePort    10.0.0.199   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:30041/TCP   4s</span><br><span class="line"></span><br><span class="line">NAME                               READY   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">deployment.apps/nginx-deployment   3/3     3            3           4s</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_71.png"></p>
+<p><img src="/img/k8s/k8s_25.png"></p>
+<h3 id="通过命令行生成-yaml文件"><a href="#通过命令行生成-yaml文件" class="headerlink" title="通过命令行生成 yaml文件"></a>通过命令行生成 yaml文件</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"># --dry-run                         不会实际创建 而是生成yaml</span><br><span class="line"># -o yaml  &gt; nginx-1.14.yaml        生成配置文件</span><br><span class="line"></span><br><span class="line">[root@k8s-master demo]# kubectl run nginx --replicas=3 --image=nginx:1.14 --port=80 --dry-run -o yaml  &gt; nginx-1.14.yaml</span><br><span class="line">kubectl run --generator=deployment/apps.v1 is DEPRECATED and will be removed in a future version. Use kubectl run --generator=run-pod/v1 or kubectl create instead.</span><br><span class="line"> </span><br><span class="line">[root@k8s-master demo]# vim nginx-1.14.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  creationTimestamp: null</span><br><span class="line">  labels:</span><br><span class="line">    run: nginx</span><br><span class="line">  name: nginx</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      run: nginx</span><br><span class="line">  strategy: &#123;&#125;</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      creationTimestamp: null</span><br><span class="line">      labels:</span><br><span class="line">        run: nginx</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: nginx:1.14</span><br><span class="line">        name: nginx</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 80</span><br><span class="line">        resources: &#123;&#125;</span><br><span class="line">status: &#123;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="生成-yaml"><a href="#生成-yaml" class="headerlink" title="生成 yaml"></a>生成 yaml</h3><ol>
+<li>yaml文件不容易记住,所以大多数时候我们都生成配置文件,以方便复用</li>
+</ol>
+<h4 id="run命令-生成"><a href="#run命令-生成" class="headerlink" title="run命令 生成"></a>run命令 生成</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 查看文件 只保留熟悉的</span><br><span class="line">kubectl create deployment java-demo --image 172.17.70.252/project/java-demo:latest --dry-run -o yaml &gt; deploy.yaml</span><br><span class="line">kubectl expose deployment java-demo --port=80 --target-port=8080 --type=NodePort --dry-run -o yaml &gt; svc.yaml</span><br><span class="line"></span><br><span class="line">kubectl run mynginx --replicas=3 --image=nginx:1.14 --port=80 --dry-run -o yaml &gt; mynginx1.14.yaml</span><br><span class="line"># 需要先创建pod 关联好 </span><br><span class="line">kubectl expose deployment mynginx --port=80 --type=NodePort --target-port=80 --name=nginx-service --dry-run -o yaml &gt; mynginx1.14.svc.yaml</span><br></pre></td></tr></table></figure>
+<h4 id="get-命令生成"><a href="#get-命令生成" class="headerlink" title="get 命令生成"></a>get 命令生成</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 查看文件 只保留熟悉的</span><br><span class="line">kubectl get deployment/nginx-deployment --export -o yaml &gt; mynginx.yaml</span><br><span class="line">kubectl get svc/nginx-service --export -o yaml &gt; mynginx.svc.yaml</span><br></pre></td></tr></table></figure>
+<h4 id="查看-pod-资源字段"><a href="#查看-pod-资源字段" class="headerlink" title="查看 pod 资源字段"></a>查看 pod 资源字段</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Pod容器的字段拼写忘记了</span><br><span class="line">kubectl explain pods.spec.containers</span><br></pre></td></tr></table></figure>
+<p>systemctl restart kube-apiserver<br>systemctl restart kube-controller-manager<br>systemctl restart kube-scheduler</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> kubernetes</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/05/k8s-02/" rel="next" title="02 搭建一个完整的Kubernetes集群">
+                <i class="fa fa-chevron-left"></i> 02 搭建一个完整的Kubernetes集群
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/07/k8s-04/" rel="prev" title="04 Pod 介绍与容器分类">
+                04 Pod 介绍与容器分类 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#kubectl-命令行管理工具"><span class="nav-number">1.</span> <span class="nav-text">kubectl 命令行管理工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kubectl-工具管理-集群应用"><span class="nav-number">2.</span> <span class="nav-text">kubectl 工具管理 集群应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-run"><span class="nav-number">2.1.</span> <span class="nav-text">创建 run</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发布-expose"><span class="nav-number">2.2.</span> <span class="nav-text">发布 expose</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新-set"><span class="nav-number">2.3.</span> <span class="nav-text">更新 set</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#回滚-rollout"><span class="nav-number">2.4.</span> <span class="nav-text">回滚 rollout</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除-delete"><span class="nav-number">2.5.</span> <span class="nav-text">删除 delete</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kubectl-工具远程连接-K8S集群"><span class="nav-number">3.</span> <span class="nav-text">kubectl 工具远程连接 K8S集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生成admin证书"><span class="nav-number">3.1.</span> <span class="nav-text">生成admin证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kubectl配置文件"><span class="nav-number">3.2.</span> <span class="nav-text">kubectl配置文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YAML配置文件管理资源"><span class="nav-number">4.</span> <span class="nav-text">YAML配置文件管理资源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法格式"><span class="nav-number">4.1.</span> <span class="nav-text">语法格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用yaml文件创建资源对象"><span class="nav-number">4.2.</span> <span class="nav-text">使用yaml文件创建资源对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#deployment"><span class="nav-number">4.2.1.</span> <span class="nav-text">deployment</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#service"><span class="nav-number">4.2.2.</span> <span class="nav-text">service</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#整合到一起"><span class="nav-number">4.2.3.</span> <span class="nav-text">整合到一起</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过命令行生成-yaml文件"><span class="nav-number">4.3.</span> <span class="nav-text">通过命令行生成 yaml文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成-yaml"><span class="nav-number">4.4.</span> <span class="nav-text">生成 yaml</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#run命令-生成"><span class="nav-number">4.4.1.</span> <span class="nav-text">run命令 生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#get-命令生成"><span class="nav-number">4.4.2.</span> <span class="nav-text">get 命令生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看-pod-资源字段"><span class="nav-number">4.4.3.</span> <span class="nav-text">查看 pod 资源字段</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

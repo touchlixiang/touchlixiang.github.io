@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Nginx,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="12 Nginx 性能优化与压测工具">
+<meta property="og:url" content="https://touchlixiang.github.io/2019/10/24/nginx-base12/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_144.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_145.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_146.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_147.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_148.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_148.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_149.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_150.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_151.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_152.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_153.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_154.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_155.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/nginx_156.png">
+<meta property="og:updated_time" content="2019-10-24T09:08:00.770Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="12 Nginx 性能优化与压测工具">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2019/10/24/nginx-base12/">
+
+
+
+
+
+  <title>12 Nginx 性能优化与压测工具 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2019/10/24/nginx-base12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">12 Nginx 性能优化与压测工具</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-24T15:23:03+08:00">
+                2019-10-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="性能-优化概述"><a href="#性能-优化概述" class="headerlink" title="性能 优化概述"></a>性能 优化概述</h2><ul>
+<li>在做性能优化前, 我们需要对如下进行考虑</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1.当前系统结构瓶颈</span><br><span class="line">    观察指标</span><br><span class="line">    压力测试 其实压力测试精准度 并不是很高</span><br><span class="line"></span><br><span class="line">2.了解业务模式</span><br><span class="line">    接口业务类型</span><br><span class="line">    系统层次化结构 SOA 松耦合</span><br><span class="line"></span><br><span class="line">3.性能与安全</span><br><span class="line">    性能好安全弱</span><br><span class="line">    安全好性能低</span><br></pre></td></tr></table></figure>
+<h2 id="压力测试工具-ab"><a href="#压力测试工具-ab" class="headerlink" title="压力测试工具 ab"></a>压力测试工具 ab</h2><h3 id="安装压力测试工具ab"><a href="#安装压力测试工具ab" class="headerlink" title="安装压力测试工具ab"></a>安装压力测试工具ab</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@proxy code]# yum install httpd-tools -y</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 了解压测工具使用方式</span><br><span class="line">[root@proxy code]# ab -n 200 -c 2 http://127.0.0.1/</span><br><span class="line"></span><br><span class="line"># -n总的请求次数</span><br><span class="line"># -c并发请求数</span><br><span class="line"># -k是否开启长连接</span><br></pre></td></tr></table></figure>
+<h3 id="压测宝"><a href="#压测宝" class="headerlink" title="压测宝"></a>压测宝</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 调取全国浏览 检测你的网站</span><br><span class="line"></span><br><span class="line">http://www.yacebao.com/trial.shtml</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_144.png" width="50%"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">        listen 80;</span><br><span class="line">        server_name localhost;</span><br><span class="line"></span><br><span class="line">        set $ip  0;</span><br><span class="line">        if ($http_x_forward_for ~ 211.161.160.201)&#123;</span><br><span class="line">        set $ip 1;</span><br><span class="line">        &#125;</span><br><span class="line">        if ($remote_addr ~ 211.161.160.201)&#123;</span><br><span class="line">        set $ip 1;</span><br><span class="line">        &#125;</span><br><span class="line">        # 如果$ip值为0,则返回403, 否则允许访问</span><br><span class="line">        location /hello &#123;</span><br><span class="line">                if ($ip = "0")&#123;</span><br><span class="line">                return 403;</span><br><span class="line">                &#125;</span><br><span class="line">                default_type application/json;</span><br><span class="line">                return 200 '&#123;"status":"success"&#125;';</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_145.png" width="50%"></p>
+<p><img src="/img/nginx_146.png" width="50%"></p>
+<h3 id="tomcat-处理静态比nginx处理-弱很多"><a href="#tomcat-处理静态比nginx处理-弱很多" class="headerlink" title="tomcat 处理静态比nginx处理 弱很多"></a>tomcat 处理静态比nginx处理 弱很多</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># ab只能参考</span><br><span class="line">[root@nginx-lua conf.d]# cat jsp.conf </span><br><span class="line">server &#123;</span><br><span class="line">        server_name localhost;</span><br><span class="line">        listen 80;</span><br><span class="line">        location / &#123;</span><br><span class="line">                root /soft/code;</span><br><span class="line">                try_files $uri @java_page;</span><br><span class="line">                index index.jsp index.html;</span><br><span class="line">        &#125;</span><br><span class="line">        location @java_page&#123;</span><br><span class="line">                proxy_pass http://192.168.56.20:8080;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//分别给Nginx准备静态网站</span><br><span class="line">[root@nginx-lua ~]# cat /soft/code/bgx.html </span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span> Ab Load <span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">//给Tomcat准备静态网站文件</span><br><span class="line">[root@tomcat-node1-20 ROOT]# cat /soft/tomcat-8080/webapps/ROOT/bgx.html </span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span> Ab Load <span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"># 使用ab工具进行压力测试</span><br><span class="line">//进行压力测试</span><br><span class="line">[root@Nginx conf.d]# ab -n2000 -c2  http://127.0.0.1/bgx.html</span><br><span class="line">...</span><br><span class="line">Server Software:        nginx/1.12.2</span><br><span class="line">Server Hostname:        127.0.0.1</span><br><span class="line">Server Port:            80</span><br><span class="line"></span><br><span class="line">Document Path:          /bgx.html</span><br><span class="line">Document Length:        19 bytes</span><br><span class="line"></span><br><span class="line">Concurrency Level:      200</span><br><span class="line"># 总花费总时长</span><br><span class="line">Time taken for tests:   1.013 seconds</span><br><span class="line"># 总请求数</span><br><span class="line">Complete requests:      2000</span><br><span class="line"># 请求失败数</span><br><span class="line">Failed requests:        0</span><br><span class="line">Write errors:           0</span><br><span class="line">Total transferred:      510000 bytes</span><br><span class="line">HTML transferred:       38000 bytes</span><br><span class="line"># 每秒多少请求/s(总请求出/总共完成的时间)</span><br><span class="line">Requests per second:    9333.23 [#/sec] (mean)</span><br><span class="line"># 客户端访问服务端, 单个请求所需花费的时间</span><br><span class="line">Time per request:       101.315 [ms] (mean)</span><br><span class="line"># 服务端处理请求的时间</span><br><span class="line">Time per request:       0.507 [ms] (mean, across all concurrent requests)</span><br><span class="line"># 判断网络传输速率, 观察网络是否存在瓶颈</span><br><span class="line">Transfer rate:          491.58 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 将nginx下的bgx文件移走, 再次压测会由tomcat进行处理</span><br><span class="line"></span><br><span class="line">Concurrency Level:      200</span><br><span class="line">Time taken for tests:   1.028 seconds</span><br><span class="line">Complete requests:      2000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Write errors:           0</span><br><span class="line">Total transferred:      510000 bytes</span><br><span class="line">HTML transferred:       38000 bytes</span><br><span class="line">Requests per second:    1945.09 [#/sec] (mean)</span><br><span class="line">Time per request:       102.823 [ms] (mean)</span><br><span class="line">Time per request:       0.514 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          484.37 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_147.png" width="50%"></p>
+<h2 id="影响性能的指标"><a href="#影响性能的指标" class="headerlink" title="影响性能的指标"></a>影响性能的指标</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">影响性能方便整体关注</span><br><span class="line"></span><br><span class="line">1.网络</span><br><span class="line">    网络的流量   每秒带宽 : 1M带宽 / 8 : 流量峰值200M</span><br><span class="line">    网络是否丢包</span><br><span class="line">    这些会影响http的请求与调用</span><br><span class="line">2.系统</span><br><span class="line">    硬件有没有磁盘损坏,磁盘速率</span><br><span class="line">    系统负载、内存、系统稳定性  -&gt; zabbix </span><br><span class="line">3.服务</span><br><span class="line">    连接优化、请求优化         -&gt; Nginx</span><br><span class="line">    根据业务形态做对应的服务设置 </span><br><span class="line">4.程序</span><br><span class="line">    接口性能</span><br><span class="line">    处理速度</span><br><span class="line">    程序执行效率</span><br><span class="line">5.数据库</span><br><span class="line">    慢查询</span><br><span class="line">    读写性能</span><br><span class="line">    数据缓存</span><br><span class="line">每个架构服务与服务之间都或多或少有一些关联, 我们需要将整个架构进行分层, 找到对应系统或服务的短板, 然后进行优化</span><br></pre></td></tr></table></figure>
+<h2 id="系统性能优化"><a href="#系统性能优化" class="headerlink" title="系统性能优化"></a>系统性能优化</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">文件句柄, Linux一切皆文件，文件句柄可以理解为就是一个索引</span><br><span class="line">    文件句柄会随着我们进程的调用频繁增加</span><br><span class="line">    系统默认对文件句柄有限制，不能让一个进程无限的调用</span><br><span class="line">    需要限制每个进程和每个服务使用多大的文件句柄</span><br><span class="line">    文件句柄是必须要调整的优化参数  系统层面必须优化</span><br><span class="line"></span><br><span class="line">设置方式</span><br><span class="line">    系统全局性修改</span><br><span class="line">    用户局部性修改</span><br><span class="line">    进程局部性修改</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/security/limits.conf</span><br><span class="line"># 针对root用户</span><br><span class="line">root soft nofile 65535</span><br><span class="line">root hard nofile 65535</span><br><span class="line"># 所有用户, 全局</span><br><span class="line">* soft nofile 25535</span><br><span class="line">* hard nofile 25535</span><br><span class="line"></span><br><span class="line"># 对于Nginx进程</span><br><span class="line">worker_rlimit_nofile 45535;</span><br><span class="line"></span><br><span class="line"># root用户 </span><br><span class="line"># soft提醒</span><br><span class="line"># hard限制 </span><br><span class="line"># nofile文件数配置项</span><br><span class="line"># 65535最大大小</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 虚拟机查看</span><br><span class="line">[root@linux-node1 ~]# ulimit -n</span><br><span class="line">1024</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# vim /etc/security/limits.conf</span><br><span class="line">root soft nofile 65535</span><br><span class="line">root hard nofile 65535</span><br><span class="line">* soft nofile 25535</span><br><span class="line">* hard nofile 25535</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# source /etc/security/limits.conf</span><br><span class="line"># 重新连接</span><br><span class="line">[root@linux-node1 ~]# ulimit -n</span><br><span class="line">65535</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"># 阿里云服务器</span><br><span class="line"></span><br><span class="line">[root@proxy code]# cat /etc/security/limits.conf</span><br><span class="line"></span><br><span class="line"># End of file</span><br><span class="line">root soft nofile 65535</span><br><span class="line">root hard nofile 65535</span><br><span class="line">* soft nofile 65535</span><br><span class="line">* hard nofile 65535</span><br><span class="line"></span><br><span class="line"># 其中, nofile是文件句柄数量，线程句柄也属于它。nproc是进程数量。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@proxy code]# ps -aux |grep nginx</span><br><span class="line">root      6389  0.0  0.1  64524  3444 ?        Ss   10:39   0:00 nginx: master process /etc/nginx/sbin/nginx</span><br><span class="line">nobody   19303  0.0  0.1  65168  3416 ?        S    15:14   0:00 nginx: worker process</span><br><span class="line">root     19392  0.0  0.0 112660   968 pts/0    R+   16:28   0:00 grep --color=auto nginx</span><br><span class="line">[root@proxy code]# cat /proc/6389/limits </span><br><span class="line">Limit                     Soft Limit           Hard Limit           Units     </span><br><span class="line">Max cpu time              unlimited            unlimited            seconds   </span><br><span class="line">Max file size             unlimited            unlimited            bytes     </span><br><span class="line">Max data size             unlimited            unlimited            bytes     </span><br><span class="line">Max stack size            8388608              unlimited            bytes     </span><br><span class="line">Max core file size        0                    unlimited            bytes     </span><br><span class="line">Max resident set          unlimited            unlimited            bytes     </span><br><span class="line">Max processes             7283                 7283                 processes </span><br><span class="line">Max open files            65535                65535                files     </span><br><span class="line">Max locked memory         65536                65536                bytes     </span><br><span class="line">Max address space         unlimited            unlimited            bytes     </span><br><span class="line">Max file locks            unlimited            unlimited            locks     </span><br><span class="line">Max pending signals       7283                 7283                 signals   </span><br><span class="line">Max msgqueue size         819200               819200               bytes     </span><br><span class="line">Max nice priority         0                    0                    </span><br><span class="line">Max realtime priority     0                    0                    </span><br><span class="line">Max realtime timeout      unlimited            unlimited            us</span><br></pre></td></tr></table></figure>
+<p><img src="/img/nginx_148.png" width="50%"></p>
+<h2 id="Nginx性能优化"><a href="#Nginx性能优化" class="headerlink" title="Nginx性能优化"></a>Nginx性能优化</h2><h3 id="cpu-亲和"><a href="#cpu-亲和" class="headerlink" title="cpu 亲和"></a>cpu 亲和</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CPU亲和, 减少进程之间不断频繁迁移, 减少性能损耗</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1.查看当前CPU物理状态</span><br><span class="line">[root@nginx ~]# lscpu |grep "CPU(s)"</span><br><span class="line">CPU(s):                24</span><br><span class="line">On-line CPU(s) list:   0-23</span><br><span class="line">NUMA node0 CPU(s):     0,2,4,6,8,10,12,14,16,18,20,22</span><br><span class="line">NUMA node1 CPU(s):     1,3,5,7,9,11,13,15,17,19,21,23</span><br><span class="line"></span><br><span class="line"># 2颗物理cpu,每颗cpu12核心, 总共24核心</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">2. 将Nginx worker进程绑到不同的核心上</span><br><span class="line">//启动多少worker进程, 官方建议和cpu核心一致, 第一种绑定组合方式</span><br><span class="line">#worker_processes 24;</span><br><span class="line"></span><br><span class="line"># 最佳方式绑定方式 1.9版本之后推出</span><br><span class="line">worker_processes auto;</span><br><span class="line">worker_cpu_affinity auto;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@linux-node1 ~]# ps -ef|grep nginx</span><br><span class="line"></span><br><span class="line">[root@linux-node1 ~]# ps -eo pid,args,psr|grep [n]ginx</span><br><span class="line">  1436 nginx: master process /usr/   0</span><br><span class="line">  1458 nginx: worker process         0</span><br><span class="line">  1459 nginx: worker process         1</span><br></pre></td></tr></table></figure>
+<h2 id="通用Nginx配置模板文件"><a href="#通用Nginx配置模板文件" class="headerlink" title="通用Nginx配置模板文件"></a>通用Nginx配置模板文件</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"># Nginx通用优化配置文件</span><br><span class="line"></span><br><span class="line">[root@nginx ~]# cat nginx.conf</span><br><span class="line">user nginx;</span><br><span class="line">worker_processes auto;</span><br><span class="line">worker_cpu_affinity auto;</span><br><span class="line"></span><br><span class="line">error_log /var/log/nginx/error.log warn;</span><br><span class="line">pid /run/nginx.pid;</span><br><span class="line">#调整至1w以上,负荷较高建议2-3w以上</span><br><span class="line">worker_rlimit_nofile 35535;</span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    use epoll;</span><br><span class="line"># 限制每个进程能处理多少个连接请求,10240x16(worker_processes)  # 每个work进程接收连接请求10240 </span><br><span class="line">    worker_connections 10240;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    include             /etc/nginx/mime.types;</span><br><span class="line">    default_type        application/octet-stream;</span><br><span class="line"># 统一使用utf-8字符集</span><br><span class="line">    charset utf-8;</span><br><span class="line"></span><br><span class="line">    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '</span><br><span class="line">                      '$status $body_bytes_sent "$http_referer" '</span><br><span class="line">                      '"$http_user_agent" "$http_x_forwarded_for"';</span><br><span class="line">    # http层配置 每个server都会打印 , 每个server可以加上对应的打印</span><br><span class="line">    # 写日志会占用读写I/O </span><br><span class="line">    access_log  /var/log/nginx/access.log  main;</span><br><span class="line"></span><br><span class="line"># Core module 文件的高效传输</span><br><span class="line">    sendfile            on;</span><br><span class="line"># 静态资源服务器建议打开</span><br><span class="line">    tcp_nopush          on;</span><br><span class="line"># 动态资源服务建议打开,需要打开keepalived</span><br><span class="line">    tcp_nodelay         on;</span><br><span class="line">    keepalive_timeout   65;</span><br><span class="line"></span><br><span class="line"># Gzip module</span><br><span class="line">    gzip on;</span><br><span class="line">    gzip_disable "MSIE [1-6]\.";        # IE6浏览器版本不支压缩 关闭</span><br><span class="line">    gzip_http_version 1.1;</span><br><span class="line"></span><br><span class="line"># Virtal Server</span><br><span class="line">    include /etc/nginx/conf.d/*.conf;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">proxy-cache</span><br><span class="line">浏览器缓存</span><br><span class="line">server-hasp </span><br><span class="line"></span><br><span class="line">有的优化 不能在全局,需要单独server进行</span><br></pre></td></tr></table></figure>
+<h2 id="参考优化大全"><a href="#参考优化大全" class="headerlink" title="参考优化大全"></a>参考优化大全</h2><p><img src="/img/nginx_148.png" width="50%"></p>
+<p><img src="/img/nginx_149.png" width="50%"></p>
+<p><img src="/img/nginx_150.png" width="50%"></p>
+<p><img src="/img/nginx_151.png" width="50%"></p>
+<p><img src="/img/nginx_152.png" width="50%"></p>
+<p><img src="/img/nginx_153.png" width="50%"></p>
+<p><img src="/img/nginx_154.png" width="50%"></p>
+<p><img src="/img/nginx_155.png" width="50%"></p>
+<p><img src="/img/nginx_156.png" width="50%"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i> Nginx</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/24/nginx-base11/" rel="next" title="11 Nginx + Lua">
+                <i class="fa fa-chevron-left"></i> 11 Nginx + Lua
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/24/nginx-base13/" rel="prev" title="13 Nginx 常见问题">
+                13 Nginx 常见问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#性能-优化概述"><span class="nav-number">1.</span> <span class="nav-text">性能 优化概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#压力测试工具-ab"><span class="nav-number">2.</span> <span class="nav-text">压力测试工具 ab</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装压力测试工具ab"><span class="nav-number">2.1.</span> <span class="nav-text">安装压力测试工具ab</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#压测宝"><span class="nav-number">2.2.</span> <span class="nav-text">压测宝</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tomcat-处理静态比nginx处理-弱很多"><span class="nav-number">2.3.</span> <span class="nav-text">tomcat 处理静态比nginx处理 弱很多</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#影响性能的指标"><span class="nav-number">3.</span> <span class="nav-text">影响性能的指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统性能优化"><span class="nav-number">4.</span> <span class="nav-text">系统性能优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx性能优化"><span class="nav-number">5.</span> <span class="nav-text">Nginx性能优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cpu-亲和"><span class="nav-number">5.1.</span> <span class="nav-text">cpu 亲和</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通用Nginx配置模板文件"><span class="nav-number">6.</span> <span class="nav-text">通用Nginx配置模板文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考优化大全"><span class="nav-number">7.</span> <span class="nav-text">参考优化大全</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
