@@ -81,14 +81,14 @@
 
 <meta name="keywords" content="kubernetes">
 <meta property="og:type" content="article">
-<meta property="og:title" content="k8s 配置管理">
+<meta property="og:title" content="13 k8s 配置管理">
 <meta property="og:url" content="https://touchlixiang.github.io/2019/12/31/k8s-13/index.html">
 <meta property="og:site_name" content="My Notes">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
-<meta property="og:updated_time" content="2019-12-31T11:11:09.878Z">
+<meta property="og:updated_time" content="2020-01-03T06:45:09.093Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="k8s 配置管理">
+<meta name="twitter:title" content="13 k8s 配置管理">
 <meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
 
 
@@ -125,7 +125,7 @@
 
 
 
-  <title>k8s 配置管理 | My Notes</title>
+  <title>13 k8s 配置管理 | My Notes</title>
   
 
 
@@ -301,7 +301,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">k8s 配置管理</h1>
+          <h1 class="post-title" itemprop="name headline">13 k8s 配置管理</h1>
         
 
         <div class="post-meta">
@@ -374,6 +374,45 @@
 
       
         <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="Secret-机密存储"><a href="#Secret-机密存储" class="headerlink" title="Secret 机密存储"></a>Secret 机密存储</h2><ol>
+<li>加密数据并存放Etcd中，让Pod的容器以挂载Volume方式访问。</li>
+<li>应用场景：凭据</li>
+<li>官方文档:</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://kubernetes.io/docs/concepts/configuration/secret/</span><br></pre></td></tr></table></figure>
+<h3 id="创建-Secret"><a href="#创建-Secret" class="headerlink" title="创建 Secret"></a>创建 Secret</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# echo -n 'admin' &gt; ./username.txt</span><br><span class="line">[root@k8s-master1 demo]# echo -n '1f2d1e2e67df' &gt; ./password.txt</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl create secret generic db-user-pass --from-file=./username.txt --from-file=./password.txt</span><br><span class="line">secret/db-user-pass created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get secret</span><br><span class="line">NAME                  TYPE                                  DATA   AGE</span><br><span class="line">db-user-pass          Opaque                                2      27s</span><br><span class="line">default-token-h6969   kubernetes.io/service-account-token   3      36h</span><br><span class="line"></span><br><span class="line"># 数据安全</span><br><span class="line">[root@k8s-master1 demo]# kubectl describe secret db-user-pass</span><br><span class="line">Name:         db-user-pass</span><br><span class="line">Namespace:    default</span><br><span class="line">Labels:       <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">Annotations:  <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">Type:  Opaque</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">password.txt:  12 bytes</span><br><span class="line">username.txt:  5 bytes</span><br></pre></td></tr></table></figure>
+<h3 id="通过-yaml-文件创建"><a href="#通过-yaml-文件创建" class="headerlink" title="通过 yaml 文件创建"></a>通过 yaml 文件创建</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># 数据需要base64位编码</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# echo -n 'admin' | base64</span><br><span class="line">YWRtaW4=</span><br><span class="line">[root@k8s-master1 demo]# echo -n '1f2d1e2e67df' | base64</span><br><span class="line">MWYyZDFlMmU2N2Rm</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim secret.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Secret</span><br><span class="line">metadata:</span><br><span class="line">  name: mysecret</span><br><span class="line">type: Opaque</span><br><span class="line">data:</span><br><span class="line">  username: YWRtaW4=</span><br><span class="line">  password: MWYyZDFlMmU2N2Rm</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl create -f secret.yaml </span><br><span class="line">secret/mysecret created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get secret</span><br><span class="line">NAME                  TYPE                                  DATA   AGE</span><br><span class="line">db-user-pass          Opaque                                2      5m20s</span><br><span class="line">mysecret              Opaque                                2      6s</span><br></pre></td></tr></table></figure>
+<h3 id="使用-Secret"><a href="#使用-Secret" class="headerlink" title="使用 Secret"></a>使用 Secret</h3><h4 id="通过变量传入"><a href="#通过变量传入" class="headerlink" title="通过变量传入"></a>通过变量传入</h4><ol>
+<li>将secret里面的数据通过变量导入pod中</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim secret-var.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: mypod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: nginx</span><br><span class="line">    image: nginx</span><br><span class="line">    env:</span><br><span class="line">      - name: SECRET_USERNAME</span><br><span class="line">        valueFrom:</span><br><span class="line">          # 引用哪个secret，username的值传给SECRET_USERNAME，password的值传给SECRET_PASSWORD</span><br><span class="line">          secretKeyRef:</span><br><span class="line">            name: mysecret</span><br><span class="line">            key: username</span><br><span class="line">      - name: SECRET_PASSWORD</span><br><span class="line">        valueFrom:</span><br><span class="line">          secretKeyRef:</span><br><span class="line">            name: mysecret</span><br><span class="line">            key: password</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl apply -f secret-var.yaml </span><br><span class="line">pod/mypod created</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 验证数据</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME    READY   STATUS    RESTARTS   AGE</span><br><span class="line">mypod   1/1     Running   0          38s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl exec -it mypod bash</span><br><span class="line">root@mypod:/# echo $SECRET_USERNAME</span><br><span class="line">admin</span><br><span class="line"></span><br><span class="line">root@mypod:/# echo $SECRET_PASSWORD</span><br><span class="line">1f2d1e2e67df</span><br></pre></td></tr></table></figure>
+<h4 id="Volume-形式挂载到pod目录下"><a href="#Volume-形式挂载到pod目录下" class="headerlink" title="Volume 形式挂载到pod目录下"></a>Volume 形式挂载到pod目录下</h4><ol>
+<li>会将secret里面的健值以文件挂载到目录下,key作为文件名，value作为内容</li>
+<li>可以将敏感的数据创建secret交给k8s管理,等应用的使用再去使用</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim secret-vol.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: mypod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: nginx</span><br><span class="line">    image: nginx</span><br><span class="line">    volumeMounts:</span><br><span class="line">    - name: foo</span><br><span class="line">      # 挂载到的路径</span><br><span class="line">      mountPath: "/etc/foo"</span><br><span class="line">      readOnly: true</span><br><span class="line">  volumes:</span><br><span class="line">  - name: foo</span><br><span class="line">    secret:</span><br><span class="line">      secretName: mysecret</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl delete -f secret-var.yaml</span><br><span class="line">[root@k8s-master1 demo]# kubectl apply -f secret-vol.yaml </span><br><span class="line">pod/mypod created</span><br><span class="line"></span><br><span class="line">root@mypod:/# cd /etc/foo/</span><br><span class="line">root@mypod:/etc/foo# ls</span><br><span class="line">password  username</span><br><span class="line"></span><br><span class="line">root@mypod:/etc/foo# cat password </span><br><span class="line">1f2d1e2e67df</span><br><span class="line">root@mypod:/etc/foo# cat username </span><br><span class="line">admin</span><br></pre></td></tr></table></figure>
+<h2 id="ConfigMap-配置文件存储"><a href="#ConfigMap-配置文件存储" class="headerlink" title="ConfigMap 配置文件存储"></a>ConfigMap 配置文件存储</h2><ol>
+<li>与Secret类似,区别在于ConfigMap保存的是不需要加密配置信息。</li>
+<li>应用场景：应用配置</li>
+<li>官方文档</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/</span><br></pre></td></tr></table></figure>
+<h3 id="创建-ConfigMap"><a href="#创建-ConfigMap" class="headerlink" title="创建 ConfigMap"></a>创建 ConfigMap</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim redis.properties</span><br><span class="line">redis.hosts=127.0.0.1</span><br><span class="line">redis.port=6379</span><br><span class="line">redis.password=123456</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl create configmap redis-config --from-file=redis.properties </span><br><span class="line">configmap/redis-config created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get configmap</span><br><span class="line">[root@k8s-master1 demo]# kubectl get cm</span><br><span class="line">NAME           DATA   AGE</span><br><span class="line">redis-config   1      5s</span><br><span class="line"></span><br><span class="line"># configmap 存储的是不需要加密的数据</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl deseribe cm redis-config</span><br><span class="line">...</span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">redis.properties:</span><br><span class="line">----</span><br><span class="line">redis.hosts=127.0.0.1</span><br><span class="line">redis.port=6379</span><br><span class="line">redis.password=123456</span><br></pre></td></tr></table></figure>
+<h3 id="Volume-形式挂载到pod目录下-1"><a href="#Volume-形式挂载到pod目录下-1" class="headerlink" title="Volume 形式挂载到pod目录下"></a>Volume 形式挂载到pod目录下</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim cm-vol.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: mypod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: busybox</span><br><span class="line">      image: busybox</span><br><span class="line">      # redis.properties 名字 = 创建configmap的文件名 deseribe 可以看到</span><br><span class="line">      command: [ "/bin/sh","-c","cat /etc/config/redis.properties" ]</span><br><span class="line">      volumeMounts:</span><br><span class="line">      # 挂载到的目录</span><br><span class="line">      - name: config-volume</span><br><span class="line">        mountPath: /etc/config</span><br><span class="line">  volumes:</span><br><span class="line">    - name: config-volume</span><br><span class="line">      configMap:</span><br><span class="line">        # 指定挂载哪个cm</span><br><span class="line">        name: redis-config</span><br><span class="line">  restartPolicy: Never</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl apply -f cm-vol.yaml </span><br><span class="line">pod/mypod created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pod</span><br><span class="line">NAME    READY   STATUS      RESTARTS   AGE</span><br><span class="line">mypod   0/1     Completed   0          19s</span><br><span class="line"></span><br><span class="line"># pod状态是执行完成，查看日志即可</span><br><span class="line"># 生产的时候 将文件 挂载到指定的目录下 让程序读取即可</span><br><span class="line">[root@k8s-master1 demo]# kubectl logs mypod</span><br><span class="line">redis.hosts=127.0.0.1</span><br><span class="line">redis.port=6379</span><br><span class="line">redis.password=123456</span><br></pre></td></tr></table></figure>
+<h3 id="通过-yaml创建configmap"><a href="#通过-yaml创建configmap" class="headerlink" title="通过 yaml创建configmap"></a>通过 yaml创建configmap</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim myconfig.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: myconfig</span><br><span class="line">  namespace: default</span><br><span class="line">data:</span><br><span class="line">  special.level: info</span><br><span class="line">  special.type: hello</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl apply -f myconfig.yaml </span><br><span class="line">configmap/myconfig created</span><br><span class="line">[root@k8s-master1 demo]# kubectl get cm</span><br><span class="line">NAME           DATA   AGE</span><br><span class="line">myconfig       2      3s</span><br><span class="line">redis-config   1      15m</span><br></pre></td></tr></table></figure>
+<h3 id="使用变量方式传入pod"><a href="#使用变量方式传入pod" class="headerlink" title="使用变量方式传入pod"></a>使用变量方式传入pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim cm-val.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: mypod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: busybox</span><br><span class="line">      image: busybox</span><br><span class="line">      # LEVEL 和 TYPE 是传入后的变量名,下面指定</span><br><span class="line">      command: [ "/bin/sh", "-c", "echo $(LEVEL) $(TYPE)" ]</span><br><span class="line">      env:</span><br><span class="line">        - name: LEVEL</span><br><span class="line">          valueFrom:</span><br><span class="line">            configMapKeyRef:</span><br><span class="line">              name: myconfig</span><br><span class="line">              key: special.level</span><br><span class="line">        - name: TYPE</span><br><span class="line">          valueFrom:</span><br><span class="line">            configMapKeyRef:</span><br><span class="line">              name: myconfig</span><br><span class="line">              key: special.type</span><br><span class="line">  restartPolicy: Never</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl apply -f cm-val.yaml </span><br><span class="line">pod/mypod created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME    READY   STATUS      RESTARTS   AGE</span><br><span class="line">mypod   0/1     Completed   0          9s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl logs mypod</span><br><span class="line">info hello</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>secret 保存机密数据,数据是加密的</li>
+<li>configmap 保存配置数据,数据不加密</li>
+<li>secret 可以保存连接harbor的配置</li>
+<li>configmap 使用最多的是,管理应用程序的配置文件,通过Volume挂载到指定的程序目录下</li>
+<li>configmap 可以代替配置中心</li>
+</ol>
 
       
     </div>
@@ -404,8 +443,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/12/30/k8s-base11/" rel="next" title="k8s-base11">
-                <i class="fa fa-chevron-left"></i> k8s-base11
+              <a href="/2019/12/30/k8s-base11/" rel="next" title="09 基于 K8S 构建 Jenkins 微服务发布平台">
+                <i class="fa fa-chevron-left"></i> 09 基于 K8S 构建 Jenkins 微服务发布平台
               </a>
             
           </div>
@@ -414,8 +453,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/12/31/k8s-14/" rel="prev" title="k8s-14">
-                k8s-14 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/12/31/k8s-14/" rel="prev" title="14 Prometheus + Gafana 全方位立体式监控系统">
+                14 Prometheus + Gafana 全方位立体式监控系统 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -468,8 +507,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -486,7 +534,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-count">108</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -532,6 +580,22 @@
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Secret-机密存储"><span class="nav-number">1.</span> <span class="nav-text">Secret 机密存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Secret"><span class="nav-number">1.1.</span> <span class="nav-text">创建 Secret</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-yaml-文件创建"><span class="nav-number">1.2.</span> <span class="nav-text">通过 yaml 文件创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-Secret"><span class="nav-number">1.3.</span> <span class="nav-text">使用 Secret</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#通过变量传入"><span class="nav-number">1.3.1.</span> <span class="nav-text">通过变量传入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Volume-形式挂载到pod目录下"><span class="nav-number">1.3.2.</span> <span class="nav-text">Volume 形式挂载到pod目录下</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ConfigMap-配置文件存储"><span class="nav-number">2.</span> <span class="nav-text">ConfigMap 配置文件存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-ConfigMap"><span class="nav-number">2.1.</span> <span class="nav-text">创建 ConfigMap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Volume-形式挂载到pod目录下-1"><span class="nav-number">2.2.</span> <span class="nav-text">Volume 形式挂载到pod目录下</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-yaml创建configmap"><span class="nav-number">2.3.</span> <span class="nav-text">通过 yaml创建configmap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用变量方式传入pod"><span class="nav-number">2.4.</span> <span class="nav-text">使用变量方式传入pod</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
 
@@ -545,7 +609,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

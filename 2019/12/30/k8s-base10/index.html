@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="k8s,">
 
 
 
@@ -79,17 +79,31 @@
 
 
 
-<meta name="description" content="Beijing">
+<meta name="keywords" content="k8s">
 <meta property="og:type" content="article">
-<meta property="og:title" content="k8s-base10">
+<meta property="og:title" content="08 微服务链路监控系统">
 <meta property="og:url" content="https://touchlixiang.github.io/2019/12/30/k8s-base10/index.html">
 <meta property="og:site_name" content="My Notes">
-<meta property="og:description" content="Beijing">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-30T00:01:57.133Z">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_246.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_247.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_248.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_249.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_250.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_251.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_252.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_254.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_253.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_255.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_256.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_257.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_258.png">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_259.png">
+<meta property="og:updated_time" content="2020-01-06T03:58:24.253Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="k8s-base10">
-<meta name="twitter:description" content="Beijing">
+<meta name="twitter:title" content="08 微服务链路监控系统">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
 
 
 
@@ -125,7 +139,7 @@
 
 
 
-  <title>k8s-base10 | My Notes</title>
+  <title>08 微服务链路监控系统 | My Notes</title>
   
 
 
@@ -301,7 +315,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">k8s-base10</h1>
+          <h1 class="post-title" itemprop="name headline">08 微服务链路监控系统</h1>
         
 
         <div class="post-meta">
@@ -323,6 +337,28 @@
             
           </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/k8s/" itemprop="url" rel="index">
+                    <span itemprop="name">k8s</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -351,7 +387,88 @@
       
 
       
-        
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="全链路监控是什么"><a href="#全链路监控是什么" class="headerlink" title="全链路监控是什么"></a>全链路监控是什么</h2><p><img src="/img/k8s/k8s_246.png" width="50%"></p>
+<h3 id="全链路监控解决什么问题"><a href="#全链路监控解决什么问题" class="headerlink" title="全链路监控解决什么问题"></a>全链路监控解决什么问题</h3><ol>
+<li>请求链路追踪：通过分析服务调用关系，绘制运行时拓扑信息，可视化展示</li>
+<li>调用情况衡量：各个调用环节的性能分析，例如吞吐量、响应时间、错误次数</li>
+<li>容器规划参考：扩容/缩容、服务降级、流量控制</li>
+<li>运行情况反馈：告警，通过调用链结合业务日志快速定位错误信息</li>
+</ol>
+<h3 id="全链路监控选择依据"><a href="#全链路监控选择依据" class="headerlink" title="全链路监控选择依据"></a>全链路监控选择依据</h3><p><strong>全链路监控系统有很多，应从这几方面选择</strong>：</p>
+<ol>
+<li>探针的性能消耗<br>APM组件服务的影响应该做到足够小，数据分析要快，性能占用小。</li>
+<li>代码的侵入性<br>即也作为业务组件，应当尽可能少入侵或者无入侵其他业务系统，<br>对于使用方透明，减少开发人员的负担。</li>
+<li><p>监控维度<br>分析的维度尽可能多。 • 可扩展性<br>一个优秀的调用跟踪系统必须支持分布式部署，具备良好的可扩展性。能够支持的组件越多当然越好。</p>
+</li>
+<li><p>主流系统：zipkin、skywalking、pinpoint</p>
+</li>
+</ol>
+<h2 id="Pinpoint-介绍"><a href="#Pinpoint-介绍" class="headerlink" title="Pinpoint 介绍"></a>Pinpoint 介绍</h2><ol>
+<li>Pinpoint是一个APM（应用程序性能管理）工具，适用于用Java/PHP编写的大型分布式系统。 </li>
+</ol>
+<p><strong>特性:</strong></p>
+<ol>
+<li>服务器地图（ServerMap）通过可视化分布式系统的模块和他们之间的相互联系来理解系统拓扑。点击某个节点会,展示这个模块的详情，比如它当前的状态和请求数量。</li>
+<li>实时活动线程图 （Realtime Active Thread Chart）: 实时监控应用内部的活动线程。</li>
+<li>请求/响应分布图（ Request/Response Scatter Chart ）: 长期可视化请求数量和应答模式来定位潜在问题。通过在图表上拉拽可以选择请求查看 更多的详细信息</li>
+<li>调用栈（ CallStack :在分布式环境中为每个调用生成代码级别的可视图，在单个视图中定位瓶颈和失败点。</li>
+<li>检查器（ Inspector ）: 查看应用上的其他详细信息，比如CPU使用率，内存/垃圾回收，TPS，和JVM参数。</li>
+</ol>
+<p><img src="/img/k8s/k8s_247.png" width="50%"></p>
+<h3 id="Docker-部署-Pinpoint"><a href="#Docker-部署-Pinpoint" class="headerlink" title="Docker 部署 Pinpoint"></a>Docker 部署 Pinpoint</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/naver/pinpoint-docker.git</span><br><span class="line">cd pinpoint-docker</span><br><span class="line">docker-compose pull &amp;&amp; docker-compose up -d</span><br><span class="line"></span><br><span class="line"># 官方文档</span><br><span class="line">https://github.com/naver/pinpoint-docker</span><br><span class="line"># 网络太慢的话 可以先下载好包</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master2 opt]# yum install git</span><br><span class="line">[root@k8s-master2 opt]# git clone https://github.com/naver/pinpoint-docker.git</span><br><span class="line">[root@k8s-master2 opt]# cd pinpoint-docker/</span><br><span class="line">[root@k8s-master2 pinpoint-docker]# docker-compose pull</span><br><span class="line">[root@k8s-master2 pinpoint-docker]# docker-compose up -d</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 pinpoint-docker]# docker-compose ps</span><br><span class="line"></span><br><span class="line"># 查看web 服务端可以访问到界面即正常</span><br><span class="line">http://47.240.13.206:8079/ </span><br><span class="line">http://47.240.13.206:8000/  quickstart 访问后会有测试数据</span><br></pre></td></tr></table></figure>
+<h3 id="Pinpoint-Agent-部署"><a href="#Pinpoint-Agent-部署" class="headerlink" title="Pinpoint Agent 部署"></a>Pinpoint Agent 部署</h3><p><strong>探针 随着服务一起启动</strong></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># Tomcat:</span><br><span class="line"># catalina.sh</span><br><span class="line">CATALINA_OPTS="$CATALINA_OPTS -javaagent:$AGENT_PATH/pinpoint-bootstrap-$VERSION.jar"   # AGENT_PATH 路径</span><br><span class="line">CATALINA_OPTS="$CATALINA_OPTS -Dpinpoint.agentId=$AGENT_ID"                             # 区分实例ID 不唯一</span><br><span class="line">CATALINA_OPTS="$CATALINA_OPTS -Dpinpoint.applicationName=$APPLICATION_NAME“             # app 名称  哪个应用</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Jar:</span><br><span class="line">java -jar -javaagent:$AGENT_PATH/pinpoint-bootstrap-$VERSION.jar -Dpinpoint.agentId=$AGENT_ID -Dpinpoint.applicationName=$APPLICATION_NAME xxx.jar</span><br></pre></td></tr></table></figure>
+<p><strong>JAR包下载地址</strong></p>
+<p><img src="/img/k8s/k8s_248.png" width="50%"></p>
+<h2 id="微服务接入Pinpoint"><a href="#微服务接入Pinpoint" class="headerlink" title="微服务接入Pinpoint"></a>微服务接入Pinpoint</h2><h3 id="服务启动时指定-Pinpoint"><a href="#服务启动时指定-Pinpoint" class="headerlink" title="服务启动时指定 Pinpoint"></a>服务启动时指定 Pinpoint</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># 每个组件 都需要配置指定 </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 microservic-code]# cd simple-microservice-dev4</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 simple-microservice-dev4]# cd portal-service/</span><br><span class="line"># pinpoint  下载好后和项目放在同一目录,Dockerfile会copy到容器中</span><br><span class="line">[root@k8s-master1 portal-service]# ls</span><br><span class="line">Dockerfile  pinpoint  pom.xml  src</span><br><span class="line"></span><br><span class="line"># 启动在Dockerfile里面指定</span><br><span class="line">[root@k8s-master1 portal-service]# vim Dockerfile </span><br><span class="line"></span><br><span class="line">FROM java:8-jdk-alpine</span><br><span class="line">LABEL maintainer lizhenliang/www.ctnrs.com</span><br><span class="line">RUN  apk add -U tzdata &amp;&amp; \</span><br><span class="line">     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</span><br><span class="line">COPY ./target/portal-service.jar ./</span><br><span class="line">COPY pinpoint /pinpoint</span><br><span class="line">EXPOSE 8080</span><br><span class="line">CMD java -jar -javaagent:/pinpoint/pinpoint-bootstrap-1.8.3.jar -Dpinpoint.agentId=$&#123;HOSTNAME&#125; -Dpinpoint.applicationName=ms-protal /portal-service.jar</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CMD java -jar </span><br><span class="line">-javaagent:/pinpoint/pinpoint-bootstrap-1.8.3.jar                     # 路径 /pinpoint            </span><br><span class="line">-Dpinpoint.agentId=$(echo $HOSTNAME | awk -F- '&#123;print "portal-"$NF&#125;') # portal + 容器名截取最后一位  与POD对应上 </span><br><span class="line">-Dpinpoint.applicationName=ms-portal                                  # 项目名 </span><br><span class="line">$JAVA_ARGS </span><br><span class="line">$JAVA_OPTS </span><br><span class="line">/portal-service.jar</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 修改配置文件的 服务端地址</span><br><span class="line">[root@k8s-master1 portal-service]# vim pinpoint/pinpoint.config </span><br><span class="line">...</span><br><span class="line">profiler.collector.ip=172.31.228.51</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h3 id="重新部署-查看采集情况"><a href="#重新部署-查看采集情况" class="headerlink" title="重新部署 查看采集情况"></a>重新部署 查看采集情况</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># eureka 属于基础组件 无需每次都重新启动配置 一般都是手动部署 发布的时候不要重新部署</span><br><span class="line"># 本次重新部署 是因为增加了 链路监控</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 k8s]# cat docker_build.sh </span><br><span class="line">#!/bin/bash</span><br><span class="line"></span><br><span class="line">docker_registry=172.31.228.51</span><br><span class="line"># kubectl create secret docker-registry registry-pull-secret --docker-server=$docker_registry --docker-username=admin --docker-password=Harbor12345 --docker-email=admin@ctnrs.com -n ms</span><br><span class="line"># kubectl create secret docker-registry registry-pull-secret --docker-server=172.31.228.51 --docker-username=admin --docker-password=lx@68328153 --docker-email=admin@ctnrs.com -n ms</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">service_list="eureka-service gateway-service order-service product-service stock-service portal-service"</span><br><span class="line">service_list=$&#123;1:-$&#123;service_list&#125;&#125;</span><br><span class="line">work_dir=$(dirname $PWD)</span><br><span class="line">current_dir=$PWD</span><br><span class="line"></span><br><span class="line">cd $work_dir</span><br><span class="line">mvn clean package -Dmaven.test.skip=true</span><br><span class="line"></span><br><span class="line">for service in $service_list; do</span><br><span class="line">   cd $work_dir/$service</span><br><span class="line">   if ls |grep biz &amp;&gt;/dev/null; then</span><br><span class="line">      cd $&#123;service&#125;-biz</span><br><span class="line">   fi</span><br><span class="line">   service=$&#123;service%-*&#125;</span><br><span class="line">   image_name=$docker_registry/microservice/$&#123;service&#125;:$(date +%F-%H-%M-%S)</span><br><span class="line">   docker build -t $&#123;image_name&#125; .</span><br><span class="line">   docker push $&#123;image_name&#125; </span><br><span class="line">   # 替换镜像名称 直接部署</span><br><span class="line">   sed -i -r "s#(image: )(.*)#\1$image_name#" $&#123;current_dir&#125;/$&#123;service&#125;.yaml</span><br><span class="line">   kubectl apply -f $&#123;current_dir&#125;/$&#123;service&#125;.yaml</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 使用脚本重新构建项目</span><br><span class="line"># 本次构建所有微服务加入了 pinpoint 链路监控</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_249.png" width="50%"></p>
+<p><img src="/img/k8s/k8s_250.png" width="50%"></p>
+<p><img src="/img/k8s/k8s_251.png" width="50%"></p>
+<p><strong>查看采集</strong></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 启动日志中是否含有 pinpoint 加载</span><br><span class="line">[root@k8s-master1 k8s]# kubectl logs order-564b46f676-fb9gh -n ms</span><br><span class="line"></span><br><span class="line"># 模拟请求</span><br><span class="line">http://portal.ctnrs.com/</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_252.png" width="50%"></p>
+<h3 id="监控JAVA应用-都需要监控哪些指标"><a href="#监控JAVA应用-都需要监控哪些指标" class="headerlink" title="监控JAVA应用 都需要监控哪些指标"></a>监控JAVA应用 都需要监控哪些指标</h3><ol>
+<li>JVM相关,堆内存:年轻代,老年代(持久常用对象 不断gcc),非堆内存(持久代,1.9后没有了)</li>
+<li>线程数量</li>
+<li>GCC(垃圾回收) ,G1,CMS</li>
+<li>CPU利用率</li>
+<li>堆栈跟踪 哪段代码堆内存使用高,cpu使用高</li>
+<li>接口状态</li>
+<li>吞吐量</li>
+</ol>
+<p><strong>堆栈信息</strong></p>
+<ol>
+<li>有利于开发定位问题</li>
+</ol>
+<p><img src="/img/k8s/k8s_254.png" width="50%"></p>
+<p><img src="/img/k8s/k8s_253.png" width="50%"></p>
+<p><img src="/img/k8s/k8s_255.png" width="50%"></p>
+<p><strong>响应时间 和 load 传入事务 (并发)</strong></p>
+<p>1个请求5秒</p>
+<p><img src="/img/k8s/k8s_256.png" width="50%"></p>
+<p><strong>堆内存</strong></p>
+<ol>
+<li>id对应pod </li>
+<li>Non-Heap Usage :             非堆内存(持久代)</li>
+<li>Heap Usage :                 堆内存:年轻代+老年代 , 堆内存的使用率快到达了堆内存大小,那么要重新分配</li>
+<li>JVM/System Cpu Usage :       CPU消耗</li>
+<li>Transactions Per Second ：   每秒事务传输,相当于并发平均</li>
+<li>Active Thread :              活动线程</li>
+<li>Response Time :              请求响应时间</li>
+<li>Open File Descriptor :       打开文件描述符的数量</li>
+</ol>
+<p><img src="/img/k8s/k8s_257.png" width="50%"></p>
+<p><img src="/img/k8s/k8s_258.png" width="50%"></p>
+<p><img src="/img/k8s/k8s_259.png" width="50%"></p>
+
       
     </div>
     
@@ -365,6 +482,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> k8s</a>
+          
+        </div>
       
 
       
@@ -385,8 +508,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/12/30/k8s-base11/" rel="prev" title="k8s-base11">
-                k8s-base11 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/12/30/k8s-base11/" rel="prev" title="09 基于 K8S 构建 Jenkins 微服务发布平台">
+                09 基于 K8S 构建 Jenkins 微服务发布平台 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -439,8 +562,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -457,7 +589,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-count">108</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -503,6 +635,22 @@
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#全链路监控是什么"><span class="nav-number">1.</span> <span class="nav-text">全链路监控是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全链路监控解决什么问题"><span class="nav-number">1.1.</span> <span class="nav-text">全链路监控解决什么问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全链路监控选择依据"><span class="nav-number">1.2.</span> <span class="nav-text">全链路监控选择依据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pinpoint-介绍"><span class="nav-number">2.</span> <span class="nav-text">Pinpoint 介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-部署-Pinpoint"><span class="nav-number">2.1.</span> <span class="nav-text">Docker 部署 Pinpoint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pinpoint-Agent-部署"><span class="nav-number">2.2.</span> <span class="nav-text">Pinpoint Agent 部署</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#微服务接入Pinpoint"><span class="nav-number">3.</span> <span class="nav-text">微服务接入Pinpoint</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务启动时指定-Pinpoint"><span class="nav-number">3.1.</span> <span class="nav-text">服务启动时指定 Pinpoint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重新部署-查看采集情况"><span class="nav-number">3.2.</span> <span class="nav-text">重新部署 查看采集情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控JAVA应用-都需要监控哪些指标"><span class="nav-number">3.3.</span> <span class="nav-text">监控JAVA应用 都需要监控哪些指标</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
 
@@ -516,7 +664,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
