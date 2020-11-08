@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="k8s,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="13 副本机制和其他控制器">
+<meta property="og:url" content="https://touchlixiang.github.io/2020/03/11/k8s-base15/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:updated_time" content="2020-03-11T10:17:02.338Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="13 副本机制和其他控制器">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2020/03/11/k8s-base15/">
+
+
+
+
+
+  <title>13 副本机制和其他控制器 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2020/03/11/k8s-base15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">13 副本机制和其他控制器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-11T08:11:47+08:00">
+                2020-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/k8s/" itemprop="url" rel="index">
+                    <span itemprop="name">k8s</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="保持-pod-的健康"><a href="#保持-pod-的健康" class="headerlink" title="保持 pod 的健康"></a>保持 pod 的健康</h2><ol>
+<li>在实际的应用里，希望部署的pod能自动保持运行和健康，无需手动干预</li>
+<li>不要直接创建pod，而是创建RC或者Deployment这样的资源由他们来管理</li>
+<li>如何托管我们的pod，k8s如何自动重启pod，node节点失败pod如何被调度。</li>
+<li>即使进程崩溃，应用程序会停止工作，比如java进程的内存泄露</li>
+</ol>
+<h3 id="存活探针"><a href="#存活探针" class="headerlink" title="存活探针"></a>存活探针</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># k8s三种探测容器机制 </span><br><span class="line"></span><br><span class="line">1. httpGet</span><br><span class="line">发送HTTP请求，返回2XX-3XX范围状态码为成功。</span><br><span class="line">2. exec</span><br><span class="line">执行Shell命令返回状态码是0为成功。</span><br><span class="line">3. tcpSocket</span><br><span class="line">发起TCP Socket建立成功。</span><br></pre></td></tr></table></figure>
+<h4 id="基于HTTP的存活探针"><a href="#基于HTTP的存活探针" class="headerlink" title="基于HTTP的存活探针"></a>基于HTTP的存活探针</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># https://github.com/luksa/kubernetes-in-action/tree/master/Chapter04/kubia-unhealthy</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-libeness-probe.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia-liveness</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - image: 172.31.228.68/project/kubia-httpget   # 出现访问问题的镜像</span><br><span class="line">    name: kubia</span><br><span class="line">    livenessProbe: # 存活探针</span><br><span class="line">      httpGet:     # httpget类型</span><br><span class="line">        path: /    # 请求路径</span><br><span class="line">        port: 8080 # 请求端口</span><br><span class="line"></span><br><span class="line"># 该镜像出现2次访问后会返回 http 500</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 大约1分半后容器会重启</span><br><span class="line"># RESTARTS 显示重启次数</span><br><span class="line"># 现在的模式是 无限循环的重启</span><br><span class="line">[root@k8s-master1 demo]# kubectl create -f kubia-libeness-probe.yaml </span><br><span class="line">pod/kubia-liveness created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME             READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-liveness   1/1     Running   0          61s</span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME             READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-liveness   1/1     Running   1          2m1s</span><br></pre></td></tr></table></figure>
+<h4 id="获取崩溃容器的应用日志"><a href="#获取崩溃容器的应用日志" class="headerlink" title="获取崩溃容器的应用日志"></a>获取崩溃容器的应用日志</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 当想知道前一个容器日志,而不是当前的容器时 加上 --previous</span><br><span class="line">[root@k8s-master1 demo]# kubectl logs kubia-liveness --previous</span><br><span class="line"></span><br><span class="line">Kubia server starting...</span><br><span class="line">Received request from ::ffff:10.244.2.1</span><br><span class="line">Received request from ::ffff:10.244.2.1</span><br><span class="line">Received request from ::ffff:10.244.2.1</span><br><span class="line">Received request from ::ffff:10.244.2.1</span><br><span class="line">Received request from ::ffff:10.244.2.1</span><br><span class="line">Received request from ::ffff:10.244.2.1</span><br><span class="line">Received request from ::ffff:10.244.2.1</span><br><span class="line">Received request from ::ffff:10.244.2.1</span><br></pre></td></tr></table></figure>
+<h4 id="查看事件"><a href="#查看事件" class="headerlink" title="查看事件"></a>查看事件</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl describe pod kubia-liveness</span><br><span class="line"></span><br><span class="line"># 先前容器发生错误 返回码 137</span><br><span class="line"># 137 = 128+x 其中x是终止进程的信号编号,在这个例子里x=9，是sigkill的信号编号,意味着被强行终止</span><br><span class="line"># Restart Count 重启次数</span><br><span class="line">...</span><br><span class="line">    Last State:     Terminated</span><br><span class="line">      Reason:       Error</span><br><span class="line">      Exit Code:    137</span><br><span class="line">      Started:      Wed, 11 Mar 2020 11:39:53 +0800</span><br><span class="line">      Finished:     Wed, 11 Mar 2020 11:41:43 +0800</span><br><span class="line">    Ready:          True</span><br><span class="line">    Restart Count:  3</span><br><span class="line">    Liveness:       http-get http://:8080/ delay=0s timeout=1s period=10s #success=1 #failure=3</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Events:</span><br><span class="line">  Type     Reason     Age                    From                  Message</span><br><span class="line">  ----     ------     ----                   ----                  -------</span><br><span class="line">  Normal   Scheduled  <span class="tag">&lt;<span class="name">unknown</span>&gt;</span>              default-scheduler     Successfully assigned default/kubia-liveness to k8s-master1</span><br><span class="line">  Normal   Created    4m36s (x3 over 8m11s)  kubelet, k8s-master1  Created container kubia</span><br><span class="line">  Normal   Started    4m36s (x3 over 8m11s)  kubelet, k8s-master1  Started container kubia</span><br><span class="line">  Warning  Unhealthy  3m16s (x9 over 7m16s)  kubelet, k8s-master1  Liveness probe failed: HTTP probe failed with statuscode: 500</span><br><span class="line">  Normal   Killing    3m16s (x3 over 6m56s)  kubelet, k8s-master1  Container kubia failed liveness probe, will be restarted</span><br><span class="line">  Normal   Pulling    2m46s (x4 over 8m11s)  kubelet, k8s-master1  Pulling image "172.31.228.68/project/kubia-httpget"</span><br><span class="line">  Normal   Pulled     2m46s (x4 over 8m11s)  kubelet, k8s-master1  Successfully pulled image "172.31.228.68/project/kubia-httpget"</span><br><span class="line"></span><br><span class="line"># 事件中告诉我们为什么会被重启</span><br><span class="line"># 当容器被强行终止时,会创建一个全新的容器,而不是重启原来的容器</span><br></pre></td></tr></table></figure>
+<h4 id="配置存活探针的附加属性"><a href="#配置存活探针的附加属性" class="headerlink" title="配置存活探针的附加属性"></a>配置存活探针的附加属性</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># http-get http://:8080/ delay=0s timeout=1s period=10s #success=1 #failure=3</span><br><span class="line"># delay 延迟  </span><br><span class="line"># timeout 超时</span><br><span class="line"># period 周期</span><br><span class="line"></span><br><span class="line"># delay=0s 容器启动后立即探测</span><br><span class="line"># timeout=1s 容器需要再1秒钟内响应，否则检测失败</span><br><span class="line"># period=10s 每10秒探测一次</span><br><span class="line"># failure=3 连续3次探测后重启容器</span><br><span class="line"></span><br><span class="line"># 务必设置一个初始延迟来说明应用的启动时间</span><br><span class="line"># 退出代码 137表示进程被外部信号终止,128+9  如果是143对应128+15</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># initialDelaySeconds: 10 # 容器启动5秒后 开始健康检查</span><br><span class="line"># periodSeconds: 5        # 每隔5秒执行一次</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim kubia-libeness-probe.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia-liveness</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - image: 172.31.228.68/project/kubia-httpget</span><br><span class="line">    name: kubia</span><br><span class="line">    livenessProbe:</span><br><span class="line">      httpGet:</span><br><span class="line">        path: /</span><br><span class="line">        port: 8080</span><br><span class="line">      initialDelaySeconds: 10</span><br><span class="line">      periodSeconds: 5</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl describe pod kubia-liveness</span><br><span class="line">...</span><br><span class="line"> Liveness:       http-get http://:8080/ delay=10s timeout=1s period=5s #success=1 #failure=3</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h2 id="创建-ReplicationController"><a href="#创建-ReplicationController" class="headerlink" title="创建 ReplicationController"></a>创建 ReplicationController</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># ReplicationController 三部分</span><br><span class="line"># 1. 标签选择器</span><br><span class="line"># 2. 副本个数</span><br><span class="line"># 3. pod 模板</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim kubia-rc.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ReplicationController        # 资源对象</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia                      # rc名称</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3                      # 副本个数</span><br><span class="line">  selector:</span><br><span class="line">    app: kubia                     # pod 选择器</span><br><span class="line">  template:                        # pod 模板</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: kubia                 # 模板中的pod标签 需要与pod标签选择器相同</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/project/kubia</span><br><span class="line">        name: kubia</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 8080</span><br><span class="line">        protocol: TCP</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl create -f kubia-rc.yaml </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-dhj7g   1/1     Running   0          33s</span><br><span class="line">kubia-k659d   1/1     Running   0          33s</span><br><span class="line">kubia-l4fpp   1/1     Running   0          33s</span><br><span class="line"></span><br><span class="line"># 删除pod 再查看</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete pod kubia-dhj7g</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods</span><br><span class="line">NAME          READY   STATUS        RESTARTS   AGE</span><br><span class="line">kubia-dhj7g   1/1     Terminating   0          115s        # 终止</span><br><span class="line">kubia-k659d   1/1     Running       0          115s</span><br><span class="line">kubia-l4fpp   1/1     Running       0          115s</span><br><span class="line">kubia-mqk8k   1/1     Running       0          28s         # 重新创建</span><br><span class="line"></span><br><span class="line"># 查看 rc</span><br><span class="line">[root@k8s-master1 demo]# kubectl get rc</span><br><span class="line">NAME    DESIRED   CURRENT   READY   AGE</span><br><span class="line">kubia   3         3         3       2m35s</span><br><span class="line"></span><br><span class="line"># 查看rc详细信息</span><br><span class="line">[root@k8s-master1 demo]# kubectl describe rc kubia</span><br><span class="line">Name:         kubia</span><br><span class="line">Namespace:    default</span><br><span class="line">Selector:     app=kubia</span><br><span class="line">Labels:       app=kubia</span><br><span class="line">Annotations:  <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">Replicas:     3 current / 3 desired                            # pod 实际数量和目标数量</span><br><span class="line">Pods Status:  3 Running / 0 Waiting / 0 Succeeded / 0 Failed   # 每种状态下的pod数量</span><br><span class="line">Pod Template:</span><br><span class="line">  Labels:  app=kubia</span><br><span class="line">  Containers:</span><br><span class="line">   kubia:</span><br><span class="line">    Image:        172.31.228.68/project/kubia</span><br><span class="line">    Port:         8080/TCP</span><br><span class="line">    Host Port:    0/TCP</span><br><span class="line">    Environment:  <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">    Mounts:       <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">  Volumes:        <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">Events:</span><br><span class="line">  Type    Reason            Age    From                    Message</span><br><span class="line">  ----    ------            ----   ----                    -------</span><br><span class="line">  Normal  SuccessfulCreate  7m51s  replication-controller  Created pod: kubia-dhj7g</span><br><span class="line">  Normal  SuccessfulCreate  7m51s  replication-controller  Created pod: kubia-l4fpp</span><br><span class="line">  Normal  SuccessfulCreate  7m51s  replication-controller  Created pod: kubia-k659d</span><br><span class="line">  Normal  SuccessfulCreate  6m24s  replication-controller  Created pod: kubia-mqk8k</span><br></pre></td></tr></table></figure>
+<h3 id="断开-node2-节点测试"><a href="#断开-node2-节点测试" class="headerlink" title="断开 node2 节点测试"></a>断开 node2 节点测试</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl get pods -o wide</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-k659d   1/1     Running   0          11m   10.244.1.16   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-l4fpp   1/1     Running   0          11m   10.244.2.16   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-mqk8k   1/1     Running   0          10m   10.244.0.14   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 如果节点在几分钟之内无法访问,那么节点上的pod的状态会变成unknown，rc会重新创建pod</span><br><span class="line">[root@k8s-master1 demo]# kubectl get nodes</span><br><span class="line">NAME          STATUS     ROLES    AGE   VERSION</span><br><span class="line">k8s-master1   Ready      <span class="tag">&lt;<span class="name">none</span>&gt;</span>   46h   v1.16.0</span><br><span class="line">k8s-node1     Ready      <span class="tag">&lt;<span class="name">none</span>&gt;</span>   46h   v1.16.0</span><br><span class="line">k8s-node2     NotReady   <span class="tag">&lt;<span class="name">none</span>&gt;</span>   46h   v1.16.0</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods -o wide</span><br><span class="line">NAME          READY   STATUS        RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-k659d   1/1     Terminating   0          18m   10.244.1.16   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-l4fpp   1/1     Running       0          18m   10.244.2.16   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-mqk8k   1/1     Running       0          16m   10.244.0.14   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-sfhkc   1/1     Running       0          17s   10.244.2.17   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="pod-迁移或迁出-rc-的作用域"><a href="#pod-迁移或迁出-rc-的作用域" class="headerlink" title="pod 迁移或迁出 rc 的作用域"></a>pod 迁移或迁出 rc 的作用域</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">1. 通过修改pod的标签 可以将它从rc的作用域中添加或者删除</span><br><span class="line"></span><br><span class="line"># 给现有rc中的pod增加新标签</span><br><span class="line"># rc并不关心 新增的标签 只关心pod是否有标签选择器中的标签 </span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-l4fpp   1/1     Running   0          29m</span><br><span class="line">kubia-mqk8k   1/1     Running   0          27m</span><br><span class="line">kubia-sfhkc   1/1     Running   0          11m</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl label pod kubia-l4fpp team=A</span><br><span class="line">pod/kubia-l4fpp labeled</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods --show-labels</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE   LABELS</span><br><span class="line">kubia-l4fpp   1/1     Running   0          29m   app=kubia,team=A</span><br><span class="line">kubia-mqk8k   1/1     Running   0          28m   app=kubia</span><br><span class="line">kubia-sfhkc   1/1     Running   0          11m   app=kubia</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 更改已托管到rc中的pod标签</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl label pod kubia-l4fpp app=foo --overwrite</span><br><span class="line">pod/kubia-l4fpp labeled</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods --show-labels</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE   LABELS</span><br><span class="line">kubia-l4fpp   1/1     Running   0          31m   app=foo,team=A  # 不再被rc管理，可以手动删除该pod</span><br><span class="line">kubia-mqk8k   1/1     Running   0          30m   app=kubia</span><br><span class="line">kubia-sfhkc   1/1     Running   0          13m   app=kubia</span><br><span class="line">kubia-wsqgg   1/1     Running   0          4s    app=kubia       # rc新建的pod </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl delete pod kubia-l4fpp</span><br><span class="line"></span><br><span class="line"># 如果修改rc控制器的标签选择器，那么rc之前管理的pod都会被脱离该rc，并且会创建3个新的pod</span><br><span class="line"># 不要修改rc控制器的标签选择器，可以修改pod模板</span><br></pre></td></tr></table></figure>
+<h3 id="kubectl-edit-修改模板"><a href="#kubectl-edit-修改模板" class="headerlink" title="kubectl edit 修改模板"></a>kubectl edit 修改模板</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl edit rc kubia</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      creationTimestamp: null</span><br><span class="line">      labels:</span><br><span class="line">        app: kubia</span><br><span class="line">        team: C        # 新增标签</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"># 1. 不会影响现有pod</span><br><span class="line"># 2. 如果删除再重新创建 则会带有新标签</span><br><span class="line"># 3. 如果我们修改了容器镜像，则相当于更新本次pod，后续还有更好的方法更新pod</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-mqk8k   1/1     Running   0          39m</span><br><span class="line">kubia-sfhkc   1/1     Running   0          22m</span><br><span class="line">kubia-wsqgg   1/1     Running   0          9m2s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl delete pod kubia-sfhkc kubia-wsqgg</span><br><span class="line">pod "kubia-sfhkc" deleted</span><br><span class="line">pod "kubia-wsqgg" deleted</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods --show-labels</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE   LABELS</span><br><span class="line">kubia-2ftc2   1/1     Running   0          40s   app=kubia,team=C</span><br><span class="line">kubia-mqk8k   1/1     Running   0          40m   app=kubia</span><br><span class="line">kubia-x6xm2   1/1     Running   0          40s   app=kubia,team=C</span><br></pre></td></tr></table></figure>
+<h3 id="kubectl-sacle-水平扩容"><a href="#kubectl-sacle-水平扩容" class="headerlink" title="kubectl sacle 水平扩容"></a>kubectl sacle 水平扩容</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl scale rc kubia --replicas=5</span><br><span class="line">replicationcontroller/kubia scaled</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods --show-labels</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE     LABELS</span><br><span class="line">kubia-2ftc2   1/1     Running   0          4m18s   app=kubia,team=C</span><br><span class="line">kubia-cf627   1/1     Running   0          32s     app=kubia,team=C</span><br><span class="line">kubia-mqk8k   1/1     Running   0          44m     app=kubia</span><br><span class="line">kubia-t2k4h   1/1     Running   0          32s     app=kubia,team=C</span><br><span class="line">kubia-x6xm2   1/1     Running   0          4m18s   app=kubia,team=C</span><br><span class="line"></span><br><span class="line"># edit 编辑定义修改 rc </span><br><span class="line">[root@k8s-master1 demo]# kubectl edit rc kubia</span><br><span class="line">...</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3  # 副本个数</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods --show-labels</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE     LABELS</span><br><span class="line">kubia-2ftc2   1/1     Running   0          7m30s   app=kubia,team=C</span><br><span class="line">kubia-mqk8k   1/1     Running   0          47m     app=kubia</span><br><span class="line">kubia-x6xm2   1/1     Running   0          7m30s   app=kubia,team=C</span><br><span class="line"></span><br><span class="line"># 声明式的集群伸缩: 我想要运行x个实例</span><br></pre></td></tr></table></figure>
+<h3 id="删除-ReplicationController"><a href="#删除-ReplicationController" class="headerlink" title="删除 ReplicationController"></a>删除 ReplicationController</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 1. 删除rc的同时，它管理的pod也会被删除</span><br><span class="line"># 2. 当删除rc时可以通过 --cascade=false 来保持pod的运行</span><br><span class="line"># 3. 当你删除rc时,pod已经不受管理,可以新建rc管理他们,只要rc的标签管理器对应pod的标签</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl delete rc kubia --cascade=false</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods --show-labels</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE   LABELS</span><br><span class="line">kubia-2ftc2   1/1     Running   0          13m   app=kubia,team=C</span><br><span class="line">kubia-mqk8k   1/1     Running   0          53m   app=kubia</span><br><span class="line">kubia-x6xm2   1/1     Running   0          13m   app=kubia,team=C</span><br></pre></td></tr></table></figure>
+<h2 id="使用-ReplicatSet-替换-ReplicationController"><a href="#使用-ReplicatSet-替换-ReplicationController" class="headerlink" title="使用 ReplicatSet 替换 ReplicationController"></a>使用 ReplicatSet 替换 ReplicationController</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 1. ReplicationController 是用于复制和在异常时重新调度节点的最早组件</span><br><span class="line"># 2. ReplicatSet 是 新一代的 ReplicationController 并且已经完全替换掉</span><br><span class="line"># 3. 通常不会直接创建ReplicatSet，而是创建更高层级的 Deployment时自动创建</span><br></pre></td></tr></table></figure>
+<h3 id="ReplicatSet-和-ReplicationController-的区别"><a href="#ReplicatSet-和-ReplicationController-的区别" class="headerlink" title="ReplicatSet 和 ReplicationController 的区别"></a>ReplicatSet 和 ReplicationController 的区别</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 1. ReplicationController 只能匹配一组标签</span><br><span class="line"># 2. ReplicatSet 可以匹配多组标签</span><br><span class="line"># 3. ReplicatSet 可以匹配标签的键,比如名为env的标签,而不在乎值,(env=*)</span><br></pre></td></tr></table></figure>
+<h3 id="定义-ReplicatSet"><a href="#定义-ReplicatSet" class="headerlink" title="定义 ReplicatSet"></a>定义 ReplicatSet</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># 参考</span><br><span class="line">[root@k8s-master1 demo]# kubectl explain rs</span><br><span class="line">KIND:     ReplicaSet</span><br><span class="line">VERSION:  apps/v1</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl explain rc</span><br><span class="line">KIND:     ReplicationController</span><br><span class="line">VERSION:  v1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 创建 ReplicatSet 并且接管之前三个被移除rc的pod</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-rs.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: ReplicaSet</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:       # 选择器里增加了 matchLabels选择器</span><br><span class="line">      app: kubia       # 标签选择器</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:          # pod中的标签对应rs的标签选择器</span><br><span class="line">        app: kubia</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/project/kubia</span><br><span class="line">        name: kubia</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 8080</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl create -f kubia-rs.yaml </span><br><span class="line">replicaset.apps/kubia created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get rs</span><br><span class="line">NAME    DESIRED   CURRENT   READY   AGE</span><br><span class="line">kubia   3         3         3       26s</span><br></pre></td></tr></table></figure>
+<h3 id="ReplicatSet-的标签选择器"><a href="#ReplicatSet-的标签选择器" class="headerlink" title="ReplicatSet 的标签选择器"></a>ReplicatSet 的标签选择器</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># ReplicatSet 对于 rc的主要改进就是标签选择器</span><br><span class="line"></span><br><span class="line">selector:</span><br><span class="line">    matchExpressions:</span><br><span class="line">      - key: app</span><br><span class="line">        operator: In</span><br><span class="line">        values:</span><br><span class="line">         - kubia</span><br><span class="line"># 会有四种 In NotIn Exists DoesNotExist </span><br><span class="line"># 如果是多个表达式 则所有条件必须都为true</span><br><span class="line"># 如果同时指定 matchExpressions 和 matchLabels 则所有标签条件都必须为true</span><br><span class="line"># 后续应该始终使用rs,当然也有其他人的部署里看到rc</span><br></pre></td></tr></table></figure>
+<h3 id="删除-ReplicatSet"><a href="#删除-ReplicatSet" class="headerlink" title="删除 ReplicatSet"></a>删除 ReplicatSet</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 删除rs,则下面的pod同时删除</span><br><span class="line">[root@k8s-master1 ~]# kubectl delete rs kubia</span><br><span class="line">replicaset.apps "kubia" deleted</span><br></pre></td></tr></table></figure>
+<h2 id="DaemonSet-在每个-node节点上运行1个pod"><a href="#DaemonSet-在每个-node节点上运行1个pod" class="headerlink" title="DaemonSet 在每个 node节点上运行1个pod"></a>DaemonSet 在每个 node节点上运行1个pod</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 如果 node节点下线 DaemonSet不会再其他节点上重新部署pod</span><br><span class="line">2. 如果一个新的node节点上线,DaemonSet会立即在这个新节点上创建一个pod </span><br><span class="line">3. 除非指定pod在某个node上运行 nodeSelector </span><br><span class="line">4. DaemonSet 会绕过调度器，即使节点被设置为不可调度</span><br></pre></td></tr></table></figure>
+<h3 id="创建-DaemonSet"><a href="#创建-DaemonSet" class="headerlink" title="创建 DaemonSet"></a>创建 DaemonSet</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master2 ssd]# vim Dockerfile</span><br><span class="line"></span><br><span class="line">FROM busybox</span><br><span class="line">ENTRYPOINT while true; do echo 'SSD OK'; sleep 5; done</span><br><span class="line"></span><br><span class="line">docker build -t ssd-monitor .</span><br><span class="line">docker images</span><br><span class="line">docker tag ssd-monitor 172.31.228.68/project/ssd-monitor</span><br><span class="line">docker push 172.31.228.68/project/ssd-monitor</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl explain ds</span><br><span class="line">KIND:     DaemonSet</span><br><span class="line">VERSION:  apps/v1</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-ds.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: DaemonSet</span><br><span class="line">metadata:</span><br><span class="line">  name: ssd-monitor</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: ssd-monitor</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: ssd-monitor</span><br><span class="line">    spec:</span><br><span class="line">      nodeSelector:            # 节点选择器 选择标签有disk: ssd的node</span><br><span class="line">        disk: ssd</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/project/ssd-monitor</span><br><span class="line">        name: main</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl create -f kubia-ds.yaml </span><br><span class="line"></span><br><span class="line"># 还没有给node 打上 disk=ssd标签 所有没有pod产生</span><br><span class="line">[root@k8s-master1 demo]# kubectl get ds</span><br><span class="line">NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE</span><br><span class="line">ssd-monitor   0         0         0       0            0           disk=ssd        33s</span><br><span class="line"></span><br><span class="line"># 给两个node打上标签</span><br><span class="line">[root@k8s-master1 demo]# kubectl get nodes</span><br><span class="line">NAME          STATUS   ROLES    AGE   VERSION</span><br><span class="line">k8s-master1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   2d    v1.16.0</span><br><span class="line">k8s-node1     Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   2d    v1.16.0</span><br><span class="line">k8s-node2     Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   2d    v1.16.0</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl label node k8s-node1 k8s-node2 disk=ssd</span><br><span class="line">node/k8s-node1 labeled</span><br><span class="line">node/k8s-node2 labeled</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get node -L disk</span><br><span class="line">NAME          STATUS   ROLES    AGE   VERSION   DISK</span><br><span class="line">k8s-master1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   2d    v1.16.0   </span><br><span class="line">k8s-node1     Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   2d    v1.16.0   ssd</span><br><span class="line">k8s-node2     Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   2d    v1.16.0   ssd</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># 查看</span><br><span class="line">[root@k8s-master1 demo]# kubectl get ds</span><br><span class="line">NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE</span><br><span class="line">ssd-monitor   2         2         2       2            2           disk=ssd        3m29s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods -o wide</span><br><span class="line">NAME                READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">ssd-monitor-9twms   1/1     Running   0          4s    10.244.1.22   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">ssd-monitor-tlrfq   1/1     Running   0          4s    10.244.0.16   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl logs ssd-monitor-9twms</span><br><span class="line">SSD OK</span><br><span class="line">SSD OK</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"># 更换一个node标签 合理的下线了 ds</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl label node k8s-node2 disk=hdd --overwrite</span><br><span class="line">node/k8s-node2 labeled</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods -o wide</span><br><span class="line">NAME                READY   STATUS        RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">ssd-monitor-9twms   1/1     Terminating   0          74s   10.244.1.22   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">ssd-monitor-tlrfq   1/1     Running       0          74s   10.244.0.16   k8s-node1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get ds</span><br><span class="line">NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE</span><br><span class="line">ssd-monitor   1         1         1       1            1           disk=ssd        77s</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 删除 ds</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete ds ssd-monitor</span><br><span class="line">daemonset.apps "ssd-monitor" deleted</span><br></pre></td></tr></table></figure>
+<h2 id="Job-运行单个任务的-pod"><a href="#Job-运行单个任务的-pod" class="headerlink" title="Job 运行单个任务的 pod"></a>Job 运行单个任务的 pod</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. jod 一旦运行完成不会重启容器</span><br><span class="line">2. Job 分为 普通任务(Job) 和 定时任务 (CronJob) </span><br><span class="line">3. 应用场景: 离线数据处理，视频解码等业务</span><br></pre></td></tr></table></figure>
+<h3 id="创建-Job"><a href="#创建-Job" class="headerlink" title="创建 Job"></a>创建 Job</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master2 job]# vim Dockerfile </span><br><span class="line"></span><br><span class="line">FROM busybox</span><br><span class="line">ENTRYPOINT echo "$(date) Batch job starting"; sleep 120; echo "$(date) Finished succesfully"</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 job]# docker build -t batch-job .</span><br><span class="line">[root@k8s-master2 job]# docker tag batch-job 172.31.228.68/project/batch-job</span><br><span class="line">[root@k8s-master2 job]# docker push 172.31.228.68/project/batch-job</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl explain job</span><br><span class="line">KIND:     Job</span><br><span class="line">VERSION:  batch/v1</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-job.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: batch/v1</span><br><span class="line">kind: Job</span><br><span class="line">metadata:</span><br><span class="line">  name: batch-job</span><br><span class="line">spec:</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: batch-job</span><br><span class="line">    spec:</span><br><span class="line">      restartPolicy: OnFailure</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/project/batch-job</span><br><span class="line">        name: main</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl create -f kubia-job.yaml</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">• Always：   当容器终止退出后，总是重启容器，默认策略。</span><br><span class="line">• OnFailure：当容器异常退出（退出状态码非0）时，才重启容器。</span><br><span class="line">• Never:：   当容器终止推出，从不重启容器。</span><br></pre></td></tr></table></figure>
+<h3 id="查看-Job-运行"><a href="#查看-Job-运行" class="headerlink" title="查看 Job 运行"></a>查看 Job 运行</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl get jobs</span><br><span class="line">NAME        COMPLETIONS   DURATION   AGE</span><br><span class="line">batch-job   0/1           50s        50s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME              READY   STATUS    RESTARTS   AGE</span><br><span class="line">batch-job-5tr5g   1/1     Running   0          70s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl describe jobs batch-job</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME              READY   STATUS      RESTARTS   AGE</span><br><span class="line">batch-job-5tr5g   0/1     Completed   0          2m31s</span><br><span class="line"></span><br><span class="line"># 读取 job 日志</span><br><span class="line">[root@k8s-master1 demo]# kubectl logs batch-job-5tr5g </span><br><span class="line">Wed Mar 11 10:00:51 UTC 2020 Batch job starting</span><br><span class="line">Wed Mar 11 10:02:51 UTC 2020 Finished succesfully</span><br><span class="line"></span><br><span class="line"># 删除 job</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete job batch-job</span><br><span class="line">job.batch "batch-job" deleted</span><br></pre></td></tr></table></figure>
+<h2 id="计划任务-CronJob"><a href="#计划任务-CronJob" class="headerlink" title="计划任务 CronJob"></a>计划任务 CronJob</h2><h3 id="创建-CronJob"><a href="#创建-CronJob" class="headerlink" title="创建 CronJob"></a>创建 CronJob</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl explain cronjob</span><br><span class="line">KIND:     CronJob</span><br><span class="line">VERSION:  batch/v1beta1</span><br><span class="line"></span><br><span class="line">定时任务，像Linux的Crontab一样</span><br><span class="line">应用场景: 通知,备份</span><br><span class="line">crontab的格式如下：</span><br><span class="line">分 时 日 月 周 要运行的命令: 第1列分钟0～59 第2列小时0～23） 第3列日1～31 第4列月1～12 第5列星期0～7（0和7表示星期天） 第6列要运行的命令</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim cronjob.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: batch/v1beta1</span><br><span class="line">kind: CronJob</span><br><span class="line">metadata:</span><br><span class="line">  name: hello</span><br><span class="line">spec:</span><br><span class="line">  schedule: "*/1 * * * *"</span><br><span class="line">  jobTemplate:</span><br><span class="line">    spec:</span><br><span class="line">      template:</span><br><span class="line">        spec:</span><br><span class="line">          containers:</span><br><span class="line">          - name: hello</span><br><span class="line">            image: busybox</span><br><span class="line">            args:</span><br><span class="line">            - /bin/sh</span><br><span class="line">            - -c</span><br><span class="line">            - date; echo Hello from the Kubernetes cluster</span><br><span class="line">          restartPolicy: OnFailure</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get cronjob</span><br><span class="line">NAME    SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE</span><br><span class="line">hello   */1 * * * *   False     0        <span class="tag">&lt;<span class="name">none</span>&gt;</span>          12s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get cronjob</span><br><span class="line">NAME    SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE</span><br><span class="line">hello   */1 * * * *   False     0        31s             58s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME                     READY   STATUS      RESTARTS   AGE</span><br><span class="line">hello-1583921700-s4rwp   0/1     Completed   0          28s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl logs hello-1583921700-s4rwp</span><br><span class="line">Wed Mar 11 10:15:16 UTC 2020</span><br><span class="line">Hello from the Kubernetes cluster</span><br><span class="line"></span><br><span class="line"># 到达定时后 会再次执行并产生pod</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME                     READY   STATUS              RESTARTS   AGE</span><br><span class="line">hello-1583921700-s4rwp   0/1     Completed           0          61s</span><br><span class="line">hello-1583921760-sxz8q   0/1     ContainerCreating   0          1s</span><br><span class="line"></span><br><span class="line"># 删除 cronjob</span><br><span class="line">[root@k8s-master1 demo]# kubectl delete cronjob hello</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/11/k8s-base14/" rel="next" title="12 K8S Pod 合理管理容器">
+                <i class="fa fa-chevron-left"></i> 12 K8S Pod 合理管理容器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/11/k8s-base16/" rel="prev" title="14 K8S 服务发现 Service">
+                14 K8S 服务发现 Service <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">119</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#保持-pod-的健康"><span class="nav-number">1.</span> <span class="nav-text">保持 pod 的健康</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#存活探针"><span class="nav-number">1.1.</span> <span class="nav-text">存活探针</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基于HTTP的存活探针"><span class="nav-number">1.1.1.</span> <span class="nav-text">基于HTTP的存活探针</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取崩溃容器的应用日志"><span class="nav-number">1.1.2.</span> <span class="nav-text">获取崩溃容器的应用日志</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看事件"><span class="nav-number">1.1.3.</span> <span class="nav-text">查看事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置存活探针的附加属性"><span class="nav-number">1.1.4.</span> <span class="nav-text">配置存活探针的附加属性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建-ReplicationController"><span class="nav-number">2.</span> <span class="nav-text">创建 ReplicationController</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#断开-node2-节点测试"><span class="nav-number">2.1.</span> <span class="nav-text">断开 node2 节点测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pod-迁移或迁出-rc-的作用域"><span class="nav-number">2.2.</span> <span class="nav-text">pod 迁移或迁出 rc 的作用域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kubectl-edit-修改模板"><span class="nav-number">2.3.</span> <span class="nav-text">kubectl edit 修改模板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kubectl-sacle-水平扩容"><span class="nav-number">2.4.</span> <span class="nav-text">kubectl sacle 水平扩容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除-ReplicationController"><span class="nav-number">2.5.</span> <span class="nav-text">删除 ReplicationController</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-ReplicatSet-替换-ReplicationController"><span class="nav-number">3.</span> <span class="nav-text">使用 ReplicatSet 替换 ReplicationController</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ReplicatSet-和-ReplicationController-的区别"><span class="nav-number">3.1.</span> <span class="nav-text">ReplicatSet 和 ReplicationController 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义-ReplicatSet"><span class="nav-number">3.2.</span> <span class="nav-text">定义 ReplicatSet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ReplicatSet-的标签选择器"><span class="nav-number">3.3.</span> <span class="nav-text">ReplicatSet 的标签选择器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除-ReplicatSet"><span class="nav-number">3.4.</span> <span class="nav-text">删除 ReplicatSet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DaemonSet-在每个-node节点上运行1个pod"><span class="nav-number">4.</span> <span class="nav-text">DaemonSet 在每个 node节点上运行1个pod</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-DaemonSet"><span class="nav-number">4.1.</span> <span class="nav-text">创建 DaemonSet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Job-运行单个任务的-pod"><span class="nav-number">5.</span> <span class="nav-text">Job 运行单个任务的 pod</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Job"><span class="nav-number">5.1.</span> <span class="nav-text">创建 Job</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看-Job-运行"><span class="nav-number">5.2.</span> <span class="nav-text">查看 Job 运行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#计划任务-CronJob"><span class="nav-number">6.</span> <span class="nav-text">计划任务 CronJob</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-CronJob"><span class="nav-number">6.1.</span> <span class="nav-text">创建 CronJob</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

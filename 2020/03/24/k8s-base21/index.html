@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="k8s,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="19 Statefulset 部署有状态应用">
+<meta property="og:url" content="https://touchlixiang.github.io/2020/03/24/k8s-base21/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:updated_time" content="2020-03-24T06:46:15.646Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="19 Statefulset 部署有状态应用">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2020/03/24/k8s-base21/">
+
+
+
+
+
+  <title>19 Statefulset 部署有状态应用 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2020/03/24/k8s-base21/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">19 Statefulset 部署有状态应用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-24T08:23:55+08:00">
+                2020-03-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/k8s/" itemprop="url" rel="index">
+                    <span itemprop="name">k8s</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="使用-Statefulset-部署应用"><a href="#使用-Statefulset-部署应用" class="headerlink" title="使用 Statefulset 部署应用"></a>使用 Statefulset 部署应用</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 区别:</span><br><span class="line">1. 无状态应用 无需持久化数据，实例挂掉没有影响,重新拉起,用户无感知</span><br><span class="line">2. 有状态应用 每个实例都需要有自己独立的持久化存储,实例挂掉，新的实例必须有就实例保持一致的状态和标识（相同的名称和网络标识）</span><br><span class="line"></span><br><span class="line"># 有状态应用提供:</span><br><span class="line">1. 稳定的网络标识:Statefulset创建的每个Pod都由一个从0开始的顺序索引，在pod的名称和主机名上,还有Pod的存储上</span><br><span class="line">2. 提供稳定的专属存储：Statefulset的每个Pod都需要关联到不同的持久卷声明(pvc),也就是自己独自专属的持久卷</span><br><span class="line">3. 需要再Pod中添加 卷声明模板(volumeClaimTemplates)</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 持久卷的创建和删除</span><br><span class="line">1. 当一个声明(pvc)被删除,与之绑定的持久卷就会被回收或者删除,数据就会被丢失</span><br><span class="line">2. 缩容 Statefulset 只会删除一个Pod，而声明(pvc)会遗留下来</span><br><span class="line">3. 当你需要释放持久卷时,需要手动删除对应的持久卷声明</span><br><span class="line">4. 缩容时不删除pvc，扩容时可以重新挂载上</span><br></pre></td></tr></table></figure>
+<h3 id="创建应用和容器镜像"><a href="#创建应用和容器镜像" class="headerlink" title="创建应用和容器镜像"></a>创建应用和容器镜像</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 该应用接收到POST请求时,会把Body数据写入 /var/data/kubia.txt中</span><br><span class="line"># 收到Get请求时，返回主机名和存储数据(文件中的内容)</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master2 kubia-pet-image]# vim app.js </span><br><span class="line"></span><br><span class="line">const http = require('http');</span><br><span class="line">const os = require('os');</span><br><span class="line">const fs = require('fs');</span><br><span class="line"></span><br><span class="line">const dataFile = "/var/data/kubia.txt";</span><br><span class="line"></span><br><span class="line">function fileExists(file) &#123;</span><br><span class="line">  try &#123;</span><br><span class="line">    fs.statSync(file);</span><br><span class="line">    return true;</span><br><span class="line">  &#125; catch (e) &#123;</span><br><span class="line">    return false;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var handler = function(request, response) &#123;</span><br><span class="line">  if (request.method == 'POST') &#123;</span><br><span class="line">    var file = fs.createWriteStream(dataFile);</span><br><span class="line">    file.on('open', function (fd) &#123;</span><br><span class="line">      request.pipe(file);</span><br><span class="line">      console.log("New data has been received and stored.");</span><br><span class="line">      response.writeHead(200);</span><br><span class="line">      response.end("Data stored on pod " + os.hostname() + "\n");</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    var data = fileExists(dataFile) ? fs.readFileSync(dataFile, 'utf8') : "No data posted yet";</span><br><span class="line">    response.writeHead(200);</span><br><span class="line">    response.write("You've hit " + os.hostname() + "\n");</span><br><span class="line">    response.end("Data stored on this pod: " + data + "\n");</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">var www = http.createServer(handler);</span><br><span class="line">www.listen(8080);</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master2 kubia-pet-image]# vim Dockerfile </span><br><span class="line"></span><br><span class="line">FROM node:7</span><br><span class="line">ADD app.js /app.js</span><br><span class="line">ENTRYPOINT ["node", "app.js"]</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 kubia-pet-image]# docker build -t 172.31.228.68/game/kubia-pet .</span><br><span class="line">[root@k8s-master2 kubia-pet-image]# docker push 172.31.228.68/game/kubia-pet</span><br></pre></td></tr></table></figure>
+<h2 id="部署有状态应用"><a href="#部署有状态应用" class="headerlink" title="部署有状态应用"></a>部署有状态应用</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 需要创建的对象</span><br><span class="line">1. 存储数据的持久卷(如果不支持动态供给,还需要手动创建)</span><br><span class="line">2. Statefulset 的 Service</span><br><span class="line">3. Statefulset 控制器</span><br><span class="line"></span><br><span class="line"># 对于每一个Pod，Statefulset 都会创建一个绑定到一个持久卷上的持久卷声明</span><br></pre></td></tr></table></figure>
+<h3 id="手动创建-PV-持久化存储卷"><a href="#手动创建-PV-持久化存储卷" class="headerlink" title="手动创建 PV 持久化存储卷"></a>手动创建 PV 持久化存储卷</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># nfs共享存储里创建好目录</span><br><span class="line">[root@k8s-master2 nfs]# mkdir -p pv-&#123;a..c&#125;</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 nfs]# ls -l</span><br><span class="line">total 12</span><br><span class="line">drwxr-xr-x 2 root root 4096 Mar 24 10:58 pv-a</span><br><span class="line">drwxr-xr-x 2 root root 4096 Mar 24 10:58 pv-b</span><br><span class="line">drwxr-xr-x 2 root root 4096 Mar 24 10:58 pv-c</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 statefulset]# vim pv-nfs.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: PersistentVolume</span><br><span class="line">metadata:</span><br><span class="line">  name: pv-a</span><br><span class="line">spec:</span><br><span class="line">  capacity:</span><br><span class="line">    storage: 2Gi</span><br><span class="line">  accessModes:</span><br><span class="line">  - ReadWriteMany</span><br><span class="line">  persistentVolumeReclaimPolicy: Recycle</span><br><span class="line">  nfs:</span><br><span class="line">    path: /data/nfs/pv-a</span><br><span class="line">    server: 172.31.228.68</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: PersistentVolume</span><br><span class="line">metadata:</span><br><span class="line">  name: pv-b</span><br><span class="line">spec:</span><br><span class="line">  capacity:</span><br><span class="line">    storage: 2Gi</span><br><span class="line">  accessModes:</span><br><span class="line">  - ReadWriteMany</span><br><span class="line">  persistentVolumeReclaimPolicy: Recycle</span><br><span class="line">  nfs:</span><br><span class="line">    path: /data/nfs/pv-b</span><br><span class="line">    server: 172.31.228.68</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: PersistentVolume</span><br><span class="line">metadata:</span><br><span class="line">  name: pv-c</span><br><span class="line">spec:</span><br><span class="line">  capacity:</span><br><span class="line">    storage: 2Gi</span><br><span class="line">  accessModes:</span><br><span class="line">  - ReadWriteMany</span><br><span class="line">  persistentVolumeReclaimPolicy: Recycle</span><br><span class="line">  nfs:</span><br><span class="line">    path: /data/nfs/pv-c</span><br><span class="line">    server: 172.31.228.68</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 创建 pv-a pv-b pv-c 三个持久卷 </span><br><span class="line"># 回收策略 Recycle 当卷的声明被释放后,空间会被回收再利用</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 statefulset]# kubectl create -f pv-nfs.yaml </span><br><span class="line">persistentvolume/pv-a created</span><br><span class="line">persistentvolume/pv-b created</span><br><span class="line">persistentvolume/pv-c created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 statefulset]# kubectl get pv</span><br><span class="line">NAME   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE</span><br><span class="line">pv-a   2Gi        RWX            Recycle          Available                                   6s</span><br><span class="line">pv-b   2Gi        RWX            Recycle          Available                                   6s</span><br><span class="line">pv-c   2Gi        RWX            Recycle          Available                                   6s</span><br></pre></td></tr></table></figure>
+<h3 id="创建-Headless-Service"><a href="#创建-Headless-Service" class="headerlink" title="创建 Headless Service"></a>创建 Headless Service</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 常规 Service：一组POD的访问策略，提供负载均衡服务发现</span><br><span class="line"># Headless Service: 不需要Cluster-IP，他会直接绑定到POD IP</span><br><span class="line"># 没有IP 使用DNS保证网络唯一标识符 coredns</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 statefulset]# vim kubia-service-headless.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  clusterIP: None</span><br><span class="line">  selector:</span><br><span class="line">    app: kubia</span><br><span class="line">  ports:</span><br><span class="line">  - name: http</span><br><span class="line">    port: 80</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 statefulset]# kubectl get svc</span><br><span class="line">NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE</span><br><span class="line">kubernetes   ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP   14d</span><br><span class="line">kubia        ClusterIP   None         <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80/TCP    3s</span><br></pre></td></tr></table></figure>
+<h3 id="创建-Statefulset"><a href="#创建-Statefulset" class="headerlink" title="创建 Statefulset"></a>创建 Statefulset</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 statefulset]# vim kubia-statefulset.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: StatefulSet</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  serviceName: kubia</span><br><span class="line">  replicas: 2</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: kubia                        # Pod 标签 app: kubia</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: kubia</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: kubia</span><br><span class="line">        image: 172.31.228.68/game/kubia-pet</span><br><span class="line">        ports:</span><br><span class="line">        - name: http</span><br><span class="line">          containerPort: 8080</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - name: data</span><br><span class="line">          mountPath: /var/data           # 容器挂载目录</span><br><span class="line">  volumeClaimTemplates:                  # 持久卷声明模板</span><br><span class="line">  - metadata:</span><br><span class="line">      name: data</span><br><span class="line">    spec:</span><br><span class="line">     # storageClassName: "managed-nfs-storage" 自动供给，本次是手动</span><br><span class="line">      resources:</span><br><span class="line">        requests:</span><br><span class="line">          storage: 1Gi</span><br><span class="line">      accessModes:</span><br><span class="line">      - ReadWriteMany</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># volumeClaimTemplates  持久卷声明模板</span><br><span class="line">1. 定义1个 data 卷声明，根据这个模板为每个Pod都创建一个持久卷声明(pvc)</span><br><span class="line">2. statefulset 创建Pod时,会自动将PVC添加到Pod描述中</span><br></pre></td></tr></table></figure>
+<h3 id="查看-生成的有状态-Pod"><a href="#查看-生成的有状态-Pod" class="headerlink" title="查看 生成的有状态 Pod"></a>查看 生成的有状态 Pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 statefulset]# kubectl create -f kubia-statefulset.yaml </span><br><span class="line">[root@k8s-master1 statefulset]# kubectl get pods</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-0                                   1/1     Running   0          5s</span><br><span class="line">kubia-1                                   1/1     Running   0          3s</span><br><span class="line"></span><br><span class="line">1. 第二个Pod会在第一个Pod运行处于就绪状态后创建</span><br><span class="line">2. 依次创建启动每个Pod，以免竞争</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 statefulset]# kubectl get pod kubia-0 -o yaml</span><br><span class="line">...</span><br><span class="line">    volumeMounts:</span><br><span class="line">    - mountPath: /var/data           # 挂载点</span><br><span class="line">      name: data</span><br><span class="line">...</span><br><span class="line">  volumes:                           # 创建的持久卷声明</span><br><span class="line">  - name: data</span><br><span class="line">    persistentVolumeClaim:</span><br><span class="line">      claimName: data-kubia-0        # 名称 =  volumeClaimTemplates的name + pod name</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 查看 PVC</span><br><span class="line">[root@k8s-master1 statefulset]# kubectl get pvc</span><br><span class="line">NAME           STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE</span><br><span class="line">data-kubia-0   Bound    pv-c     2Gi        RWX                           48s</span><br><span class="line">data-kubia-1   Bound    pv-a     2Gi        RWX                           47s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 statefulset]# kubectl get pv</span><br><span class="line">NAME   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                  STORAGECLASS   REASON   AGE</span><br><span class="line">pv-a   2Gi        RWX            Recycle          Bound       default/data-kubia-1                           2m17s</span><br><span class="line">pv-b   2Gi        RWX            Recycle          Available                                                  2m17s</span><br><span class="line">pv-c   2Gi        RWX            Recycle          Bound       default/data-kubia-0                           2m17s</span><br></pre></td></tr></table></figure>
+<h3 id="使用-Pod-测试数据"><a href="#使用-Pod-测试数据" class="headerlink" title="使用 Pod 测试数据"></a>使用 Pod 测试数据</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># 通过API服务器与Pod通信</span><br><span class="line"># 创建一个新代理</span><br><span class="line">[root@k8s-master1 statefulset]# kubectl proxy</span><br><span class="line">Starting to serve on 127.0.0.1:8001</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# curl localhost:8001/api/v1/namespaces/default/pods/kubia-0/proxy/</span><br><span class="line">You've hit kubia-0</span><br><span class="line">Data stored on this pod: No data posted yet</span><br><span class="line"></span><br><span class="line"># 请求被正确收到 </span><br><span class="line"></span><br><span class="line"># 发送一个POST请求</span><br><span class="line">[root@k8s-master1 ~]# curl -X POST -d "Hey there! to kubia-0" localhost:8001/api/v1/namespaces/default/pods/kubia-0/proxy/</span><br><span class="line">Data stored on pod kubia-0</span><br><span class="line"></span><br><span class="line"># 再来Get请求看看能否查看数据</span><br><span class="line">[root@k8s-master1 ~]# curl localhost:8001/api/v1/namespaces/default/pods/kubia-0/proxy/</span><br><span class="line">You've hit kubia-0</span><br><span class="line">Data stored on this pod: Hey there! to kubia-0</span><br><span class="line"></span><br><span class="line"># 看看对应的存储里面的数据</span><br><span class="line"># data-kubia-0   Bound    pv-c </span><br><span class="line">[root@k8s-master2 pv-c]# cat kubia.txt</span><br><span class="line">Hey there! to kubia-0</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 测试下其他集群节点数据 kubia-1</span><br><span class="line"># 没有数据正确</span><br><span class="line">[root@k8s-master1 statefulset]# curl localhost:8001/api/v1/namespaces/default/pods/kubia-1/proxy/</span><br><span class="line">You've hit kubia-1</span><br><span class="line">Data stored on this pod: No data posted yet</span><br><span class="line"></span><br><span class="line"># 插入数据到 kubia-1</span><br><span class="line">[root@k8s-master1 statefulset]# curl -X POST -d "Hey there! to kubia-1" localhost:8001/api/v1/namespaces/default/pods/kubia-1/proxy/</span><br><span class="line">Data stored on pod kubia-1</span><br><span class="line"></span><br><span class="line"># 每个节点的存储都保存自己的数据</span><br><span class="line">[root@k8s-master1 statefulset]# curl localhost:8001/api/v1/namespaces/default/pods/kubia-1/proxy/</span><br><span class="line">You've hit kubia-1</span><br><span class="line">Data stored on this pod: Hey there! to kubia-1</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 statefulset]# curl localhost:8001/api/v1/namespaces/default/pods/kubia-0/proxy/</span><br><span class="line">You've hit kubia-0</span><br><span class="line">Data stored on this pod: Hey there! to kubia-0</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 pv-a]# cat kubia.txt </span><br><span class="line">Hey there! to kubia-1</span><br></pre></td></tr></table></figure>
+<h3 id="删除一个有状态Pod"><a href="#删除一个有状态Pod" class="headerlink" title="删除一个有状态Pod"></a>删除一个有状态Pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># 删除一个有状态Pod 查看重新调度的Pod 是否关联了之前的数据</span><br><span class="line">[root@k8s-master1 statefulset]# kubectl delete pod kubia-0</span><br><span class="line">pod "kubia-0" deleted</span><br><span class="line"></span><br><span class="line"># 当Pod成功终止后,Statefulset会立即拉起一个新的具有相同名称的Pod，有可能在其他node上,Pod地址肯定是变化了</span><br><span class="line">[root@k8s-master1 ~]# kubectl get pod -o wide</span><br><span class="line">NAME                                      READY   STATUS        RESTARTS   AGE     IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-0                                   0/1     Terminating   0          3m      10.244.1.104   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-1                                   1/1     Running       0          10m     10.244.2.83    k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">nfs-client-provisioner-56f4b98d47-v4nf6   1/1     Running       9          4d12h   10.244.0.78    k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pod -o wide</span><br><span class="line">NAME                                      READY   STATUS              RESTARTS   AGE     IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-0                                   0/1     ContainerCreating   0          1s      <span class="tag">&lt;<span class="name">none</span>&gt;</span>        k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-1                                   1/1     Running             0          10m     10.244.2.83   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">nfs-client-provisioner-56f4b98d47-v4nf6   1/1     Running             9          4d12h   10.244.0.78   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pod -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE     IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-0                                   1/1     Running   0          1s      10.244.1.105   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-1                                   1/1     Running   0          10m     10.244.2.83    k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">nfs-client-provisioner-56f4b98d47-v4nf6   1/1     Running   9          4d12h   10.244.0.78    k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 新的Pod保留名称 主机名 存储</span><br><span class="line"># pod的名称是被保留的,通过访问Pod来确认</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 statefulset]# curl localhost:8001/api/v1/namespaces/default/pods/kubia-0/proxy/</span><br><span class="line">You've hit kubia-0</span><br><span class="line">Data stored on this pod: Hey there! to kubia-0</span><br><span class="line"></span><br><span class="line"># 说明重新拉起的Pod的主机名和持久化数据 与 之前的保持一致,即保证了服务状态,基本完全一致的新Pod</span><br></pre></td></tr></table></figure>
+<h2 id="在Statefulset-中发现其他伙伴节点"><a href="#在Statefulset-中发现其他伙伴节点" class="headerlink" title="在Statefulset 中发现其他伙伴节点"></a>在Statefulset 中发现其他伙伴节点</h2><h3 id="SRV-记录"><a href="#SRV-记录" class="headerlink" title="SRV 记录"></a>SRV 记录</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 运行一个DNS查询工具 dig 命令 </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl run -it srvlookup --image=tutum/dnsutils --rm --restart=Never -- dig SRV kubia.default.svc.cluster.local</span><br><span class="line">...</span><br><span class="line">;; ANSWER SECTION:</span><br><span class="line">kubia.default.svc.cluster.local. 5 IN	SRV	0 50 80 kubia-0.kubia.default.svc.cluster.local.</span><br><span class="line">kubia.default.svc.cluster.local. 5 IN	SRV	0 50 80 kubia-1.kubia.default.svc.cluster.local.</span><br><span class="line"></span><br><span class="line">;; ADDITIONAL SECTION:</span><br><span class="line">kubia-0.kubia.default.svc.cluster.local. 5 IN A	10.244.1.106</span><br><span class="line">kubia-1.kubia.default.svc.cluster.local. 5 IN A	10.244.2.86</span><br></pre></td></tr></table></figure>
+<h3 id="通过DNS查找所有Pod节点-并获取数据"><a href="#通过DNS查找所有Pod节点-并获取数据" class="headerlink" title="通过DNS查找所有Pod节点 并获取数据"></a>通过DNS查找所有Pod节点 并获取数据</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 pub]# vim kubia-service-public.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia-public</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    app: kubia</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80</span><br><span class="line">    targetPort: 8080</span><br><span class="line"></span><br><span class="line"># 通过API服务器访问集群内部服务</span><br><span class="line"># 让请求随机分配到一个statefulset的pod上</span><br><span class="line">[root@k8s-master1 pub]# kubectl create -f kubia-service-public.yaml </span><br><span class="line">service/kubia-public created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 pub]# kubectl get svc</span><br><span class="line">NAME           TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE</span><br><span class="line">kubernetes     ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP   14d</span><br><span class="line">kubia-public   ClusterIP   10.0.0.241   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80/TCP    8s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 pub]# curl localhost:8001/api/v1/namespaces/default/services/kubia-public/proxy/</span><br><span class="line">You've hit kubia-1</span><br><span class="line">Data stored on this pod: Hey there! to kubia-1</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 pub]# curl localhost:8001/api/v1/namespaces/default/services/kubia-public/proxy/</span><br><span class="line">You've hit kubia-0</span><br><span class="line">Data stored on this pod: Hey there! to kubia-0</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master2 kubia-pet-peers-image]# cat app.js </span><br><span class="line">const http = require('http');</span><br><span class="line">const os = require('os');</span><br><span class="line">const fs = require('fs');</span><br><span class="line">const dns = require('dns');</span><br><span class="line"></span><br><span class="line">const dataFile = "/var/data/kubia.txt";</span><br><span class="line">const serviceName = "kubia.default.svc.cluster.local";</span><br><span class="line">const port = 8080;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">function fileExists(file) &#123;</span><br><span class="line">  try &#123;</span><br><span class="line">    fs.statSync(file);</span><br><span class="line">    return true;</span><br><span class="line">  &#125; catch (e) &#123;</span><br><span class="line">    return false;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function httpGet(reqOptions, callback) &#123;</span><br><span class="line">  return http.get(reqOptions, function(response) &#123;</span><br><span class="line">    var body = '';</span><br><span class="line">    response.on('data', function(d) &#123; body += d; &#125;);</span><br><span class="line">    response.on('end', function() &#123; callback(body); &#125;);</span><br><span class="line">  &#125;).on('error', function(e) &#123;</span><br><span class="line">    callback("Error: " + e.message);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var handler = function(request, response) &#123;</span><br><span class="line">  if (request.method == 'POST') &#123;</span><br><span class="line">    var file = fs.createWriteStream(dataFile);</span><br><span class="line">    file.on('open', function (fd) &#123;</span><br><span class="line">      request.pipe(file);</span><br><span class="line">      response.writeHead(200);</span><br><span class="line">      response.end("Data stored on pod " + os.hostname() + "\n");</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    response.writeHead(200);</span><br><span class="line">    if (request.url == '/data') &#123;</span><br><span class="line">      var data = fileExists(dataFile) ? fs.readFileSync(dataFile, 'utf8') : "No data posted yet";</span><br><span class="line">      response.end(data);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      response.write("You've hit " + os.hostname() + "\n");</span><br><span class="line">      response.write("Data stored in the cluster:\n");</span><br><span class="line">      dns.resolveSrv(serviceName, function (err, addresses) &#123;</span><br><span class="line">        if (err) &#123;</span><br><span class="line">          response.end("Could not look up DNS SRV records: " + err);</span><br><span class="line">          return;</span><br><span class="line">        &#125;</span><br><span class="line">        var numResponses = 0;</span><br><span class="line">        if (addresses.length == 0) &#123;</span><br><span class="line">          response.end("No peers discovered.");</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          addresses.forEach(function (item) &#123;</span><br><span class="line">            var requestOptions = &#123;</span><br><span class="line">              host: item.name,</span><br><span class="line">              port: port,</span><br><span class="line">              path: '/data'</span><br><span class="line">            &#125;;</span><br><span class="line">            httpGet(requestOptions, function (returnedData) &#123;</span><br><span class="line">              numResponses++;</span><br><span class="line">              response.write("- " + item.name + ": " + returnedData + "\n");</span><br><span class="line">              if (numResponses == addresses.length) &#123;</span><br><span class="line">                response.end();</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">          &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">var www = http.createServer(handler);</span><br><span class="line">www.listen(port);</span><br></pre></td></tr></table></figure>
+<h3 id="更新-Statefulset"><a href="#更新-Statefulset" class="headerlink" title="更新 Statefulset"></a>更新 Statefulset</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 ~]# kubectl edit statefulset kubia</span><br><span class="line">replicas: 3                                         # 更新副本个数</span><br><span class="line">...</span><br><span class="line">- image: 172.31.228.68/game/kubia-pet-peers         # 更新镜像</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 ~]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE     IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-0                                   1/1     Running   0          5s      10.244.1.109   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-1                                   1/1     Running   0          45s     10.244.2.87    k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-2                                   1/1     Running   0          80s     10.244.0.81    k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 新增的kubia-2  之前的连个Pod也被滚动更新</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pvc</span><br><span class="line">NAME           STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE</span><br><span class="line">data-kubia-0   Bound    pv-c     2Gi        RWX                           3h13m</span><br><span class="line">data-kubia-1   Bound    pv-a     2Gi        RWX                           3h13m</span><br><span class="line">data-kubia-2   Bound    pv-b     2Gi        RWX                           101s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pv</span><br><span class="line">NAME   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                  STORAGECLASS   REASON   AGE</span><br><span class="line">pv-a   2Gi        RWX            Recycle          Bound    default/data-kubia-1                           3h14m</span><br><span class="line">pv-b   2Gi        RWX            Recycle          Bound    default/data-kubia-2                           3h14m</span><br><span class="line">pv-c   2Gi        RWX            Recycle          Bound    default/data-kubia-0                           3h14m</span><br></pre></td></tr></table></figure>
+<h3 id="测试集群数据"><a href="#测试集群数据" class="headerlink" title="测试集群数据"></a>测试集群数据</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 ~]# kubectl proxy</span><br><span class="line">Starting to serve on 127.0.0.1:8001</span><br><span class="line"></span><br><span class="line"># 写入到不同的pod中</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 pub]# curl -X POST -d "123" localhost:8001/api/v1/namespaces/default/services/kubia-public/proxy/</span><br><span class="line">Data stored on pod kubia-2</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 pub]# curl -X POST -d "567" localhost:8001/api/v1/namespaces/default/services/kubia-public/proxy/</span><br><span class="line">Data stored on pod kubia-0</span><br></pre></td></tr></table></figure>
+<h3 id="通过-DNS-获取-POD-IP"><a href="#通过-DNS-获取-POD-IP" class="headerlink" title="通过 DNS 获取 POD IP"></a>通过 DNS 获取 POD IP</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 statefulset]# kubectl get svc</span><br><span class="line">NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE</span><br><span class="line">kubernetes   ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP   14d</span><br><span class="line">kubia        ClusterIP   None         <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80/TCP    3s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim busybox.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: dns-test</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: busybox</span><br><span class="line">    image: busybox:1.28.4</span><br><span class="line">    args:</span><br><span class="line">    - /bin/sh</span><br><span class="line">    - -c</span><br><span class="line">    - sleep 36000</span><br><span class="line">  restartPolicy: Never</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 statefulset]# kubectl create -f busybox.yaml </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 statefulset]# kubectl exec -it dns-test sh</span><br><span class="line">/ #  nslookup kubia</span><br><span class="line">Server:    10.0.0.2</span><br><span class="line">Address 1: 10.0.0.2 kube-dns.kube-system.svc.cluster.local</span><br><span class="line"></span><br><span class="line">Name:      kubia</span><br><span class="line">Address 1: 10.244.2.89 kubia-1.kubia.default.svc.cluster.local</span><br><span class="line">Address 2: 10.244.1.111 kubia-0.kubia.default.svc.cluster.local</span><br><span class="line">Address 3: 10.244.0.82 kubia-2.kubia.default.svc.cluster.local</span><br><span class="line"></span><br><span class="line">/ #  nslookup kubia-1.kubia.default.svc.cluster.local</span><br><span class="line">Server:    10.0.0.2</span><br><span class="line">Address 1: 10.0.0.2 kube-dns.kube-system.svc.cluster.local</span><br><span class="line"></span><br><span class="line">Name:      kubia-1.kubia.default.svc.cluster.local</span><br><span class="line">Address 1: 10.244.2.89 kubia-1.kubia.default.svc.cluster.local</span><br></pre></td></tr></table></figure>
+<h3 id="StatefulSet-总结"><a href="#StatefulSet-总结" class="headerlink" title="StatefulSet 总结"></a>StatefulSet 总结</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">StatefulSet 与 Deployment区别: 有身份的,有网络标识,主机名,固定的存储</span><br><span class="line">身份三要素:</span><br><span class="line">域名</span><br><span class="line">主机名</span><br><span class="line">存储(PVC)</span><br><span class="line"></span><br><span class="line">statefulset 的 POD 名字 == 主机名</span><br><span class="line">ClusterIP A记录: <span class="tag">&lt;<span class="name">service-name</span>&gt;</span>.<span class="tag">&lt;<span class="name">namespace-name</span>&gt;</span>.svc.cluster.local </span><br><span class="line">ClusterIP = Node A记录格式: <span class="tag">&lt;<span class="name">StatefulsetName-index</span>&gt;</span>.<span class="tag">&lt;<span class="name">namespace-name</span>&gt;</span>.<span class="tag">&lt;<span class="name">service-name</span>&gt;</span>.svc.cluster.local</span><br><span class="line">nginx-statefulset-0.nginx.default.svc.cluster.local</span><br><span class="line">这个就是 statefulset 的 POD 的固定的访问地址 ，通过域名访问到后面的 POD ，通过DNS维持身份</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/19/k8s-base20/" rel="next" title="18 Deployment 声明式地升级应用">
+                <i class="fa fa-chevron-left"></i> 18 Deployment 声明式地升级应用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/24/k8s-base22/" rel="prev" title="20 计算资源管理">
+                20 计算资源管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">119</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Statefulset-部署应用"><span class="nav-number">1.</span> <span class="nav-text">使用 Statefulset 部署应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建应用和容器镜像"><span class="nav-number">1.1.</span> <span class="nav-text">创建应用和容器镜像</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署有状态应用"><span class="nav-number">2.</span> <span class="nav-text">部署有状态应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#手动创建-PV-持久化存储卷"><span class="nav-number">2.1.</span> <span class="nav-text">手动创建 PV 持久化存储卷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Headless-Service"><span class="nav-number">2.2.</span> <span class="nav-text">创建 Headless Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Statefulset"><span class="nav-number">2.3.</span> <span class="nav-text">创建 Statefulset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看-生成的有状态-Pod"><span class="nav-number">2.4.</span> <span class="nav-text">查看 生成的有状态 Pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-Pod-测试数据"><span class="nav-number">2.5.</span> <span class="nav-text">使用 Pod 测试数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除一个有状态Pod"><span class="nav-number">2.6.</span> <span class="nav-text">删除一个有状态Pod</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在Statefulset-中发现其他伙伴节点"><span class="nav-number">3.</span> <span class="nav-text">在Statefulset 中发现其他伙伴节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SRV-记录"><span class="nav-number">3.1.</span> <span class="nav-text">SRV 记录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过DNS查找所有Pod节点-并获取数据"><span class="nav-number">3.2.</span> <span class="nav-text">通过DNS查找所有Pod节点 并获取数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新-Statefulset"><span class="nav-number">3.3.</span> <span class="nav-text">更新 Statefulset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试集群数据"><span class="nav-number">3.4.</span> <span class="nav-text">测试集群数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-DNS-获取-POD-IP"><span class="nav-number">3.5.</span> <span class="nav-text">通过 DNS 获取 POD IP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StatefulSet-总结"><span class="nav-number">3.6.</span> <span class="nav-text">StatefulSet 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

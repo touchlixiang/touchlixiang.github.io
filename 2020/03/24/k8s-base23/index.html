@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="k8s,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="21 高级调度">
+<meta property="og:url" content="https://touchlixiang.github.io/2020/03/24/k8s-base23/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:updated_time" content="2020-03-31T10:53:38.506Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="21 高级调度">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2020/03/24/k8s-base23/">
+
+
+
+
+
+  <title>21 高级调度 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2020/03/24/k8s-base23/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">21 高级调度</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-24T08:24:02+08:00">
+                2020-03-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/k8s/" itemprop="url" rel="index">
+                    <span itemprop="name">k8s</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="污点和容忍度"><a href="#污点和容忍度" class="headerlink" title="污点和容忍度"></a>污点和容忍度</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 之前我们可以通过节点选择器,来实现Pod调度到哪一台Node节点上</span><br><span class="line">2. 现在可以通过 节点污点和Pod容忍度 限制 Pod 调度到指定节点</span><br><span class="line">3. 只有当一个Pod容忍某个Node节点的污点,这个Pod才能被调度到该节点</span><br><span class="line">4. 节点选择器和节点亲和性规则 都是通过再Pod中添加明确的信息 来决定Pod是否可以调度到指定节点</span><br><span class="line">5. 污点是再不通过修改Pod的前提下,通过再节点上添加污点信息,来拒绝Pod在指定Mode节点上部署</span><br></pre></td></tr></table></figure>
+<h3 id="显示-节点-的污点信息"><a href="#显示-节点-的污点信息" class="headerlink" title="显示 节点 的污点信息"></a>显示 节点 的污点信息</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># 默认情况下 master主节点要设置污点 </span><br><span class="line"># 显示节点的污点信息</span><br><span class="line">[root@k8s-master1 ~]# kubectl describe node k8s-master</span><br><span class="line">CreationTimestamp:  Mon, 09 Mar 2020 17:02:12 +0800</span><br><span class="line">Taints:             <span class="tag">&lt;<span class="name">none</span>&gt;</span>             # 暂时没有污点信息 (二进制安装)</span><br><span class="line"></span><br><span class="line">### 显示 Pod 的污点容忍度</span><br><span class="line"></span><br><span class="line"># coredns、flannel和 nginx-ingress-controller 都是以Pod的形式不是再K8S集群当中</span><br><span class="line"># 如果你要求这些Pod运行在master节点上,master如果不设置任何污点信息是可以的,但是如果需要就要添加符合的污点信息</span><br><span class="line"># Pod的污点容忍度 需要匹配 主节点的污点信息</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl describe pod coredns-6d8cfdd59d-w2xnx -n kube-system</span><br><span class="line">...</span><br><span class="line">Tolerations:     CriticalAddonsOnly</span><br><span class="line">                 node-role.kubernetes.io/master:NoSchedule</span><br><span class="line">                 node.kubernetes.io/not-ready:NoExecute for 300s</span><br><span class="line">                 node.kubernetes.io/unreachable:NoExecute for 300s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl describe pod  kube-flannel-ds-amd64-xq7gq  -n kube-system</span><br><span class="line">...</span><br><span class="line">Tolerations:     :NoSchedule</span><br><span class="line">                 node.kubernetes.io/disk-pressure:NoSchedule</span><br><span class="line">                 node.kubernetes.io/memory-pressure:NoSchedule</span><br><span class="line">                 node.kubernetes.io/network-unavailable:NoSchedule</span><br><span class="line">                 node.kubernetes.io/not-ready:NoExecute</span><br><span class="line">                 node.kubernetes.io/pid-pressure:NoSchedule</span><br><span class="line">                 node.kubernetes.io/unreachable:NoExecute</span><br><span class="line">                 node.kubernetes.io/unschedulable:NoSchedule</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl describe pod  nginx-ingress-controller-m8ljl  -n ingress-nginx</span><br><span class="line">...</span><br><span class="line">Tolerations:     node.kubernetes.io/disk-pressure:NoSchedule</span><br><span class="line">                 node.kubernetes.io/memory-pressure:NoSchedule</span><br><span class="line">                 node.kubernetes.io/network-unavailable:NoSchedule</span><br><span class="line">                 node.kubernetes.io/not-ready:NoExecute</span><br><span class="line">                 node.kubernetes.io/pid-pressure:NoSchedule</span><br><span class="line">                 node.kubernetes.io/unreachable:NoExecute</span><br><span class="line">                 node.kubernetes.io/unschedulable:NoSchedule</span><br></pre></td></tr></table></figure>
+<h3 id="了解污点效果"><a href="#了解污点效果" class="headerlink" title="了解污点效果"></a>了解污点效果</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">                 node-role.kubernetes.io/master:NoSchedule</span><br><span class="line">                 node.kubernetes.io/not-ready:NoExecute for 300s</span><br><span class="line">                 node.kubernetes.io/unreachable:NoExecute for 300s</span><br><span class="line"></span><br><span class="line"># 1. not-ready 和  unreachable 是描述当前节点的状态 ，如果处于该状态那么Pod可以运行在该Node上多长时间,后面跟秒数</span><br><span class="line"># 2. NoSchedule 和 NoExecute 都属于污点效果</span><br><span class="line"># 3. 每一个污点都可以关联一种效果</span><br><span class="line"># 4. NoSchedule : 表示如果Pod没有容忍这些污点,Pod不能调度到包含这些污点的Node节点上</span><br><span class="line"># 5. NoExecute : 会影响到正在运行在该Node节点上的Pod，如果在一个节点上添加了NoExecute污点，那些正在该Node节点上运行的Pod如果没有容忍</span><br><span class="line">这个污点,则会被从节点上去除。</span><br></pre></td></tr></table></figure>
+<h2 id="在-Node-节点上添加自定义污点"><a href="#在-Node-节点上添加自定义污点" class="headerlink" title="在 Node 节点上添加自定义污点"></a>在 Node 节点上添加自定义污点</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">1. 常用在一套K8S环境中,区分生产环境和测试环境</span><br><span class="line">2. 测试环境的Pod 不能够部署到 生产环境</span><br><span class="line"></span><br><span class="line"># 在node1添加生产环境污点信息</span><br><span class="line">[root@k8s-master1 ~]# kubectl taint node k8s-node1 node-type=production:NoSchedule</span><br><span class="line">node/k8s-node1 tainted</span><br><span class="line"></span><br><span class="line"># 污点描述:</span><br><span class="line"># key = node-type</span><br><span class="line"># value = production</span><br><span class="line"># 效果 = NoSchedule</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl describe node k8s-node1</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">Taints:             node-type=production:NoSchedule</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">Events:</span><br><span class="line">  Type     Reason                   Age   From                   Message</span><br><span class="line">  ----     ------                   ----  ----                   -------</span><br><span class="line">  Normal   Starting                 60m   kube-proxy, k8s-node1  Starting kube-proxy.</span><br><span class="line">  Normal   Starting                 60m   kubelet, k8s-node1     Starting kubelet.</span><br><span class="line">  Normal   NodeHasSufficientMemory  60m   kubelet, k8s-node1     Node k8s-node1 status is now: NodeHasSufficientMemory</span><br><span class="line">  Normal   NodeHasNoDiskPressure    60m   kubelet, k8s-node1     Node k8s-node1 status is now: NodeHasNoDiskPressure</span><br><span class="line">  Normal   NodeHasSufficientPID     60m   kubelet, k8s-node1     Node k8s-node1 status is now: NodeHasSufficientPID</span><br><span class="line">  Normal   NodeAllocatableEnforced  60m   kubelet, k8s-node1     Updated Node Allocatable limit across pods</span><br><span class="line">  Warning  Rebooted                 60m   kubelet, k8s-node1     Node k8s-node1 has been rebooted, boot id: f41c8744-b629-422b-8271-96aa873a7b73</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 测试部署一套没有容忍度的Pod  </span><br><span class="line"># 看看有没有Pod部署到有污点 node-type=production:NoSchedule 的Node1上</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl run test --image=busybox --replicas=5  -- sleep 99999</span><br><span class="line">deployment.apps/test created</span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods -o wide</span><br><span class="line"></span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE   IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">test-55c88c5b54-5tts2                     1/1     Running   0          20s   10.244.2.103   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">test-55c88c5b54-f9fgq                     1/1     Running   0          20s   10.244.1.134   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">test-55c88c5b54-krppr                     1/1     Running   0          20s   10.244.1.136   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">test-55c88c5b54-kwz8b                     1/1     Running   0          20s   10.244.1.135   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">test-55c88c5b54-rhxg7                     1/1     Running   0          20s   10.244.2.104   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="在-Pod-上添加污点容忍度"><a href="#在-Pod-上添加污点容忍度" class="headerlink" title="在 Pod 上添加污点容忍度"></a>在 Pod 上添加污点容忍度</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"># 导出 原deployment </span><br><span class="line">[root@k8s-master1 Taints]# kubectl get deployment test -o yaml &gt; proc-deployment.yaml</span><br><span class="line"></span><br><span class="line"># 修改 增加污点容忍度</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# vim proc-deployment.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  annotations:</span><br><span class="line">    deployment.kubernetes.io/revision: "1"</span><br><span class="line">  labels:</span><br><span class="line">    run: test</span><br><span class="line">  name: test</span><br><span class="line">  namespace: default</span><br><span class="line">spec:  </span><br><span class="line">  replicas: 5</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      run: test</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        run: test</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - args:</span><br><span class="line">        - sleep</span><br><span class="line">        - "99999"</span><br><span class="line">        image: busybox</span><br><span class="line">        imagePullPolicy: Always</span><br><span class="line">        name: test</span><br><span class="line">      tolerations:                     # 添加污点容忍度 让Pod允许被调度到生产环境节点上</span><br><span class="line">      - key: node-type</span><br><span class="line">        operator: Equal</span><br><span class="line">        value: production</span><br><span class="line">        effect: NoSchedule</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># 部署并查看</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl delete deployment test</span><br><span class="line">deployment.apps "test" deleted</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl create -f proc-deployment.yaml </span><br><span class="line">deployment.apps/test created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE   IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">test-5458cfd747-2p6wh                     1/1     Running   0          24s   10.244.1.138   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">test-5458cfd747-4xjsx                     1/1     Running   0          24s   10.244.2.105   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">test-5458cfd747-8tc8w                     1/1     Running   0          24s   10.244.0.95    k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">test-5458cfd747-drm2d                     1/1     Running   0          24s   10.244.1.137   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">test-5458cfd747-psxtw                     1/1     Running   0          24s   10.244.0.96    k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 这样就可以将Pod调度到生产环境Node1上</span><br><span class="line"># 如果node2是测试环境 可以增加污点信息 : node-type=test:NoSchedule </span><br><span class="line"># 测试环境的Pod 也要加上污点容忍度 指向测试环境 node-type=test:NoSchedule</span><br></pre></td></tr></table></figure>
+<h3 id="污点和污点容忍度的使用场景"><a href="#污点和污点容忍度的使用场景" class="headerlink" title="污点和污点容忍度的使用场景"></a>污点和污点容忍度的使用场景</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">1. 区分生产环境和测试环境</span><br><span class="line">2. 区分不同团队部署的不同项目</span><br><span class="line">3. 区分硬件资源 如SSD或者其他资源 </span><br><span class="line">4. 配置节点失效之后的Pod重新调度最长等待时间,每个Pod都可以配置某种污点的效果等待时间</span><br><span class="line">5. 当k8s检测到Node出现 not-ready 或者 unreachable状态的时候,将会等待300秒,如果状态持续的话,会将该Pod调度到其他节点上</span><br><span class="line">6. 如果没有设置这两个状态，是会自动添加到Pod中的,如果5分钟太长,可以修改该值</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl describe pod test-5458cfd747-2p6wh</span><br><span class="line"></span><br><span class="line">Tolerations:     node-type=production:NoSchedule</span><br><span class="line">                 node.kubernetes.io/not-ready:NoExecute for 300s</span><br><span class="line">                 node.kubernetes.io/unreachable:NoExecute for 300s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl edit pod test-5458cfd747-2p6wh</span><br><span class="line">...</span><br><span class="line">  tolerations:</span><br><span class="line">  - effect: NoSchedule</span><br><span class="line">    key: node-type</span><br><span class="line">    operator: Equal</span><br><span class="line">    value: production</span><br><span class="line">  - effect: NoExecute</span><br><span class="line">    key: node.kubernetes.io/not-ready</span><br><span class="line">    operator: Exists</span><br><span class="line">    tolerationSeconds: 300</span><br><span class="line">  - effect: NoExecute</span><br><span class="line">    key: node.kubernetes.io/unreachable</span><br><span class="line">    operator: Exists</span><br><span class="line">    tolerationSeconds: 300</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h2 id="测试二进制安装-K8S-重启后污点是否使用"><a href="#测试二进制安装-K8S-重启后污点是否使用" class="headerlink" title="测试二进制安装 K8S 重启后污点是否使用"></a>测试二进制安装 K8S 重启后污点是否使用</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">1. 由于二进制安装的Node都默认没有污点,测试设置污点后重启Node之前的组件Pod是否可以重建</span><br><span class="line">2. 看起来正常，后续应该多测试</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods --all-namespaces -o wide </span><br><span class="line">NAMESPACE              NAME                                         READY   STATUS    RESTARTS   AGE    IP              NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">default                nfs-client-provisioner-56f4b98d47-v4nf6      1/1     Running   16         10d    10.244.0.97     k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">default                test-5458cfd747-2p6wh                        1/1     Running   1          19m    10.244.1.141    k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">default                test-5458cfd747-4xjsx                        1/1     Running   1          19m    10.244.2.108    k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">default                test-5458cfd747-8tc8w                        1/1     Running   1          19m    10.244.0.99     k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">default                test-5458cfd747-drm2d                        1/1     Running   1          19m    10.244.1.140    k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">default                test-5458cfd747-psxtw                        1/1     Running   1          19m    10.244.0.100    k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">ingress-nginx          nginx-ingress-controller-6txhq               1/1     Running   28         21d    172.31.228.70   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">ingress-nginx          nginx-ingress-controller-jqxrm               1/1     Running   27         21d    172.31.228.69   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">ingress-nginx          nginx-ingress-controller-m8ljl               1/1     Running   27         21d    172.31.228.67   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kube-system            coredns-6d8cfdd59d-w2xnx                     1/1     Running   23         19d    10.244.2.107    k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kube-system            kube-flannel-ds-amd64-q29r8                  1/1     Running   28         21d    172.31.228.70   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kube-system            kube-flannel-ds-amd64-xh7c4                  1/1     Running   28         21d    172.31.228.69   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kube-system            kube-flannel-ds-amd64-xq7gq                  1/1     Running   29         21d    172.31.228.67   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kube-system            metrics-server-7dbbcf4c7-6qrsb               1/1     Running   2          2d7h   10.244.1.139    k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubernetes-dashboard   dashboard-metrics-scraper-566cddb686-t8fw4   1/1     Running   23         19d    10.244.2.106    k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubernetes-dashboard   kubernetes-dashboard-c4bc5bd44-4prrf         1/1     Running   27         21d    10.244.0.98     k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="删除-Node上的污点信息"><a href="#删除-Node上的污点信息" class="headerlink" title="删除 Node上的污点信息"></a>删除 Node上的污点信息</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 Taints]# kubectl taint nodes k8s-node1 node-type=test:NoSchedule-</span><br><span class="line">node/k8s-node1 untainted</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl describe node k8s-node1</span><br><span class="line">...</span><br><span class="line">Taints:             <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h2 id="通过-节点亲和性-调度Pod到指定节点"><a href="#通过-节点亲和性-调度Pod到指定节点" class="headerlink" title="通过 节点亲和性 调度Pod到指定节点"></a>通过 节点亲和性 调度Pod到指定节点</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 节点亲和性(node affinity) 对比 污点是更新的一种技术, 他用来告诉K8S将Pod只调度到某几个节点上</span><br><span class="line">2. 初始的节点亲和性 就是 NodeSelector 也就是节点选择器 必须和Node的标签Label互相匹配</span><br><span class="line">3. 节点亲和性功能更加强大,节点选择器将来可能被弃用</span><br><span class="line">4. 每个Pod都可以自定义自己的节点亲和性规则，用来指定硬性限制或者偏好</span><br><span class="line">5. 告诉K8S 我的Pod 更倾向于部署到哪类的Node上,K8S会尽量满足需求,如果无法满足,会将Pod调度到其他节点上。</span><br></pre></td></tr></table></figure>
+<h3 id="检查默认的节点标签"><a href="#检查默认的节点标签" class="headerlink" title="检查默认的节点标签"></a>检查默认的节点标签</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">1. 节点亲和性 也是根据Node节点的标签进行选择 ，和节点选择器一样</span><br><span class="line">2. 检查下Node里的默认标签</span><br><span class="line">3. 可以通过我们自定义的disk=ssd ,当然还可以增加 机房位置,服务器分区等其他标签</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl describe node k8s-node1</span><br><span class="line">...</span><br><span class="line">Labels:             beta.kubernetes.io/arch=amd64</span><br><span class="line">                    beta.kubernetes.io/os=linux</span><br><span class="line">                    disk=ssd                            # 之前学习标签时候自定义添加的</span><br><span class="line">                    kubernetes.io/arch=amd64</span><br><span class="line">                    kubernetes.io/hostname=k8s-node1</span><br><span class="line">                    kubernetes.io/os=linux</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h3 id="指定强制性-节点亲和性-规则"><a href="#指定强制性-节点亲和性-规则" class="headerlink" title="指定强制性 节点亲和性 规则"></a>指定强制性 节点亲和性 规则</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# vim kubia-gpu-nodeaffinity.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia-gpu</span><br><span class="line">spec:</span><br><span class="line">  affinity:</span><br><span class="line">    nodeAffinity:</span><br><span class="line">      requiredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">        nodeSelectorTerms:</span><br><span class="line">        - matchExpressions:</span><br><span class="line">          - key: gpu</span><br><span class="line">            operator: In</span><br><span class="line">            values:</span><br><span class="line">            - "true"</span><br><span class="line">  containers:</span><br><span class="line">  - image: 172.31.228.68/project/kubia</span><br><span class="line">    name: kubia</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl create -f kubia-gpu-nodeaffinity.yaml </span><br><span class="line">pod/kubia-gpu created</span><br></pre></td></tr></table></figure>
+<h3 id="节点亲和性-属性定义"><a href="#节点亲和性-属性定义" class="headerlink" title="节点亲和性 属性定义"></a>节点亲和性 属性定义</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1. affinity / nodeAffinity</span><br><span class="line">2. requiredDuringScheduling...   该字段下定义的规则,为了让Pod能调度到这个节点上,明确定义了该节点必须包含的标签</span><br><span class="line">3. ...IgnoredDuringExecution     该字段下定义的规则,不会影响已经在Node节点上运行的Pod</span><br><span class="line">4. 亲和性规则影现在被调度的Pod，而不会导致之前部署的Pod被剔除的风险,需要使用IgnoredDuringExecution结尾</span><br><span class="line">5. nodeSelectorTerms 和 matchExpressions 定义了节点标签必须满足哪一种表达式</span><br><span class="line">6. 当前例子的含义: 节点中必须包含一个 gpu 的标签 ， 并且这个标签的值必须是 true</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl get nodes -L gpu</span><br><span class="line">NAME          STATUS   ROLES    AGE   VERSION   GPU</span><br><span class="line">k8s-master1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   21d   v1.16.0   </span><br><span class="line">k8s-node1     Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   21d   v1.16.0   </span><br><span class="line">k8s-node2     Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   21d   v1.16.0   true</span><br><span class="line"></span><br><span class="line"># 一个Pod的节点亲和性 指定了节点必须包含哪些标签，才能满足Pod调度的条件</span><br></pre></td></tr></table></figure>
+<h3 id="调度Pod时优先考虑哪些节点"><a href="#调度Pod时优先考虑哪些节点" class="headerlink" title="调度Pod时优先考虑哪些节点"></a>调度Pod时优先考虑哪些节点</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 大型容器平台不同机房或者地域</span><br><span class="line">2. 提前预留出的资源良好的服务器</span><br><span class="line">3. 基础的两个标签: 区域 和 独占节点还是共享节点</span><br></pre></td></tr></table></figure>
+<h3 id="给-node-节点加上标签"><a href="#给-node-节点加上标签" class="headerlink" title="给 node 节点加上标签"></a>给 node 节点加上标签</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Region : 区域</span><br><span class="line">share : 共享  </span><br><span class="line">dedicated : 专用模式</span><br><span class="line">shared ： 共享模式</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 Taints]# kubectl label node k8s-node1 Region=zone1</span><br><span class="line">node/k8s-node1 labeled</span><br><span class="line">[root@k8s-master1 Taints]# kubectl label node k8s-node2 Region=zone2</span><br><span class="line">node/k8s-node2 labeled</span><br><span class="line">[root@k8s-master1 Taints]# kubectl label node k8s-node1 share=dedicated</span><br><span class="line">node/k8s-node1 labeled</span><br><span class="line">[root@k8s-master1 Taints]# kubectl label node k8s-node2 share=shared</span><br><span class="line">node/k8s-node2 labeled</span><br><span class="line"></span><br><span class="line"># 删除标签</span><br><span class="line">[root@k8s-master1 Taints]# kubectl label node k8s-node2 Region-</span><br><span class="line">node/k8s-node2 labeled</span><br><span class="line">[root@k8s-master1 Taints]# kubectl label node k8s-node1 Region-</span><br><span class="line">node/k8s-node2 labeled</span><br><span class="line"></span><br><span class="line"># 重新添加</span><br><span class="line">[root@k8s-master1 Taints]# kubectl label node k8s-node2 region=zone2</span><br><span class="line">node/k8s-node2 labeled</span><br><span class="line">[root@k8s-master1 Taints]# kubectl label node k8s-node1 region=zone1</span><br><span class="line">node/k8s-node1 labeled</span><br><span class="line"></span><br><span class="line"># 查看</span><br><span class="line">[root@k8s-master1 Taints]# kubectl get nodes -L region -L share</span><br><span class="line">NAME          STATUS   ROLES    AGE   VERSION   REGION   SHARE</span><br><span class="line">k8s-master1   Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   21d   v1.16.0            </span><br><span class="line">k8s-node1     Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   21d   v1.16.0   zone1    dedicated</span><br><span class="line">k8s-node2     Ready    <span class="tag">&lt;<span class="name">none</span>&gt;</span>   21d   v1.16.0   zone2    shared</span><br></pre></td></tr></table></figure>
+<h3 id="指定优先级-节点亲和性-规则"><a href="#指定优先级-节点亲和性-规则" class="headerlink" title="指定优先级 节点亲和性 规则"></a>指定优先级 节点亲和性 规则</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 Taints]# vim preferred-deployment.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: pref</span><br><span class="line">spec:</span><br><span class="line">  replicas: 10</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: pref</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: pref</span><br><span class="line">    spec:</span><br><span class="line">      affinity:</span><br><span class="line">        nodeAffinity:</span><br><span class="line">          preferredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">          - weight: 80</span><br><span class="line">            preference:</span><br><span class="line">              matchExpressions:</span><br><span class="line">              - key: region</span><br><span class="line">                operator: In</span><br><span class="line">                values:</span><br><span class="line">                - zone1</span><br><span class="line">          - weight: 20</span><br><span class="line">            preference:</span><br><span class="line">              matchExpressions:</span><br><span class="line">              - key: share</span><br><span class="line">                operator: In</span><br><span class="line">                values:</span><br><span class="line">                - dedicated</span><br><span class="line">      containers:</span><br><span class="line">      - args:</span><br><span class="line">        - sleep</span><br><span class="line">        - "99999"</span><br><span class="line">        image: busybox</span><br><span class="line">        name: main</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">1. 节点优先调度到 zone1       80权重</span><br><span class="line">2. 次要优先级到 dedicated     20权重</span><br><span class="line">3. 当前工作模式如果我们有多个节点比如4个 优先最高的是 zone1 和 dedicated 然后是 zone1 和 shared ，再然后是 其他区域的 dedicated ，最低优先级是剩下的条件</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE     IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">pref-69f48f9b59-4wk8h                     1/1     Running   0          2m18s   10.244.0.111   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pref-69f48f9b59-59h24                     1/1     Running   0          2m18s   10.244.2.114   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pref-69f48f9b59-77cgj                     1/1     Running   0          2m18s   10.244.1.150   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pref-69f48f9b59-bxfqs                     1/1     Running   0          2m18s   10.244.0.114   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pref-69f48f9b59-gsqsc                     1/1     Running   0          2m18s   10.244.0.112   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pref-69f48f9b59-klblh                     1/1     Running   0          2m18s   10.244.0.110   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pref-69f48f9b59-kpbzz                     1/1     Running   0          2m18s   10.244.2.115   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pref-69f48f9b59-s5mg5                     1/1     Running   0          2m18s   10.244.1.149   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pref-69f48f9b59-w4c8j                     1/1     Running   0          2m18s   10.244.0.115   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">pref-69f48f9b59-x4csj                     1/1     Running   0          2m18s   10.244.0.113   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 为什么 k8s-master1 和 k8s-node2  还有Pod可以分配</span><br><span class="line">1. 除了节点亲和性优先级函数，调度器还使用其他优先级函数来决定如何分配,其中还有Selector SpreadPriority函数</span><br><span class="line">2. 该函数确保属于同一个RS或者Servcie的Pod，将分散部署到不同节点上,以免出现单点问题</span><br><span class="line">3. 如果没有添加节点亲和性优先级配置,那么Pod会均匀的分配到3个工作节点上</span><br></pre></td></tr></table></figure>
+<h2 id="使用-Pod亲和性-和-非亲和性-对Pod进行协同部署"><a href="#使用-Pod亲和性-和-非亲和性-对Pod进行协同部署" class="headerlink" title="使用 Pod亲和性 和 非亲和性 对Pod进行协同部署"></a>使用 Pod亲和性 和 非亲和性 对Pod进行协同部署</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 上面的操作都是在pod和node之间的亲和性来分配Pod到指定的节点上</span><br><span class="line">2. pod也可以与pod之间产生 Pod亲和性 </span><br><span class="line">3. 例如1个前端Pod和1个后端Pod，将这两个Pod部署在比较靠近的区域,可以降低延迟，提高应用的性能</span><br><span class="line">4. 通过节点亲和性可以将这两个Pod调度到同一个区域,或者同一个机架的Node服务器上</span><br><span class="line">5. K8S 还可以通过Pod亲和性,让这两个Pod部署合适的位置，并且确保他们是靠近的</span><br></pre></td></tr></table></figure>
+<h3 id="使用Pod亲和性-将多个Pod部署在同一个节点上"><a href="#使用Pod亲和性-将多个Pod部署在同一个节点上" class="headerlink" title="使用Pod亲和性 将多个Pod部署在同一个节点上"></a>使用Pod亲和性 将多个Pod部署在同一个节点上</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 先部署后端Pod</span><br><span class="line"># 添加了标签 app=backend 这个标签将在前端的pod亲和性里面使用</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl run backend -l app=backend --image busybox -- sleep 99999</span><br><span class="line">deployment.apps/backend created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl get pods -L app</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE   APP</span><br><span class="line">backend-75d54556d4-ns276                  1/1     Running   0          25s   backend</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 Taints]# vim frontend-podaffinity-host.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: frontend</span><br><span class="line">spec:</span><br><span class="line">  replicas: 5</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: frontend</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: frontend</span><br><span class="line">    spec:</span><br><span class="line">      affinity:</span><br><span class="line">        podAffinity:</span><br><span class="line">          requiredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">          - topologyKey: kubernetes.io/hostname</span><br><span class="line">            labelSelector:</span><br><span class="line">              matchLabels:</span><br><span class="line">                app: backend</span><br><span class="line">      containers:</span><br><span class="line">      - name: main</span><br><span class="line">        image: busybox</span><br><span class="line">        args:</span><br><span class="line">        - sleep</span><br><span class="line">        - "99999"</span><br><span class="line"></span><br><span class="line"># requiredDuringScheduling 强制要求</span><br><span class="line"># podAffinity Pod亲和性</span><br><span class="line"># 这个Pod必须调度到匹配 Pod选择器的节点上 app: backend </span><br><span class="line"># Pod亲缘性 允许 Pod 被调度到那些包含指定标签Pod所在的节点</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 查看 全部都被调度到同一个节点</span><br><span class="line">[root@k8s-master1 Taints]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE     IP             NODE        NOMINATED NODE   READINESS GATES</span><br><span class="line">backend-75d54556d4-ns276                  1/1     Running   0          8m22s   10.244.1.151   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-7bfc78d68d-46lf8                 1/1     Running   0          16s     10.244.1.155   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-7bfc78d68d-6h82c                 1/1     Running   0          16s     10.244.1.153   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-7bfc78d68d-m5fsz                 1/1     Running   0          16s     10.244.1.154   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-7bfc78d68d-mrdxr                 1/1     Running   0          16s     10.244.1.156   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-7bfc78d68d-pcd6k                 1/1     Running   0          16s     10.244.1.152   k8s-node2   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 在调度前端Pod时,调度器最先找到所有匹配前端Pod的podAffinity中配置的 labelSelector 的 Pod </span><br><span class="line"># 之后将前端Pod都调度到同一节点</span><br></pre></td></tr></table></figure>
+<h3 id="将Pod部署在同一个区域或者同一个机柜"><a href="#将Pod部署在同一个区域或者同一个机柜" class="headerlink" title="将Pod部署在同一个区域或者同一个机柜"></a>将Pod部署在同一个区域或者同一个机柜</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"># 前面的例子将所有Pod都部署到了同一个Node上，可能存在单点问题</span><br><span class="line"># 比如我们拥有20台服务器 每5台服务器 在一个机柜 那么机柜就是 1 2 3 4 </span><br><span class="line"># 每天Node上都设置rack=机柜(1-4) </span><br><span class="line"># 调度器会先去查询Pod的 podAffinity,需要定义 topologyKey 设置为 rack </span><br><span class="line"># 如果前端的rack=2 那么后端的Pod 就会先考虑rack=2的机柜来部署Pod </span><br><span class="line"># podAffinity中的topologyKey决定了Pod被调度的范围</span><br></pre></td></tr></table></figure>
+<h3 id="Pod亲和性优先级"><a href="#Pod亲和性优先级" class="headerlink" title="Pod亲和性优先级"></a>Pod亲和性优先级</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">1. 告诉K8S 优先调度到相同节点上</span><br><span class="line">2. 如果无法满足也可以到其他节点</span><br><span class="line">3. 根据调度器的其他调度函数,尽量会在同一节点上部署,也会有调度到其他节点上的以免单点</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 logs]# vim frontend-podaffinity-preferred-host.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: frontend</span><br><span class="line">spec:</span><br><span class="line">  replicas: 5</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: frontend</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: frontend</span><br><span class="line">    spec:</span><br><span class="line">      affinity:</span><br><span class="line">        podAffinity:</span><br><span class="line">          preferredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">          - weight: 80</span><br><span class="line">            podAffinityTerm:</span><br><span class="line">              topologyKey: kubernetes.io/hostname</span><br><span class="line">              labelSelector:</span><br><span class="line">                matchLabels:</span><br><span class="line">                  app: backend</span><br><span class="line">      containers:</span><br><span class="line">      - name: main</span><br><span class="line">        image: busybox</span><br><span class="line">        args:</span><br><span class="line">        - sleep</span><br><span class="line">        - "99999"</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 Taints]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE   IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">backend-75d54556d4-ns276                  1/1     Running   0          35m   10.244.1.151   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-6747f764d7-7t6lx                 1/1     Running   0          24s   10.244.1.157   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-6747f764d7-8kf4r                 1/1     Running   0          24s   10.244.1.159   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-6747f764d7-dlkr7                 1/1     Running   0          24s   10.244.1.158   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-6747f764d7-dmspl                 1/1     Running   0          24s   10.244.2.116   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-6747f764d7-j2cl5                 1/1     Running   0          24s   10.244.0.116   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="利用-Pod-的非亲和性-分开调度Pod"><a href="#利用-Pod-的非亲和性-分开调度Pod" class="headerlink" title="利用 Pod 的非亲和性 分开调度Pod"></a>利用 Pod 的非亲和性 分开调度Pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 如果希望Pod之间远离彼此, 这种特性叫做非亲和性</span><br><span class="line">2. 调度器永远不会将Pod调度到 非亲和的Pod所在的节点上</span><br><span class="line">3. 有两个Pod业务都比较占用资源, 放在同一个Node上会影响彼此</span><br><span class="line">4. 按照可用区分配业务,一个可用区出现问题,另外一个可用区的服务还在</span><br><span class="line">5. 使用 podAntiAffinity 替换  podAffinity</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 Taints]# vim podAntiAffinity.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: frontend</span><br><span class="line">spec:</span><br><span class="line">  replicas: 5</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: frontend</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: frontend</span><br><span class="line">    spec:</span><br><span class="line">      affinity:</span><br><span class="line">        podAntiAffinity:</span><br><span class="line">          requiredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">          - topologyKey: kubernetes.io/hostname</span><br><span class="line">            labelSelector:</span><br><span class="line">              matchLabels:</span><br><span class="line">                app: frontend</span><br><span class="line">      containers:</span><br><span class="line">      - name: main</span><br><span class="line">        image: busybox</span><br><span class="line">        args:</span><br><span class="line">        - sleep</span><br><span class="line">        - "99999"</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 Taints]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE   IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">backend-75d54556d4-ns276                  1/1     Running   0          86m   10.244.1.151   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-b4667c656-hg26f                  0/1     Pending   0          64s   <span class="tag">&lt;<span class="name">none</span>&gt;</span>         <span class="tag">&lt;<span class="name">none</span>&gt;</span>        <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-b4667c656-hzl2b                  1/1     Running   0          64s   10.244.1.170   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-b4667c656-mcd7j                  1/1     Running   0          64s   10.244.2.120   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-b4667c656-tcmlk                  0/1     Pending   0          64s   <span class="tag">&lt;<span class="name">none</span>&gt;</span>         <span class="tag">&lt;<span class="name">none</span>&gt;</span>        <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">frontend-b4667c656-wmrb8                  1/1     Running   0          64s   10.244.0.124   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 出现 Pending状态 调度器不允许Pod部署在亲和性Pod的节点上</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/24/k8s-base22/" rel="next" title="20 计算资源管理">
+                <i class="fa fa-chevron-left"></i> 20 计算资源管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">119</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#污点和容忍度"><span class="nav-number">1.</span> <span class="nav-text">污点和容忍度</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#显示-节点-的污点信息"><span class="nav-number">1.1.</span> <span class="nav-text">显示 节点 的污点信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#了解污点效果"><span class="nav-number">1.2.</span> <span class="nav-text">了解污点效果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-Node-节点上添加自定义污点"><span class="nav-number">2.</span> <span class="nav-text">在 Node 节点上添加自定义污点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在-Pod-上添加污点容忍度"><span class="nav-number">2.1.</span> <span class="nav-text">在 Pod 上添加污点容忍度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#污点和污点容忍度的使用场景"><span class="nav-number">2.2.</span> <span class="nav-text">污点和污点容忍度的使用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试二进制安装-K8S-重启后污点是否使用"><span class="nav-number">3.</span> <span class="nav-text">测试二进制安装 K8S 重启后污点是否使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#删除-Node上的污点信息"><span class="nav-number">3.1.</span> <span class="nav-text">删除 Node上的污点信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过-节点亲和性-调度Pod到指定节点"><span class="nav-number">4.</span> <span class="nav-text">通过 节点亲和性 调度Pod到指定节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检查默认的节点标签"><span class="nav-number">4.1.</span> <span class="nav-text">检查默认的节点标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定强制性-节点亲和性-规则"><span class="nav-number">4.2.</span> <span class="nav-text">指定强制性 节点亲和性 规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#节点亲和性-属性定义"><span class="nav-number">4.3.</span> <span class="nav-text">节点亲和性 属性定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调度Pod时优先考虑哪些节点"><span class="nav-number">4.4.</span> <span class="nav-text">调度Pod时优先考虑哪些节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#给-node-节点加上标签"><span class="nav-number">4.5.</span> <span class="nav-text">给 node 节点加上标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定优先级-节点亲和性-规则"><span class="nav-number">4.6.</span> <span class="nav-text">指定优先级 节点亲和性 规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Pod亲和性-和-非亲和性-对Pod进行协同部署"><span class="nav-number">5.</span> <span class="nav-text">使用 Pod亲和性 和 非亲和性 对Pod进行协同部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Pod亲和性-将多个Pod部署在同一个节点上"><span class="nav-number">5.1.</span> <span class="nav-text">使用Pod亲和性 将多个Pod部署在同一个节点上</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将Pod部署在同一个区域或者同一个机柜"><span class="nav-number">5.2.</span> <span class="nav-text">将Pod部署在同一个区域或者同一个机柜</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pod亲和性优先级"><span class="nav-number">5.3.</span> <span class="nav-text">Pod亲和性优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用-Pod-的非亲和性-分开调度Pod"><span class="nav-number">5.4.</span> <span class="nav-text">利用 Pod 的非亲和性 分开调度Pod</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

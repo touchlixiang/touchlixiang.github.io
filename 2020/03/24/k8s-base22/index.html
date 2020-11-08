@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="k8s,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="20 计算资源管理">
+<meta property="og:url" content="https://touchlixiang.github.io/2020/03/24/k8s-base22/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:updated_time" content="2020-03-28T02:37:51.375Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="20 计算资源管理">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2020/03/24/k8s-base22/">
+
+
+
+
+
+  <title>20 计算资源管理 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2020/03/24/k8s-base22/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">20 计算资源管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-24T08:23:59+08:00">
+                2020-03-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/k8s/" itemprop="url" rel="index">
+                    <span itemprop="name">k8s</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="为Pod中的容器申请资源"><a href="#为Pod中的容器申请资源" class="headerlink" title="为Pod中的容器申请资源"></a>为Pod中的容器申请资源</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">request 资源请求</span><br><span class="line">limits  资源限制</span><br></pre></td></tr></table></figure>
+<h3 id="创建包含-requests-请求资源的-Pod"><a href="#创建包含-requests-请求资源的-Pod" class="headerlink" title="创建包含 requests 请求资源的 Pod"></a>创建包含 requests 请求资源的 Pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 request]# vim requests-pod.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: requests-pod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: main</span><br><span class="line">    image: busybox</span><br><span class="line">    command: ["dd","if=/dev/zero","of=/dev/null"]</span><br><span class="line">    resources:</span><br><span class="line">      requests:</span><br><span class="line">        cpu: 0.5</span><br><span class="line">        memory: 1000Mi</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Mem: 1180484K used, 2699924K free, 1008K shrd, 36844K buff, 666140K cached</span><br><span class="line">CPU0: 27.7% usr 65.0% sys  0.0% nic  6.9% idle  0.0% io  0.0% irq  0.1% sirq</span><br><span class="line">CPU1:  5.6% usr  7.6% sys  0.0% nic 86.1% idle  0.6% io  0.0% irq  0.0% sirq</span><br><span class="line">Load average: 1.02 0.54 0.30 3/353 10</span><br><span class="line">  PID  PPID USER     STAT   VSZ %VSZ CPU %CPU COMMAND</span><br><span class="line">    1     0 root     R     1284  0.0   0 50.0 dd if /dev/zero of /dev/null</span><br><span class="line">    6     0 root     R     1292  0.0   1  0.0 top</span><br><span class="line"></span><br><span class="line"># dd命令会持续消耗尽可能多的cpu 我的node主机是2核心cpu,那么它应该是跑满了1个U </span><br><span class="line"># 说明该Pod的实际cpu消耗 超出了 requests 申请的 0.5 个 cpu</span><br><span class="line"># requests 不会限制容器可以使用的cpu数量</span><br></pre></td></tr></table></figure>
+<h3 id="资源-requests-如何影响调度"><a href="#资源-requests-如何影响调度" class="headerlink" title="资源 requests 如何影响调度"></a>资源 requests 如何影响调度</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 调度器判断一个Pod是否适合调度到某个节点</span><br><span class="line">1. 调度器不关注Pod的实际资源使用量,只关心节点上部署的所有Pod的资源申请量之和</span><br><span class="line">2. 调度器首先会对节点列表进行过滤,排除不满足需求的节点,然后根据预先设置的优先级函数对其余节点进行排序</span><br><span class="line">3. 有2个基于资源请求量的优先级排序函数,LeastRequestedPriority 和 MostRequestedPriority</span><br><span class="line">4. LeastRequestedPriority 会将Pod调度到请求量少的节点上(拥有更多未分配资源的节点) </span><br><span class="line">5. MostRequestedPriority 会将Pod调度到请求量最多的节点,在云主机环境可以使资源更紧凑的使用,节省开销</span><br><span class="line">6. 默认只能配置一种优先级函数</span><br></pre></td></tr></table></figure>
+<h3 id="查看节点资源总量"><a href="#查看节点资源总量" class="headerlink" title="查看节点资源总量"></a>查看节点资源总量</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 request]# kubectl describe node k8s-node2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Capacity:                           # 节点的资源总量</span><br><span class="line"> cpu:                2</span><br><span class="line"> ephemeral-storage:  41147472Ki</span><br><span class="line"> hugepages-1Gi:      0</span><br><span class="line"> hugepages-2Mi:      0</span><br><span class="line"> memory:             3880408Ki</span><br><span class="line"> pods:               110</span><br><span class="line">Allocatable:                        # 可分配给Pod的资源总量</span><br><span class="line"> cpu:                2</span><br><span class="line"> ephemeral-storage:  37921510133</span><br><span class="line"> hugepages-1Gi:      0</span><br><span class="line"> hugepages-2Mi:      0</span><br><span class="line"> memory:             3778008Ki</span><br><span class="line"> pods:               110</span><br></pre></td></tr></table></figure>
+<h3 id="模拟超出请求资源总量"><a href="#模拟超出请求资源总量" class="headerlink" title="模拟超出请求资源总量"></a>模拟超出请求资源总量</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 模拟现在有一个申请3个CPU的Pod 超出我们的node资源总量</span><br><span class="line"># 事件会告诉我们没有足够的cpu </span><br><span class="line">Events:</span><br><span class="line">  Type     Reason            Age        From               Message</span><br><span class="line">  ----     ------            ----       ----               -------</span><br><span class="line">  Warning  FailedScheduling  <span class="tag">&lt;<span class="name">unknown</span>&gt;</span>  default-scheduler  0/3 nodes are available: 3 Insufficient cpu.</span><br></pre></td></tr></table></figure>
+<h2 id="限制容器的可用资源"><a href="#限制容器的可用资源" class="headerlink" title="限制容器的可用资源"></a>限制容器的可用资源</h2><h3 id="设置容器可用资源的硬限制"><a href="#设置容器可用资源的硬限制" class="headerlink" title="设置容器可用资源的硬限制"></a>设置容器可用资源的硬限制</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># cpu是可压缩资源,内存是不可压缩资源</span><br><span class="line"># 如果不限制内存使用量,工作节点上的容器可能会吃掉所有内存，恶意Pod占用内存,可能导致其他Pod无法分配到该Node</span><br></pre></td></tr></table></figure>
+<h3 id="创建包含-limits-限制资源的-Pod"><a href="#创建包含-limits-限制资源的-Pod" class="headerlink" title="创建包含 limits 限制资源的 Pod"></a>创建包含 limits 限制资源的 Pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 request]# vim limits-pod.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: limits-pod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: main</span><br><span class="line">    image: busybox</span><br><span class="line">    command: ["dd","if=/dev/zero","of=/dev/null"]</span><br><span class="line">    resources:</span><br><span class="line">      limits:</span><br><span class="line">        cpu: 1</span><br><span class="line">        memory: 1000Mi</span><br><span class="line"></span><br><span class="line"># 如果不填写requests,那么会被设置为limits相同的值</span><br><span class="line">[root@k8s-master1 request]# kubectl describe pod limits-pod</span><br><span class="line">...</span><br><span class="line">    Limits:</span><br><span class="line">      cpu:     1</span><br><span class="line">      memory:  1000Mi</span><br><span class="line">    Requests:</span><br><span class="line">      cpu:        1</span><br><span class="line">      memory:     1000Mi</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h3 id="超过-limits"><a href="#超过-limits" class="headerlink" title="超过 limits"></a>超过 limits</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 如果进程尝试申请比限额更多的内存时,会被杀掉(OOM)</span><br><span class="line">2. 如果Pod的重启策略是 Always，进程将会被重启</span><br><span class="line">3. 如果持续这种状态 一边超出 一边重启 会被增加下次的重启时间 </span><br><span class="line">4. Pod 会处于 CrashLoopBackOff 状态</span><br><span class="line">5. 如果不想被OOM ,内存的Limits就不应该被设置的太低</span><br></pre></td></tr></table></figure>
+<h3 id="容器中的应用如何看待-limits"><a href="#容器中的应用如何看待-limits" class="headerlink" title="容器中的应用如何看待 limits"></a>容器中的应用如何看待 limits</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Mem: 1247588K used, 2632820K free, 1008K shrd, 77436K buff, 681992K cached</span><br><span class="line">CPU0:  0.0% usr  0.0% sys  0.0% nic  100% idle  0.0% io  0.0% irq  0.0% sirq</span><br><span class="line">CPU1: 20.0% usr 80.0% sys  0.0% nic  0.0% idle  0.0% io  0.0% irq  0.0% sirq</span><br><span class="line">Load average: 1.13 1.08 0.84 4/351 10</span><br><span class="line">  PID  PPID USER     STAT   VSZ %VSZ CPU %CPU COMMAND</span><br><span class="line">    1     0 root     R     1284  0.0   1 49.9 dd if /dev/zero of /dev/null</span><br><span class="line">    6     0 root     R     1292  0.0   0  0.0 top</span><br><span class="line"></span><br><span class="line"># 在容器中看到的内存数据,始终会是节点内存,而不是容器本身的内存</span><br><span class="line">1. 即使你设置了最大可用内存,top命令显示的是运行该容器的节点的内存数量,而容器无法感知到此限制</span><br><span class="line">2. 对于Java程序 需要设置 -Xmx ，虽然设置了堆大小,但是没有管住 off-heap内存</span><br><span class="line">3. 新版本的JAVA会考虑到容器的limits 缓解该问题</span><br><span class="line">4. cpu也同样,即使我们限制了 cpu配额为1，容器中也无法只显示暴露1个核</span><br><span class="line">5. 如果程序通过查询CPU核数来启动线程数量，可能就不够友好，造成启动大量线程争取资源问题</span><br><span class="line">6. 不能依赖应用程序从系统获取CPU数量，可能需要Downward限制传递给容器,并且使用这个值给程序</span><br></pre></td></tr></table></figure>
+<h2 id="了解-Pod-QoS-等级"><a href="#了解-Pod-QoS-等级" class="headerlink" title="了解 Pod QoS 等级"></a>了解 Pod QoS 等级</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 当节点无法提供所有Pod指定的资源的Limis之和怎么办</span><br><span class="line">1. 假设有两个Pod PodA使用了节点的90% PodB突然使用到了比之前更多内存</span><br><span class="line">2. 这个时候节点无法提供足够的内存，那么意味着哪个Pod会被杀死</span><br><span class="line">3. 是PodB被杀掉 因为无法满足他的内存使用 还是释放PodA 让PodB运行</span><br><span class="line">4. K8S 无法直接帮我们选择,需要设定哪种Pod在该场景的优先级更高</span><br><span class="line">5. K8S 将Pod 划分成3个Qos等级 (服务质量管理)</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. BestEffort (优先级最低)</span><br><span class="line">2. Burstable </span><br><span class="line">3. Guaranteed (优先级最高)</span><br></pre></td></tr></table></figure>
+<h3 id="BestEffort-等级"><a href="#BestEffort-等级" class="headerlink" title="BestEffort 等级"></a>BestEffort 等级</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 最低优先级的BestEffort 会分配给没有(为任何容器)设置任何requests和limits的Pod </span><br><span class="line">2. 这个等级运行的容器没有任何资源保障,在最坏的情况下,他们不会被分配任何CPU时间</span><br><span class="line">3. 同时,在需要为其他Pod释放资源内存时,这些容器会被第一批杀死</span><br><span class="line">4. 好处是,由于他们没有设置 内存的Limits，当有充足可用内存时,这些容器可以使用任意多的内存</span><br></pre></td></tr></table></figure>
+<h3 id="Guaranteed-等级"><a href="#Guaranteed-等级" class="headerlink" title="Guaranteed 等级"></a>Guaranteed 等级</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. CPU和内存都要设置 requests和limits </span><br><span class="line">2. 每个容器都需要设置资源量</span><br><span class="line">3. 每个容器的每种资源的requests和limits 都必须相等</span><br><span class="line">4. 如果只设定limits，那么requests和limits会相等,所以设置一个容器的限制量limits,就可以让这个Pod的等级为Guaranteed</span><br><span class="line">5. Guaranteed 的 Pod 可以使用它申请的资源的等额资源，但是无法消耗更多的资源(requests和limits相同)</span><br></pre></td></tr></table></figure>
+<h3 id="Burstable-等级"><a href="#Burstable-等级" class="headerlink" title="Burstable 等级"></a>Burstable 等级</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. Burstable 介于前两者之间,其他的Pod都属于这个等级</span><br><span class="line">2. requests和limits 不相同的Pod ，</span><br><span class="line">3. 有一个容器定义了request但是没有定义limits的Pod </span><br><span class="line">4. 在多容器的Pod中,1个容器定义了requests和limits , 另外一个确没有定义</span><br><span class="line">5. Burstable 的 Pod 可以获得申请的等额资源,并可以使用额外的资源(超出limits)</span><br></pre></td></tr></table></figure>
+<h3 id="查看Pod的等级"><a href="#查看Pod的等级" class="headerlink" title="查看Pod的等级"></a>查看Pod的等级</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 request]# kubectl describe pod limits-pod</span><br><span class="line">...</span><br><span class="line">QoS Class:       Guaranteed</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h3 id="内存不足时-哪类进程会先被杀死"><a href="#内存不足时-哪类进程会先被杀死" class="headerlink" title="内存不足时 哪类进程会先被杀死"></a>内存不足时 哪类进程会先被杀死</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. BestEffort (优先级最低)  最先被杀掉</span><br><span class="line">2. Burstable               其次</span><br><span class="line">3. Guaranteed (优先级最高)  最后</span><br><span class="line">4. 如果是两个同级的Burstable，系统会根据Pod的实际使用率占内存申请量比率最高的</span><br></pre></td></tr></table></figure>
+<h2 id="为命名空间的Pod设置-requests-和-limits"><a href="#为命名空间的Pod设置-requests-和-limits" class="headerlink" title="为命名空间的Pod设置 requests 和 limits"></a>为命名空间的Pod设置 requests 和 limits</h2><h3 id="LimitRange"><a href="#LimitRange" class="headerlink" title="LimitRange"></a>LimitRange</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 通过该资源为命名空间下的Pod配置资源限制</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 request]# vim limits.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: LimitRange</span><br><span class="line">metadata:</span><br><span class="line">  name: example</span><br><span class="line">spec:              </span><br><span class="line">  limits:</span><br><span class="line">  - type: Pod           # 整个Pod</span><br><span class="line">    min:                # Pod中所有容器的CPU和内存的请求量之和的 最小值</span><br><span class="line">      cpu: 100m         </span><br><span class="line">      memory: 100Mi</span><br><span class="line">    max:                # Pod中所有容器的CPU和内存的请求量之和的 最大值</span><br><span class="line">      cpu: 1</span><br><span class="line">      memory: 1Gi</span><br><span class="line">  - type: Container     # 指定容器的资源限制</span><br><span class="line">    defaultRequest:     # 容器没有指定CPU或内存请求量时的默认值</span><br><span class="line">      cpu: 100m</span><br><span class="line">      memory: 100Mi</span><br><span class="line">    default:            # 容器没有指定 limits 时的默认值</span><br><span class="line">      cpu: 200m</span><br><span class="line">      memory: 200Mi</span><br><span class="line">    min:                # 容器的cpu和内存 requests和limits 最小值和最大值</span><br><span class="line">      cpu: 100m</span><br><span class="line">      memory: 100Mi</span><br><span class="line">    max:</span><br><span class="line">      cpu: 1</span><br><span class="line">      memory: 1Gi</span><br><span class="line">    maxLimitRequestRatio:           # 每种资源requests和limits的最大比值</span><br><span class="line">      cpu: 4</span><br><span class="line">      memory: 10</span><br><span class="line">  - type: PersistentVolumeClaim     # 请求pvc容量的最大值和最小值</span><br><span class="line">    min:</span><br><span class="line">      storage: 1Gi</span><br><span class="line">    max:</span><br><span class="line">      storage: 10Gi</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 request]# vim limits.yaml</span><br><span class="line">[root@k8s-master1 request]# kubectl create -f limits.yaml </span><br><span class="line">limitrange/example created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 request]# kubectl get limitrange</span><br><span class="line">NAME      CREATED AT</span><br><span class="line">example   2020-03-27T10:23:28Z</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"># 测试限制</span><br><span class="line"># 创建一个要求3CPU的Pod</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 request]# vim limits-pod-too-big.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: too-big</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - image: busybox</span><br><span class="line">    args: ["sleep", "9999999"]</span><br><span class="line">    name: main</span><br><span class="line">    resources:</span><br><span class="line">      requests:</span><br><span class="line">        cpu: 3</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 request]# kubectl create -f limits-pod-too-big.yaml </span><br><span class="line">The Pod "too-big" is invalid: spec.containers[0].resources.requests: Invalid value: "2": must be less than or equal to cpu limit</span><br><span class="line"></span><br><span class="line"># 修改一下 不配置资源请求 看看是不是加上默认值</span><br><span class="line">[root@k8s-master1 request]# vim limits-pod-too-big.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: too-big</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - image: busybox</span><br><span class="line">    args: ["sleep", "9999999"]</span><br><span class="line">    name: main</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 request]# kubectl describe pod too-big</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">    Limits:</span><br><span class="line">      cpu:     200m</span><br><span class="line">      memory:  200Mi</span><br><span class="line">    Requests:</span><br><span class="line">      cpu:        100m</span><br><span class="line">      memory:     100Mi</span><br><span class="line">...</span><br><span class="line"># QoS Class:       Burstable</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 总结:</span><br><span class="line">1. Limitrange 只是限制Pod和容器的资源申请 </span><br><span class="line">2. ResourceQuota 限制命名空间的资源</span><br><span class="line">3. 可以在不同的命名空间中增加 Limitrange 限制资源的使用 比如生产环境和测试环境的Pod资源限制,但是无法限制整体使用多少资源</span><br><span class="line">4. ResourceQuota 可以通过限制命名空间的资源,以免大量Pod吃掉整个集群的所有资源</span><br></pre></td></tr></table></figure>
+<h3 id="ResourceQuota"><a href="#ResourceQuota" class="headerlink" title="ResourceQuota"></a>ResourceQuota</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">1. Limitrange应用于单独的Pod，ResourceQuota 应用于命名空间中所有的Pod </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 request]# vim quota-cpu-memory.yaml</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ResourceQuota</span><br><span class="line">metadata:</span><br><span class="line">  name: cpu-and-mem</span><br><span class="line">spec:</span><br><span class="line">  hard:</span><br><span class="line">    requests.cpu: 500m</span><br><span class="line">    requests.memory: 500Mi</span><br><span class="line">    limits.cpu: 1</span><br><span class="line">    limits.memory: 1024Mi</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 request]# kubectl create -f quota-cpu-memory.yaml </span><br><span class="line">resourcequota/cpu-and-mem created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 request]# kubectl describe quota</span><br><span class="line">Name:            cpu-and-mem</span><br><span class="line">Namespace:       default</span><br><span class="line">Resource         Used  Hard</span><br><span class="line">--------         ----  ----</span><br><span class="line">limits.cpu       0     1</span><br><span class="line">limits.memory    0     1Gi</span><br><span class="line">requests.cpu     0     500m</span><br><span class="line">requests.memory  0     500Mi</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 重新创建默认pod看看是否增加变化</span><br><span class="line">[root@k8s-master1 request]# kubectl create -f limits-pod-too-big.yaml </span><br><span class="line">pod/too-big created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 request]# kubectl get pod</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE</span><br><span class="line">too-big                                   1/1     Running   0          17s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 request]# kubectl describe quota</span><br><span class="line">Name:            cpu-and-mem</span><br><span class="line">Namespace:       default</span><br><span class="line">Resource         Used   Hard</span><br><span class="line">--------         ----   ----</span><br><span class="line">limits.cpu       200m   1</span><br><span class="line">limits.memory    200Mi  1Gi</span><br><span class="line">requests.cpu     100m   500m</span><br><span class="line">requests.memory  100Mi  500Mi</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 总结</span><br><span class="line">1. ResourceQuota 和 LimitRange 应该一起创建,如果我们没有创建LimitRange，不指定任何资源限制的pod比如上一个，会无法创建成功</span><br><span class="line">2. 也就是既然有了指定的配额,就必须为Pod创建 requests和limits，否则API不会接收Pod的创建请求\</span><br><span class="line">3. 创建这些资源时,需要指定命名空间创建,否则会在默认的命名空间中创建</span><br><span class="line">4. Quota 定额</span><br><span class="line">5. limit 限制</span><br></pre></td></tr></table></figure>
+<h2 id="监控-Pod-的资源使用量"><a href="#监控-Pod-的资源使用量" class="headerlink" title="监控 Pod 的资源使用量"></a>监控 Pod 的资源使用量</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. Kubernetes 中的组件 Metrics Server 持续采集所有 Pod 副本的指标数据。 (heapster 在k8s 1.13 版本后 被弃用了)</span><br><span class="line">2. cadvisor 采集容器的资源利用率: CPU、内存 的使用率</span><br></pre></td></tr></table></figure>
+<h3 id="部署-Metrics-Server"><a href="#部署-Metrics-Server" class="headerlink" title="部署 Metrics Server"></a>部署 Metrics Server</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# unzip metrics-server.zip </span><br><span class="line">[root@k8s-master1 demo]# cd metrics-server</span><br><span class="line"># 修改参数:</span><br><span class="line">...</span><br><span class="line">      containers:</span><br><span class="line">      - name: metrics-server</span><br><span class="line">        image: lizhenliang/metrics-server-amd64:v0.3.1</span><br><span class="line">        command:</span><br><span class="line">        - /metrics-server</span><br><span class="line">        - --kubelet-insecure-tls                            # 忽略证书</span><br><span class="line">        - --kubelet-preferred-address-types=InternalIP      # 找到nodeIP，默认使用注册节点名称,修改成IP</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"># 部署</span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl apply -f . </span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl get pods -n kube-system</span><br><span class="line"></span><br><span class="line"># 检查是否正常工作</span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl logs metrics-server-7dbbcf4c7-vzdn2 -n kube-system</span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl get apiservice</span><br><span class="line">...</span><br><span class="line">v1beta1.metrics.k8s.io                 kube-system/metrics-server   True        86s</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"># 获取资源利用率 metrics-server 工作正常 采集到了数据</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl top node</span><br><span class="line">NAME          CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%   </span><br><span class="line">k8s-master1   118m         5%     1169Mi          31%       </span><br><span class="line">k8s-node1     81m          4%     543Mi           14%       </span><br><span class="line">k8s-node2     83m          4%     545Mi           14%   </span><br><span class="line"></span><br><span class="line"># 显示Pod的资源使用情况</span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl top pods</span><br><span class="line">NAME                                      CPU(cores)   MEMORY(bytes)   </span><br><span class="line">nfs-client-provisioner-56f4b98d47-v4nf6   1m           6Mi             </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 metrics-server]# kubectl top pods --all-namespaces</span><br><span class="line">NAMESPACE              NAME                                         CPU(cores)   MEMORY(bytes)   </span><br><span class="line">default                nfs-client-provisioner-56f4b98d47-v4nf6      1m           6Mi             </span><br><span class="line">ingress-nginx          nginx-ingress-controller-6txhq               4m           111Mi           </span><br><span class="line">ingress-nginx          nginx-ingress-controller-jqxrm               4m           109Mi           </span><br><span class="line">ingress-nginx          nginx-ingress-controller-m8ljl               4m           107Mi           </span><br><span class="line">kube-system            coredns-6d8cfdd59d-w2xnx                     3m           12Mi            </span><br><span class="line">kube-system            kube-flannel-ds-amd64-q29r8                  2m           13Mi            </span><br><span class="line">kube-system            kube-flannel-ds-amd64-xh7c4                  2m           9Mi             </span><br><span class="line">kube-system            kube-flannel-ds-amd64-xq7gq                  2m           11Mi            </span><br><span class="line">kube-system            metrics-server-7dbbcf4c7-6qrsb               1m           13Mi            </span><br><span class="line">kubernetes-dashboard   dashboard-metrics-scraper-566cddb686-t8fw4   1m           11Mi            </span><br><span class="line">kubernetes-dashboard   kubernetes-dashboard-c4bc5bd44-4prrf         2m           17Mi            </span><br><span class="line"></span><br><span class="line"># 如果 top pod命令拒绝，有可能是收集工作正在执行,等等再看即可</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/24/k8s-base21/" rel="next" title="19 Statefulset 部署有状态应用">
+                <i class="fa fa-chevron-left"></i> 19 Statefulset 部署有状态应用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/24/k8s-base23/" rel="prev" title="21 高级调度">
+                21 高级调度 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">119</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为Pod中的容器申请资源"><span class="nav-number">1.</span> <span class="nav-text">为Pod中的容器申请资源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建包含-requests-请求资源的-Pod"><span class="nav-number">1.1.</span> <span class="nav-text">创建包含 requests 请求资源的 Pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#资源-requests-如何影响调度"><span class="nav-number">1.2.</span> <span class="nav-text">资源 requests 如何影响调度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看节点资源总量"><span class="nav-number">1.3.</span> <span class="nav-text">查看节点资源总量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模拟超出请求资源总量"><span class="nav-number">1.4.</span> <span class="nav-text">模拟超出请求资源总量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限制容器的可用资源"><span class="nav-number">2.</span> <span class="nav-text">限制容器的可用资源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置容器可用资源的硬限制"><span class="nav-number">2.1.</span> <span class="nav-text">设置容器可用资源的硬限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建包含-limits-限制资源的-Pod"><span class="nav-number">2.2.</span> <span class="nav-text">创建包含 limits 限制资源的 Pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#超过-limits"><span class="nav-number">2.3.</span> <span class="nav-text">超过 limits</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#容器中的应用如何看待-limits"><span class="nav-number">2.4.</span> <span class="nav-text">容器中的应用如何看待 limits</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#了解-Pod-QoS-等级"><span class="nav-number">3.</span> <span class="nav-text">了解 Pod QoS 等级</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BestEffort-等级"><span class="nav-number">3.1.</span> <span class="nav-text">BestEffort 等级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Guaranteed-等级"><span class="nav-number">3.2.</span> <span class="nav-text">Guaranteed 等级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Burstable-等级"><span class="nav-number">3.3.</span> <span class="nav-text">Burstable 等级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看Pod的等级"><span class="nav-number">3.4.</span> <span class="nav-text">查看Pod的等级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存不足时-哪类进程会先被杀死"><span class="nav-number">3.5.</span> <span class="nav-text">内存不足时 哪类进程会先被杀死</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为命名空间的Pod设置-requests-和-limits"><span class="nav-number">4.</span> <span class="nav-text">为命名空间的Pod设置 requests 和 limits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LimitRange"><span class="nav-number">4.1.</span> <span class="nav-text">LimitRange</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ResourceQuota"><span class="nav-number">4.2.</span> <span class="nav-text">ResourceQuota</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监控-Pod-的资源使用量"><span class="nav-number">5.</span> <span class="nav-text">监控 Pod 的资源使用量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#部署-Metrics-Server"><span class="nav-number">5.1.</span> <span class="nav-text">部署 Metrics Server</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

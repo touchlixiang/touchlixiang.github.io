@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="k8s,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="18 Deployment 声明式地升级应用">
+<meta property="og:url" content="https://touchlixiang.github.io/2020/03/19/k8s-base20/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:updated_time" content="2020-04-10T09:27:17.214Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="18 Deployment 声明式地升级应用">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2020/03/19/k8s-base20/">
+
+
+
+
+
+  <title>18 Deployment 声明式地升级应用 | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2020/03/19/k8s-base20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">18 Deployment 声明式地升级应用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-19T22:52:23+08:00">
+                2020-03-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/k8s/" itemprop="url" rel="index">
+                    <span itemprop="name">k8s</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="使用-RC-实现自动滚动升级"><a href="#使用-RC-实现自动滚动升级" class="headerlink" title="使用 RC 实现自动滚动升级"></a>使用 RC 实现自动滚动升级</h2><h3 id="先定义两个容器镜像-v1-和-v2-版本"><a href="#先定义两个容器镜像-v1-和-v2-版本" class="headerlink" title="先定义两个容器镜像 v1 和 v2 版本"></a>先定义两个容器镜像 v1 和 v2 版本</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># v1 版本</span><br><span class="line">[root@k8s-master2 v1]# cat app.js </span><br><span class="line">const http = require('http');</span><br><span class="line">const os = require('os');</span><br><span class="line"></span><br><span class="line">console.log("Kubia server starting...");</span><br><span class="line"></span><br><span class="line">var handler = function(request, response) &#123;</span><br><span class="line">  console.log("Received request from " + request.connection.remoteAddress);</span><br><span class="line">  response.writeHead(200);</span><br><span class="line">  response.end("This is v1 running in pod " + os.hostname() + "\n");</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">var www = http.createServer(handler);</span><br><span class="line">www.listen(8080);</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 v1]# cat Dockerfile </span><br><span class="line">FROM node:7</span><br><span class="line">ADD app.js /app.js</span><br><span class="line">ENTRYPOINT ["node", "app.js"]</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 v1]# docker build -t 172.31.228.68/game/kubia:v1 .</span><br><span class="line">[root@k8s-master2 v1]# docker push 172.31.228.68/game/kubia:v1</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># v2 版本 区别在于返回的是 v2的信息</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master2 v2]# docker build -t 172.31.228.68/game/kubia:v2 .</span><br><span class="line">[root@k8s-master2 v2]# cat app.js </span><br><span class="line">const http = require('http');</span><br><span class="line">const os = require('os');</span><br><span class="line"></span><br><span class="line">console.log("Kubia server starting...");</span><br><span class="line"></span><br><span class="line">var handler = function(request, response) &#123;</span><br><span class="line">  console.log("Received request from " + request.connection.remoteAddress);</span><br><span class="line">  response.writeHead(200);</span><br><span class="line">  response.end("This is v2 running in pod " + os.hostname() + "\n");</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">var www = http.createServer(handler);</span><br><span class="line">www.listen(8080);</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 v2]# cat Dockerfile </span><br><span class="line">FROM node:7</span><br><span class="line">ADD app.js /app.js</span><br><span class="line">ENTRYPOINT ["node", "app.js"]</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 v2]# docker build -t 172.31.228.68/game/kubia:v2 .</span><br><span class="line">[root@k8s-master2 v2]# docker push 172.31.228.68/game/kubia:v2</span><br></pre></td></tr></table></figure>
+<h3 id="单个-yaml-运行-rc-和-service"><a href="#单个-yaml-运行-rc-和-service" class="headerlink" title="单个 yaml 运行 rc 和 service"></a>单个 yaml 运行 rc 和 service</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"># 多种资源定义通过 --- 分割</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# vim kubia-rc-svc-v1.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ReplicationController</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia-v1</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      name: kubia</span><br><span class="line">      labels:</span><br><span class="line">        app: kubia</span><br><span class="line">    spec:</span><br><span class="line">      imagePullSecrets:</span><br><span class="line">      - name: my-harbor-secret</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/game/kubia:v1</span><br><span class="line">        name: nodejs</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  type: NodePort</span><br><span class="line">  selector:</span><br><span class="line">    app: kubia</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80</span><br><span class="line">    targetPort: 8080</span><br><span class="line">    nodePort: 30123</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 deployment]# kubectl get pods,svc</span><br><span class="line">NAME                                          READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/kubia-v1-5cgjx                            1/1     Running   0          2m21s</span><br><span class="line">pod/kubia-v1-tbhqr                            1/1     Running   0          2m21s</span><br><span class="line">pod/kubia-v1-th6rr                            1/1     Running   0          2m21s</span><br><span class="line">pod/nfs-client-provisioner-56f4b98d47-v4nf6   1/1     Running   8          3d14h</span><br><span class="line"></span><br><span class="line">NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">service/kubernetes   ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        13d</span><br><span class="line">service/kubia        NodePort    10.0.0.119   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:30123/TCP   2m21s</span><br><span class="line"></span><br><span class="line"># 测试程序一直循环访问</span><br><span class="line">[root@k8s-master1 demo]# while true;do curl http://10.0.0.119;sleep 1; done</span><br><span class="line">This is v1 running in pod kubia-v1-tbhqr</span><br><span class="line">This is v1 running in pod kubia-v1-th6rr</span><br><span class="line">This is v1 running in pod kubia-v1-5cgjx</span><br></pre></td></tr></table></figure>
+<h3 id="RC-的滚动升级-rolling-update"><a href="#RC-的滚动升级-rolling-update" class="headerlink" title="RC 的滚动升级 rolling-update"></a>RC 的滚动升级 rolling-update</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 deployment]# kubectl rolling-update kubia-v1 kubia-v2 --image=172.31.228.68/game/kubia:v2</span><br><span class="line">Command "rolling-update" is deprecated, use "rollout" instead</span><br><span class="line">Created kubia-v2</span><br><span class="line">Scaling up kubia-v2 from 0 to 3, scaling down kubia-v1 from 3 to 0 (keep 3 pods available, don't exceed 4 pods)</span><br><span class="line">Scaling kubia-v2 up to 1</span><br><span class="line">Scaling kubia-v1 down to 2</span><br><span class="line">Scaling kubia-v2 up to 2</span><br><span class="line">Scaling kubia-v1 down to 1</span><br><span class="line">Scaling kubia-v2 up to 3</span><br><span class="line">Scaling kubia-v1 down to 0</span><br><span class="line">Update succeeded. Deleting kubia-v1</span><br><span class="line">replicationcontroller/kubia-v2 rolling updated to "kubia-v2"</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl describe rc kubia-v2</span><br><span class="line">Name:         kubia-v2</span><br><span class="line">Namespace:    default</span><br><span class="line">Selector:     app=kubia,deployment=1c9b94fec2662e272187373534aef5c6</span><br><span class="line">Labels:       app=kubia</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl describe rc kubia-v1</span><br><span class="line">Name:         kubia-v1</span><br><span class="line">Namespace:    default</span><br><span class="line">Selector:     app=kubia,deployment=9b82b6cdfb3cd18a5e53068dda002fe1-orig</span><br><span class="line">Labels:       app=kubia</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"># 查看 Pod</span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods --show-labels</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE     LABELS</span><br><span class="line">kubia-v1-tbhqr                            1/1     Running   0          18m     app=kubia,deployment=9b82b6cdfb3cd18a5e53068dda002fe1-orig</span><br><span class="line">kubia-v2-p8vbl                            1/1     Running   0          3m15s   app=kubia,deployment=1c9b94fec2662e272187373534aef5c6</span><br><span class="line">kubia-v2-x7g6g                            1/1     Running   0          2m8s    app=kubia,deployment=1c9b94fec2662e272187373534aef5c6</span><br><span class="line">kubia-v2-xr8hz                            1/1     Running   0          62s     app=kubia,deployment=1c9b94fec2662e272187373534aef5c6</span><br><span class="line">nfs-client-provisioner-56f4b98d47-v4nf6   1/1     Running   8          3d14h   app=nfs-client-provisioner,pod-template-hash=56f4b98d47</span><br><span class="line"></span><br><span class="line"># v1的pod被滚动升级到v2版本 并且多了一个标签 deployment=9b82...</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE     IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-v2-p8vbl                            1/1     Running   0          5m54s   10.244.1.75   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-v2-x7g6g                            1/1     Running   0          4m47s   10.244.0.61   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-v2-xr8hz                            1/1     Running   0          3m41s   10.244.2.62   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">nfs-client-provisioner-56f4b98d47-v4nf6   1/1     Running   8          3d14h   10.244.0.59   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 请求也都到了 v2 </span><br><span class="line">This is v2 running in pod kubia-v2-x7g6g</span><br><span class="line">This is v2 running in pod kubia-v2-p8vbl</span><br><span class="line">This is v2 running in pod kubia-v2-xr8hz</span><br><span class="line"></span><br><span class="line"># rolling-update 已过时,现在使用 deployment </span><br><span class="line"># deployment 是否可以通过修改pod中的镜像 升级应用 而不是通过删除手法的自动伸缩,应该通过期望副本数来做升级</span><br></pre></td></tr></table></figure>
+<h2 id="使用-Deployment-声明式升级应用"><a href="#使用-Deployment-声明式升级应用" class="headerlink" title="使用 Deployment 声明式升级应用"></a>使用 Deployment 声明式升级应用</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. Deployment -&gt; rs -&gt; pod</span><br><span class="line">2. Deployment 是一种更高级资源 用于部署应用程序，并且用声明式方式更新应用</span><br><span class="line">3. Deployment 被创建时也会创建 ReplicaSet ，在使用Deployment时实际上Pod是由ReplicaSet创建和管理的</span><br></pre></td></tr></table></figure>
+<h3 id="创建-Deployment"><a href="#创建-Deployment" class="headerlink" title="创建 Deployment"></a>创建 Deployment</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 deployment]# kubectl explain deployment</span><br><span class="line">KIND:     Deployment</span><br><span class="line">VERSION:  apps/v1</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# vim kubia-deployment-v1.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: kubia</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      name: kubia</span><br><span class="line">      labels:</span><br><span class="line">        app: kubia</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/game/kubia:v1</span><br><span class="line">        name: nodejs</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl delete rc --all</span><br><span class="line">replicationcontroller "kubia-v2" deleted</span><br><span class="line"></span><br><span class="line"># 创建deployment并记录版本号</span><br><span class="line">[root@k8s-master1 deployment]# kubectl create -f kubia-deployment-v1.yaml --record</span><br><span class="line">deployment.apps/kubia created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS        RESTARTS   AGE     IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-dbd9664c7-4mggm                     1/1     Running       0          35s     10.244.2.64   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-dbd9664c7-8b629                     1/1     Running       0          35s     10.244.1.77   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-dbd9664c7-8npt4                     1/1     Running       0          35s     10.244.0.63   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl get rs</span><br><span class="line">NAME                                DESIRED   CURRENT   READY   AGE</span><br><span class="line">kubia-dbd9664c7                     3         3         3       93s</span><br><span class="line"></span><br><span class="line"># 别忘记deployment是通过rs来创建pod 所有rs的名字中包含了pod模板的哈希值</span><br><span class="line"># Deployment可以创建多个RS来对应管理一组Pod模板</span><br><span class="line"># 可以通过RS这个值去区分 </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pod --show-labels</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE     LABELS</span><br><span class="line">kubia-dbd9664c7-4mggm                     1/1     Running   0          5m36s   app=kubia,pod-template-hash=dbd9664c7</span><br><span class="line">kubia-dbd9664c7-8b629                     1/1     Running   0          5m36s   app=kubia,pod-template-hash=dbd9664c7</span><br><span class="line">kubia-dbd9664c7-8npt4                     1/1     Running   0          5m36s   app=kubia,pod-template-hash=dbd9664c7</span><br></pre></td></tr></table></figure>
+<h3 id="升级-Deployment"><a href="#升级-Deployment" class="headerlink" title="升级 Deployment"></a>升级 Deployment</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Deployment 有两种升级策略</span><br><span class="line">1. 默认滚动更新 渐进删除旧Pod,同时创建新Pod ，整个应用在升级中都处于可用状态  RollingUpdate</span><br><span class="line">2. 一次删除所有旧Pod,然后创建新Pod 应用如果不支持多版本同时对外提供服务,就需要再启动新版本之前停止旧版本，会导致短期业务无不可用 Recre-ate</span><br></pre></td></tr></table></figure>
+<h3 id="减慢滚动升级速度"><a href="#减慢滚动升级速度" class="headerlink" title="减慢滚动升级速度"></a>减慢滚动升级速度</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 用来测试查看观察升级过程 </span><br><span class="line"># 设置为10秒</span><br><span class="line"># kubectl patch 可以用来修改单个资源信息</span><br><span class="line">[root@k8s-master1 demo]# kubectl patch deployment kubia -p '&#123;"spec": &#123;"minReadySeconds": 10&#125;&#125;'</span><br><span class="line">deployment.apps/kubia patched</span><br><span class="line"></span><br><span class="line"># 查看下</span><br><span class="line">[root@k8s-master1 deployment]# kubectl edit deploy kubia</span><br><span class="line">spec:</span><br><span class="line">  minReadySeconds: 10</span><br></pre></td></tr></table></figure>
+<h3 id="修改镜像-触发滚动升级"><a href="#修改镜像-触发滚动升级" class="headerlink" title="修改镜像 触发滚动升级"></a>修改镜像 触发滚动升级</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# while true;do curl http://10.0.0.119;sleep 1; done</span><br><span class="line">This is v1 running in pod kubia-dbd9664c7-8npt4</span><br><span class="line">This is v1 running in pod kubia-dbd9664c7-4mggm</span><br><span class="line">This is v1 running in pod kubia-dbd9664c7-8b629</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl set image deployment kubia nodejs=172.31.228.68/game/kubia:v2</span><br><span class="line">deployment.apps/kubia image updated</span><br><span class="line"></span><br><span class="line"># 滚动升级过程 一个个的将v1版本pod 替换成 v2 pod </span><br><span class="line">This is v2 running in pod kubia-56fd945996-lz847</span><br><span class="line">This is v2 running in pod kubia-56fd945996-glj6d</span><br><span class="line">This is v2 running in pod kubia-56fd945996-ccg9c</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS        RESTARTS   AGE     IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-56fd945996-ccg9c                    1/1     Running       0          61s     10.244.1.78   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-56fd945996-glj6d                    1/1     Running       0          49s     10.244.0.64   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-56fd945996-lz847                    1/1     Running       0          38s     10.244.2.65   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-dbd9664c7-8b629                     1/1     Terminating   0          20m     10.244.1.77   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># 升级过程</span><br><span class="line"># 1. 创建新的的RS(v2) 并且慢慢扩容</span><br><span class="line"># 2. 之前版本(v1) 会缩容至0</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl get rs</span><br><span class="line">NAME                                DESIRED   CURRENT   READY   AGE</span><br><span class="line">kubia-56fd945996                    3         3         3       5m28s</span><br><span class="line">kubia-dbd9664c7                     0         0         0       25m</span><br><span class="line"></span><br><span class="line"># 旧版本的RS会被保留，可以用来做更多的操作 </span><br><span class="line"># RC 无法实现这些 比如修改镜像版本触发更新,或者是回滚</span><br></pre></td></tr></table></figure>
+<h3 id="更新-ConfigMap"><a href="#更新-ConfigMap" class="headerlink" title="更新 ConfigMap"></a>更新 ConfigMap</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 如果 deployment 中的pod 引用了1个 ConfigMap(或Secret) </span><br><span class="line"># 1. 更改ConfigMap资源本身不会触发升级操作</span><br><span class="line"># 2. 如果需要修改应用程序的配置并且想触发更新 需要创建一个新的ConfigMap 并且修改Pod模板引用新的CM</span><br></pre></td></tr></table></figure>
+<h3 id="回滚-Deployment"><a href="#回滚-Deployment" class="headerlink" title="回滚 Deployment"></a>回滚 Deployment</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># 先创建一个错误版本 v3 </span><br><span class="line"># 5个请求后 会返回500错误</span><br><span class="line"></span><br><span class="line">[root@k8s-master2 v3]# cat app.js </span><br><span class="line">const http = require('http');</span><br><span class="line">const os = require('os');</span><br><span class="line"></span><br><span class="line">var requestCount = 0;</span><br><span class="line"></span><br><span class="line">console.log("Kubia server starting...");</span><br><span class="line"></span><br><span class="line">var handler = function(request, response) &#123;</span><br><span class="line">  console.log("Received request from " + request.connection.remoteAddress);</span><br><span class="line">  if (++requestCount &gt;= 5) &#123;</span><br><span class="line">    response.writeHead(500);</span><br><span class="line">    response.end("Some internal error has occurred! This is pod " + os.hostname() + "\n");</span><br><span class="line">    return;</span><br><span class="line">  &#125;</span><br><span class="line">  response.writeHead(200);</span><br><span class="line">  response.end("This is v3 running in pod " + os.hostname() + "\n");</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">var www = http.createServer(handler);</span><br><span class="line">www.listen(8080);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master2 v3]# docker build -t 172.31.228.68/game/kubia:v3 .</span><br><span class="line">[root@k8s-master2 v3]# docker push 172.31.228.68/game/kubia:v3</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 升级 然后查看错误请求</span><br><span class="line">[root@k8s-master1 deployment]# kubectl set image deployment kubia nodejs=172.31.228.68/game/kubia:v3</span><br><span class="line">deployment.apps/kubia image updated</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl set image deployment kubia nodejs=172.31.228.68/game/kubia:v3</span><br><span class="line">deployment.apps/kubia image updated</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# while true;do curl http://10.0.0.119;sleep 1; done</span><br><span class="line">This is v3 running in pod kubia-698c869b67-z7qpw</span><br><span class="line">This is v3 running in pod kubia-698c869b67-228w5</span><br><span class="line">Some internal error has occurred! This is pod kubia-698c869b67-vkvch</span><br><span class="line">Some internal error has occurred! This is pod kubia-698c869b67-z7qpw</span><br><span class="line">Some internal error has occurred! This is pod kubia-698c869b67-228w5</span><br><span class="line">Some internal error has occurred! This is pod kubia-698c869b67-vkvch</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"># 回滚升级 到之前的版本</span><br><span class="line">[root@k8s-master1 deployment]# kubectl rollout undo deployment kubia</span><br><span class="line">deployment.apps/kubia rolled back</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">This is v2 running in pod kubia-56fd945996-t28ch</span><br><span class="line">This is v2 running in pod kubia-56fd945996-n7cwd</span><br><span class="line">This is v2 running in pod kubia-56fd945996-jzzl4</span><br><span class="line"></span><br><span class="line"># 显示Deployment的滚动升级历史</span><br><span class="line">[root@k8s-master1 deployment]# kubectl rollout history deployment kubia</span><br><span class="line">deployment.apps/kubia </span><br><span class="line">REVISION  CHANGE-CAUSE</span><br><span class="line">1         kubectl create --filename=kubia-deployment-v1.yaml --record=true</span><br><span class="line">3         kubectl create --filename=kubia-deployment-v1.yaml --record=true</span><br><span class="line">4         kubectl create --filename=kubia-deployment-v1.yaml --record=true</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 版本记录大小 </span><br><span class="line">[root@k8s-master1 deployment]# kubectl edit deploy kubia</span><br><span class="line">revisionHistoryLimit: 10</span><br><span class="line"></span><br><span class="line"># 根据版本号回滚</span><br><span class="line">[root@k8s-master1 deployment]# kubectl rollout undo deployment kubia --to-revision=1</span><br><span class="line">deployment.apps/kubia rolled back</span><br><span class="line">[root@k8s-master1 deployment]# kubectl get rs</span><br><span class="line">NAME                                DESIRED   CURRENT   READY   AGE</span><br><span class="line">kubia-56fd945996                    0         0         0       3m26s</span><br><span class="line">kubia-698c869b67                    0         0         0       2m47s</span><br><span class="line">kubia-dbd9664c7                     3         3         3       8m52s</span><br><span class="line"></span><br><span class="line"># RS中记录着版本号</span><br><span class="line">[root@k8s-master1 deployment]# kubectl edit rs kubia-dbd9664c7</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: ReplicaSet</span><br><span class="line">metadata:</span><br><span class="line">  annotations:</span><br><span class="line">    deployment.kubernetes.io/desired-replicas: "3"</span><br><span class="line">    deployment.kubernetes.io/max-replicas: "4"</span><br><span class="line">    deployment.kubernetes.io/revision: "5"</span><br><span class="line">    deployment.kubernetes.io/revision-history: "1"</span><br><span class="line">    kubernetes.io/change-cause: kubectl create --filename=kubia-deployment-v1.yaml</span><br><span class="line">      --record=true</span><br></pre></td></tr></table></figure>
+<h3 id="控制滚动升级速率"><a href="#控制滚动升级速率" class="headerlink" title="控制滚动升级速率"></a>控制滚动升级速率</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 deployment]# kubectl edit deploy kubia</span><br><span class="line">  strategy:</span><br><span class="line">    rollingUpdate:</span><br><span class="line">      maxSurge: 25%</span><br><span class="line">      maxUnavailable: 25%</span><br><span class="line">    type: RollingUpdate</span><br><span class="line"></span><br><span class="line"># maxSurge 最多超出副本数之外 设置成1或者2 最多超出1到2个Pod </span><br><span class="line"># maxUnavailable 滚动升级期间,有多少个Pod成为不可用状态</span><br></pre></td></tr></table></figure>
+<h3 id="暂停滚动升级-使用试探性发布"><a href="#暂停滚动升级-使用试探性发布" class="headerlink" title="暂停滚动升级 使用试探性发布"></a>暂停滚动升级 使用试探性发布</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 假金丝雀发布</span><br><span class="line"># 让少数请求到升级后的服务</span><br><span class="line"># 之前的继续使用旧版本</span><br><span class="line"># 有问题回滚到旧版本,没问题全部升级</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"># 先做一个最新版本</span><br><span class="line">[root@k8s-master2 v4]# cat app.js </span><br><span class="line">const http = require('http');</span><br><span class="line">const os = require('os');</span><br><span class="line"></span><br><span class="line">console.log("Kubia server starting...");</span><br><span class="line"></span><br><span class="line">var handler = function(request, response) &#123;</span><br><span class="line">  console.log("Received request from " + request.connection.remoteAddress);</span><br><span class="line">  response.writeHead(200);</span><br><span class="line">  response.end("This is v4 running in pod " + os.hostname() + "\n");</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">var www = http.createServer(handler);</span><br><span class="line">www.listen(8080);</span><br><span class="line"></span><br><span class="line"># 暂停滚动升级</span><br><span class="line">[root@k8s-master1 deployment]# kubectl set image deployment kubia nodejs=172.31.228.68/game/kubia:v4</span><br><span class="line">deployment.apps/kubia image updated</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl rollout pause deployment kubia</span><br><span class="line">deployment.apps/kubia paused</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE     IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-557944968b-579xn                    1/1     Running   0          71s     10.244.1.86   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-557944968b-vr6s5                    1/1     Running   0          59s     10.244.2.73   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-dbd9664c7-bhpf5                     1/1     Running   0          26m     10.244.0.71   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-dbd9664c7-hc4kj                     1/1     Running   0          27m     10.244.1.85   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 ~]# while true;do curl http://10.0.0.119;sleep 1; done</span><br><span class="line">This is v4 running in pod kubia-557944968b-579xn</span><br><span class="line">This is v1 running in pod kubia-dbd9664c7-bhpf5</span><br><span class="line">This is v1 running in pod kubia-dbd9664c7-hc4kj</span><br><span class="line">This is v4 running in pod kubia-557944968b-vr6s5</span><br><span class="line">This is v4 running in pod kubia-557944968b-579xn</span><br><span class="line"></span><br><span class="line"># 正常 恢复滚动升级</span><br><span class="line">[root@k8s-master1 deployment]# kubectl rollout resume deployment kubia</span><br><span class="line">deployment.apps/kubia resumed</span><br><span class="line"></span><br><span class="line"># 如果想完全的对应pod数量 可以考虑使用两个不同的Deployment 同时数量一致,同时上线,再调整下线的Deployment</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# vim kubia-deployment-v2.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia-v2</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: kubia</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      name: kubia</span><br><span class="line">      labels:</span><br><span class="line">        app: kubia</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/game/kubia:v2</span><br><span class="line">        name: nodejs</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl create -f kubia-deployment-v2.yaml </span><br><span class="line">deployment.apps/kubia-v2 created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl get ep</span><br><span class="line">NAME         ENDPOINTS                                                        AGE</span><br><span class="line">kubernetes   172.31.228.67:6443                                               13d</span><br><span class="line">kubia        10.244.0.72:8080,10.244.0.73:8080,10.244.1.86:8080 + 3 more...   128m</span><br><span class="line"></span><br><span class="line"># 由于svc匹配两个Pod的标签,所以被加入服务</span><br><span class="line">This is v4 running in pod kubia-557944968b-6bw9r</span><br><span class="line">This is v4 running in pod kubia-557944968b-vr6s5</span><br><span class="line">This is v4 running in pod kubia-557944968b-579xn</span><br><span class="line">This is v2 running in pod kubia-v2-56fd945996-t9zdb</span><br><span class="line">This is v2 running in pod kubia-v2-56fd945996-76g6l</span><br><span class="line">This is v2 running in pod kubia-v2-56fd945996-fgn2k</span><br></pre></td></tr></table></figure>
+<h3 id="增加-就绪探针"><a href="#增加-就绪探针" class="headerlink" title="增加 就绪探针"></a>增加 就绪探针</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"># 先全部回滚到v2版本</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# vim kubia-deployment-v3-with-readinesscheck.yaml</span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: kubia</span><br><span class="line">  minReadySeconds: 10</span><br><span class="line">  strategy:</span><br><span class="line">    rollingUpdate:</span><br><span class="line">      maxSurge: 1</span><br><span class="line">      maxUnavailable: 0</span><br><span class="line">    type: RollingUpdate</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      name: kubia</span><br><span class="line">      labels:</span><br><span class="line">        app: kubia</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/game/kubia:v3</span><br><span class="line">        name: nodejs</span><br><span class="line">        readinessProbe:</span><br><span class="line">          periodSeconds: 1</span><br><span class="line">          httpGet:</span><br><span class="line">            path: /</span><br><span class="line">            port: 8080</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 deployment]# kubectl apply -f kubia-deployment-v3-with-readinesscheck.yaml </span><br><span class="line"></span><br><span class="line">This is v2 running in pod kubia-56fd945996-8zr5j</span><br><span class="line">This is v2 running in pod kubia-56fd945996-6g4zl</span><br><span class="line">This is v2 running in pod kubia-56fd945996-hfvk5</span><br><span class="line">This is v2 running in pod kubia-56fd945996-8zr5j</span><br><span class="line">This is v2 running in pod kubia-56fd945996-6g4zl</span><br><span class="line"></span><br><span class="line"># 没有出现v3版本</span><br><span class="line">[root@k8s-master1 deployment]# kubectl get pods -o wide</span><br><span class="line">NAME                                      READY   STATUS    RESTARTS   AGE     IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kubia-56fd945996-6g4zl                    1/1     Running   0          3m59s   10.244.0.75   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-56fd945996-8zr5j                    1/1     Running   0          4m22s   10.244.2.75   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-56fd945996-hfvk5                    1/1     Running   0          4m10s   10.244.1.89   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-58c74659b7-mf2bv                    0/1     Running   0          69s     10.244.1.90   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># kubia-58c74659b7-mf2bv  为处于就绪状态</span><br><span class="line"># 当新的Pod启动时候,就绪探针每隔1秒去发起请求 在上面的pod里 第5个请求会出现500返回,就绪探针会报错</span><br><span class="line"># 因为 pod会从Svc的ep中被剔除 所以curl也请求不到新的Pod</span><br><span class="line">[root@k8s-master1 deployment]# kubectl get ep</span><br><span class="line">NAME         ENDPOINTS                                            AGE</span><br><span class="line">kubernetes   172.31.228.67:6443                                   13d</span><br><span class="line">kubia        10.244.0.75:8080,10.244.1.89:8080,10.244.2.75:8080   143m</span><br><span class="line"></span><br><span class="line"># 滚动升级不继续下去,新的Pod一直处于不可用状态，就绪10秒后才真可用</span><br><span class="line"># maxUnavailable: 0 使滚动更新正好卡在这里 除非之前的Pod准备就绪才行1</span><br></pre></td></tr></table></figure>
+<h3 id="滚动升级时限"><a href="#滚动升级时限" class="headerlink" title="滚动升级时限"></a>滚动升级时限</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 deployment]# kubectl edit deploy kubia</span><br><span class="line">spec:</span><br><span class="line">progressDeadlineSeconds: 600</span><br><span class="line"></span><br><span class="line"># 滚动超时会自动取消</span><br></pre></td></tr></table></figure>
+<h3 id="取消出错版本的滚动升级"><a href="#取消出错版本的滚动升级" class="headerlink" title="取消出错版本的滚动升级"></a>取消出错版本的滚动升级</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 直接回滚到上一版本</span><br><span class="line">[root@k8s-master1 deployment]#  kubectl rollout undo deployment kubia</span><br><span class="line">deployment.apps/kubia rolled back</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/19/k8s-base19/" rel="next" title="17 从应用访问 Pod 元数据">
+                <i class="fa fa-chevron-left"></i> 17 从应用访问 Pod 元数据
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/24/k8s-base21/" rel="prev" title="19 Statefulset 部署有状态应用">
+                19 Statefulset 部署有状态应用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">119</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-RC-实现自动滚动升级"><span class="nav-number">1.</span> <span class="nav-text">使用 RC 实现自动滚动升级</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#先定义两个容器镜像-v1-和-v2-版本"><span class="nav-number">1.1.</span> <span class="nav-text">先定义两个容器镜像 v1 和 v2 版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#单个-yaml-运行-rc-和-service"><span class="nav-number">1.2.</span> <span class="nav-text">单个 yaml 运行 rc 和 service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RC-的滚动升级-rolling-update"><span class="nav-number">1.3.</span> <span class="nav-text">RC 的滚动升级 rolling-update</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Deployment-声明式升级应用"><span class="nav-number">2.</span> <span class="nav-text">使用 Deployment 声明式升级应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Deployment"><span class="nav-number">2.1.</span> <span class="nav-text">创建 Deployment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#升级-Deployment"><span class="nav-number">2.2.</span> <span class="nav-text">升级 Deployment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#减慢滚动升级速度"><span class="nav-number">2.3.</span> <span class="nav-text">减慢滚动升级速度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改镜像-触发滚动升级"><span class="nav-number">2.4.</span> <span class="nav-text">修改镜像 触发滚动升级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新-ConfigMap"><span class="nav-number">2.5.</span> <span class="nav-text">更新 ConfigMap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#回滚-Deployment"><span class="nav-number">2.6.</span> <span class="nav-text">回滚 Deployment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#控制滚动升级速率"><span class="nav-number">2.7.</span> <span class="nav-text">控制滚动升级速率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#暂停滚动升级-使用试探性发布"><span class="nav-number">2.8.</span> <span class="nav-text">暂停滚动升级 使用试探性发布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#增加-就绪探针"><span class="nav-number">2.9.</span> <span class="nav-text">增加 就绪探针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#滚动升级时限"><span class="nav-number">2.10.</span> <span class="nav-text">滚动升级时限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取消出错版本的滚动升级"><span class="nav-number">2.11.</span> <span class="nav-text">取消出错版本的滚动升级</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

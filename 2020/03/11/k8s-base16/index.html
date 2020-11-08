@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="k8s,">
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="14 K8S 服务发现 Service">
+<meta property="og:url" content="https://touchlixiang.github.io/2020/03/11/k8s-base16/index.html">
+<meta property="og:site_name" content="My Notes">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+<meta property="og:image" content="https://touchlixiang.github.io/img/k8s/k8s_373.png">
+<meta property="og:updated_time" content="2020-03-14T03:35:42.840Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="14 K8S 服务发现 Service">
+<meta name="twitter:image" content="https://touchlixiang.github.io/img/mix_3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://touchlixiang.github.io/2020/03/11/k8s-base16/">
+
+
+
+
+
+  <title>14 K8S 服务发现 Service | My Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">My Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记不住的一定要写在这里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://touchlixiang.github.io/2020/03/11/k8s-base16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harris Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/Greeen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">14 K8S 服务发现 Service</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-11T18:19:33+08:00">
+                2020-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/k8s/" itemprop="url" rel="index">
+                    <span itemprop="name">k8s</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/img/mix_3.jpg" width="50%"><br><a id="more"></a></p>
+<h2 id="创建服务资源"><a href="#创建服务资源" class="headerlink" title="创建服务资源"></a>创建服务资源</h2><h3 id="利用单个地址访问一组-Pod"><a href="#利用单个地址访问一组-Pod" class="headerlink" title="利用单个地址访问一组 Pod"></a>利用单个地址访问一组 Pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl get pods -L app</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE   APP</span><br><span class="line">kubia-cq4ht   1/1     Running   0          8s    kubia</span><br><span class="line">kubia-mwwxw   1/1     Running   0          8s    kubia</span><br><span class="line">kubia-rf5j4   1/1     Running   0          8s    kubia</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl explain service</span><br><span class="line">KIND:     Service</span><br><span class="line">VERSION:  v1</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-svc.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80            # 服务端口</span><br><span class="line">    targetPort: 8080    # 服务转发到容器的端口</span><br><span class="line">  selector:             # 标签选择器 app: kubia 的pod都属于该服务</span><br><span class="line">    app: kubia</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get svc</span><br><span class="line">NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE</span><br><span class="line">kubernetes   ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP   3d16h</span><br><span class="line">kubia        ClusterIP   10.0.0.22    <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80/TCP    38s</span><br><span class="line"></span><br><span class="line"># CLUSTER-IP 内部集群IP 内部访问</span><br></pre></td></tr></table></figure>
+<h3 id="kubuctl-exec-在运行的容器中远程执行命令"><a href="#kubuctl-exec-在运行的容器中远程执行命令" class="headerlink" title="kubuctl exec 在运行的容器中远程执行命令"></a>kubuctl exec 在运行的容器中远程执行命令</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl exec kubia-cq4ht -- curl -s 10.0.0.22</span><br><span class="line">You've hit kubia-rf5j4</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl exec kubia-cq4ht -- curl -s 10.0.0.22</span><br><span class="line">You've hit kubia-cq4ht</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl exec kubia-cq4ht -- curl -s 10.0.0.22</span><br><span class="line">You've hit kubia-mwwxw</span><br></pre></td></tr></table></figure>
+<h3 id="会话亲和性"><a href="#会话亲和性" class="headerlink" title="会话亲和性"></a>会话亲和性</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># sessionAffinity: ClientIP  (默认为None)</span><br><span class="line"># 同一个Client IP的请求会被转发到同一个Pod </span><br><span class="line"># K8s 不支持 cookie的会话保持,因为k8s不是工作在http层上</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-svc.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80</span><br><span class="line">    targetPort: 8080</span><br><span class="line">  selector:</span><br><span class="line">    app: kubia</span><br><span class="line">  sessionAffinity: ClientIP</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl exec kubia-cq4ht -- curl -s 10.0.0.62</span><br><span class="line">You've hit kubia-rf5j4</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl exec kubia-cq4ht -- curl -s 10.0.0.62</span><br><span class="line">You've hit kubia-rf5j4</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl exec kubia-cq4ht -- curl -s 10.0.0.62</span><br><span class="line">You've hit kubia-rf5j4</span><br></pre></td></tr></table></figure>
+<h3 id="指定多个端口-80-443"><a href="#指定多个端口-80-443" class="headerlink" title="指定多个端口 80 443"></a>指定多个端口 80 443</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"># 在1个容器服务中有多个服务端口 </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-svc.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  ports:</span><br><span class="line">  - name: http</span><br><span class="line">    port: 80</span><br><span class="line">    targetPort: 8080      # svc的 80 转发到 pod 的 8080</span><br><span class="line">  - name: https</span><br><span class="line">    port: 443</span><br><span class="line">    targetPort: 8443      # svc的 443 转发到 pod 的 8443</span><br><span class="line">  selector:</span><br><span class="line">    app: kubia</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-rs.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: ReplicaSet</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: kubia</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: kubia</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/project/kubia</span><br><span class="line">        name: kubia</span><br><span class="line">        ports:</span><br><span class="line">        - name: http </span><br><span class="line">          containerPort: 8080</span><br><span class="line">        - name: https</span><br><span class="line">          containerPort: 8443</span><br><span class="line"></span><br><span class="line">NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</span><br><span class="line">service/kubernetes   ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP          3d16h</span><br><span class="line">service/kubia        ClusterIP   10.0.0.226   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80/TCP,443/TCP   25s</span><br></pre></td></tr></table></figure>
+<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><h3 id="通过环境变量发现服务"><a href="#通过环境变量发现服务" class="headerlink" title="通过环境变量发现服务"></a>通过环境变量发现服务</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 客户端如何知道svc的IP和端口？</span><br><span class="line">2. 是否需要先创建svc，然后再手动查找IP再进行配置？</span><br><span class="line">3. k8s提供了svc服务发现</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">1. 在pod开始运行前,k8s会完成一系列的环境变量配置</span><br><span class="line">2. 如果你创建的服务早于客户端Pod的创建，那么pod可以根据环境变量获得服务的IP和端口</span><br><span class="line"></span><br><span class="line"># 先删除之前创建的pod </span><br><span class="line">[root@k8s-master1 demo]# kubectl delete pod --all</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-55cbs   1/1     Running   0          103s</span><br><span class="line">kubia-jpzvx   1/1     Running   0          103s</span><br><span class="line">kubia-zkkgt   1/1     Running   0          103s</span><br><span class="line">[root@k8s-master1 demo]# kubectl exec kubia-55cbs env</span><br><span class="line">...</span><br><span class="line">KUBIA_SERVICE_PORT_HTTP=80</span><br><span class="line">KUBIA_SERVICE_HOST=10.0.0.226</span><br><span class="line">KUBIA_SERVICE_PORT_HTTPS=443</span><br><span class="line">KUBIA_SERVICE_PORT=80</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h3 id="通过-DNS-发现"><a href="#通过-DNS-发现" class="headerlink" title="通过 DNS 发现"></a>通过 DNS 发现</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl exec kubia-55cbs bash</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl -it exec kubia-55cbs bash</span><br><span class="line">root@kubia-55cbs:/# cat /etc/resolv.conf </span><br><span class="line">nameserver 10.0.0.2</span><br><span class="line">search default.svc.cluster.local svc.cluster.local cluster.local</span><br><span class="line">options ndots:5</span><br><span class="line"></span><br><span class="line">root@kubia-55cbs:/# curl http://kubia.default.svc.cluster.local</span><br><span class="line">You've hit kubia-55cbs</span><br><span class="line">root@kubia-55cbs:/# curl http://kubia.default.svc.cluster.local</span><br><span class="line">You've hit kubia-jpzvx</span><br><span class="line">root@kubia-55cbs:/# curl http://kubia.default.svc.cluster.local</span><br><span class="line">You've hit kubia-zkkgt</span><br><span class="line"></span><br><span class="line"># 解析:</span><br><span class="line">http://kubia.default.svc.cluster.local </span><br><span class="line"># kubia   服务名称</span><br><span class="line"># default 命名空间</span><br><span class="line"># svc.cluster.local 集群域名后缀</span><br><span class="line"></span><br><span class="line"># 如果前端pod和数据库pod 在同一命名空间下 可以省略 svc.cluster.local 和 命名空间</span><br><span class="line">root@kubia-55cbs:/# curl http://kubia.default                  </span><br><span class="line">You've hit kubia-55cbs</span><br><span class="line">root@kubia-55cbs:/# curl http://kubia.default</span><br><span class="line">You've hit kubia-jpzvx</span><br><span class="line">root@kubia-55cbs:/# curl http://kubia.default</span><br><span class="line">You've hit kubia-zkkgt</span><br><span class="line"></span><br><span class="line">root@kubia-55cbs:/# curl http://kubia        </span><br><span class="line">You've hit kubia-55cbs</span><br><span class="line">root@kubia-55cbs:/# curl http://kubia</span><br><span class="line">You've hit kubia-jpzvx</span><br><span class="line">root@kubia-55cbs:/# curl http://kubia</span><br><span class="line">You've hit kubia-zkkgt</span><br><span class="line"></span><br><span class="line">root@kubia-55cbs:/# ping kubia</span><br><span class="line">PING kubia.default.svc.cluster.local (10.0.0.246): 56 data bytes</span><br><span class="line">64 bytes from 10.0.0.246: icmp_seq=0 ttl=64 time=0.054 ms</span><br></pre></td></tr></table></figure>
+<h2 id="暴露服务"><a href="#暴露服务" class="headerlink" title="暴露服务"></a>暴露服务</h2><h3 id="endpoint"><a href="#endpoint" class="headerlink" title="endpoint"></a>endpoint</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">1. 服务并不是和pod直接相连</span><br><span class="line">2. 之间存在着endpoint </span><br><span class="line">3. endpoint 就是暴露一组服务的IP和端口列表</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl describe svc kubia</span><br><span class="line">Name:              kubia</span><br><span class="line">Namespace:         default</span><br><span class="line">Labels:            <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">Annotations:       <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">Selector:          app=kubia</span><br><span class="line">Type:              ClusterIP</span><br><span class="line">IP:                10.0.0.246</span><br><span class="line">Port:              http  80/TCP</span><br><span class="line">TargetPort:        8080/TCP</span><br><span class="line">Endpoints:         10.244.0.22:8080,10.244.1.28:8080,10.244.2.26:8080</span><br><span class="line">Port:              https  443/TCP</span><br><span class="line">TargetPort:        8443/TCP</span><br><span class="line">Endpoints:         10.244.0.22:8443,10.244.1.28:8443,10.244.2.26:8443</span><br><span class="line">Session Affinity:  None</span><br><span class="line">Events:            <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get ep</span><br><span class="line">NAME         ENDPOINTS                                                        AGE</span><br><span class="line">kubernetes   172.31.228.67:6443                                               3d17h</span><br><span class="line">kubia        10.244.0.22:8443,10.244.1.28:8443,10.244.2.26:8443 + 3 more...   18m</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get ep kubia</span><br><span class="line">NAME    ENDPOINTS                                                        AGE</span><br><span class="line">kubia   10.244.0.22:8443,10.244.1.28:8443,10.244.2.26:8443 + 3 more...   18m</span><br></pre></td></tr></table></figure>
+<h3 id="将服务暴露到外部"><a href="#将服务暴露到外部" class="headerlink" title="将服务暴露到外部"></a>将服务暴露到外部</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Service 类型</span><br><span class="line"># 有三种方式可以在外部访问服务</span><br><span class="line">1. NodePort: 在每个Node上分配一个端口作为外部访问入口</span><br><span class="line">2. LoadBalancer: 工作在特定的Cloud Provider上，例如Google Cloud，AWS，OpenStack</span><br><span class="line">3. Ingress: 通过一个IP地址公开多个服务 运行在7层http svc是4层 </span><br><span class="line">4. ClusterIP：默认，分配一个集群内部可以访问的虚拟IP（VIP）</span><br></pre></td></tr></table></figure>
+<h3 id="创建-NodePort"><a href="#创建-NodePort" class="headerlink" title="创建 NodePort"></a>创建 NodePort</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim kubia-ndp.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia-nodeport</span><br><span class="line">spec:</span><br><span class="line">  type: NodePort</span><br><span class="line">  ports:</span><br><span class="line">  - name: http</span><br><span class="line">    port: 80           # svc 端口</span><br><span class="line">    targetPort: 8080   # pod 端口</span><br><span class="line">    nodePort: 30123    # 通过集群节点的30123可以访问该svc 如果不添加,默认随机分配一个端口</span><br><span class="line">  selector:</span><br><span class="line">    app: kubia</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get svc -o wide</span><br><span class="line">NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE     SELECTOR</span><br><span class="line">kubernetes       ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        3d18h   <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-nodeport   NodePort    10.0.0.87    <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:30123/TCP   55s     </span><br><span class="line"></span><br><span class="line"># 访问方式</span><br><span class="line">1. NodePort也分配了CLUSTER-IP: 10.0.0.87:80</span><br><span class="line">2. nodeip + 30123 </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# netstat -tnlp | grep 30123</span><br><span class="line">tcp6       0      0 :::30123                :::*                    LISTEN      944/kube-proxy  </span><br><span class="line"></span><br><span class="line">[root@k8s-node2 ~]# netstat -tnlp | grep 30123</span><br><span class="line">tcp6       0      0 :::30123                :::*                    LISTEN      903/kube-proxy</span><br></pre></td></tr></table></figure>
+<h4 id="查看-ipvsadm-规则"><a href="#查看-ipvsadm-规则" class="headerlink" title="查看 ipvsadm 规则"></a>查看 ipvsadm 规则</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl get ep kubia-nodeport</span><br><span class="line">NAME             ENDPOINTS                                            AGE</span><br><span class="line">kubia-nodeport   10.244.0.22:8080,10.244.1.28:8080,10.244.2.26:8080   9m30s</span><br><span class="line"></span><br><span class="line">[root@k8s-node1 ~]# ipvsadm -ln | grep 30123</span><br><span class="line">TCP  172.17.0.1:30123 rr</span><br><span class="line">TCP  10.244.0.0:30123 rr</span><br><span class="line">TCP  10.244.0.1:30123 rr</span><br><span class="line">TCP  127.0.0.1:30123 rr</span><br><span class="line">TCP  172.31.228.69:30123 rr</span><br><span class="line"></span><br><span class="line"># 都是向三台node上的podIP转发</span><br><span class="line">TCP  172.31.228.69:30123 rr</span><br><span class="line">  -&gt; 10.244.0.22:8080             Masq    1      0          0         </span><br><span class="line">  -&gt; 10.244.1.28:8080             Masq    1      0          0         </span><br><span class="line">  -&gt; 10.244.2.26:8080             Masq    1      0          0</span><br></pre></td></tr></table></figure>
+<h4 id="域名应该找哪个node"><a href="#域名应该找哪个node" class="headerlink" title="域名应该找哪个node"></a>域名应该找哪个node</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">还得有一层负载均衡</span><br><span class="line">这层负载均衡负责 转发给 node集群+对外端口</span><br><span class="line">域名解析 -&gt; 负载均衡器nginx -&gt; nodeIP+对外端口 -&gt; ipvs -&gt; pod+端口</span><br><span class="line"></span><br><span class="line"># node1上的30123收到的请求 可以被转发到node1上的pod，也可能是node2上的</span><br><span class="line"></span><br><span class="line"># 我使用的阿里云,如果是自建可以选择修改防火墙策略开放node端口 </span><br><span class="line">http://47.240.12.170:30123/</span><br></pre></td></tr></table></figure>
+<p><img src="/img/k8s/k8s_373.png" width="50%"> </p>
+<h3 id="Load-Badancer-通过负载均衡将服务暴露出来"><a href="#Load-Badancer-通过负载均衡将服务暴露出来" class="headerlink" title="Load Badancer 通过负载均衡将服务暴露出来"></a>Load Badancer 通过负载均衡将服务暴露出来</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. nodeport 虽然可以解决外部暴露,但是当客户端连接的时候写了其中一个nodeip+端口,但是该node又出现问题会导致服务不可访问</span><br><span class="line">2. nginx+nodeport可以解决该问题,但是还有Load Badancer方式</span><br><span class="line"></span><br><span class="line"># 就是前面加一个LB</span><br><span class="line"># LB 转发给 每个nodeIP+port</span><br><span class="line"># 域名解析到LB地址</span><br><span class="line"># 自建LB 需要知道 生成的端口是多少 再添加到LB</span><br><span class="line"># 公有云 LoadBalancer LB 可以自动关联 提供访问 访问流程和NodePort一致</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. NodePort</span><br><span class="line">用户 -&gt; 域名 -&gt; 负载均衡(阿里云公网)(后端手动添加) -&gt; NodeIP(内网):Port -&gt; PodIP+Port</span><br><span class="line">2. LoadBalancer</span><br><span class="line">用户 -&gt; 域名 -&gt; 负载均衡(阿里云公网)(自动添加) -&gt; NodeIP(内网):Port -&gt; PodIP+Port</span><br><span class="line"></span><br><span class="line">1. LoadBalancer: 特定云提供商底层LB接口 例如aws,google,openstack,aliyun不知道有没有</span><br><span class="line">2. NodePort : NodeIP 不固定,Node Port 可以固定</span><br></pre></td></tr></table></figure>
+<h3 id="通过-Ingress-暴露服务"><a href="#通过-Ingress-暴露服务" class="headerlink" title="通过 Ingress 暴露服务"></a>通过 Ingress 暴露服务</h3><h4 id="创建-Ingress"><a href="#创建-Ingress" class="headerlink" title="创建 Ingress"></a>创建 Ingress</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 cfg]# kubectl explain ingress</span><br><span class="line">KIND:     Ingress</span><br><span class="line">VERSION:  extensions/v1beta1</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get svc</span><br><span class="line">NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">kubernetes       ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        4d15h</span><br><span class="line">kubia-nodeport   NodePort    10.0.0.87    <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:30123/TCP   21h</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-ingress.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: networking.k8s.io/v1beta1</span><br><span class="line">kind: Ingress</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  rules:</span><br><span class="line">  - host: kubia.example.com                    # 要映射的域名</span><br><span class="line">    http:</span><br><span class="line">      paths:</span><br><span class="line">      - path: /</span><br><span class="line">        backend:</span><br><span class="line">          serviceName: kubia-nodeport          # 转发到哪个 service</span><br><span class="line">          servicePort: 80                      # 对应 kubia-nodeport svc 的 80 端口</span><br><span class="line"></span><br><span class="line"># ingress控制器收到的 请求主机 kubia.example.com 的http请求，将被转发给 服务svc kubia-nodeport 的 80 端口</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get ingress</span><br><span class="line">NAME    HOSTS               ADDRESS   PORTS   AGE</span><br><span class="line">kubia   kubia.example.com             80      16s</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># 测试增加域名解析</span><br><span class="line"># 不添加hosts的话 需要将域名接下到 部署控制器的 node节点上</span><br><span class="line"># 实际工作环境 就是将 域名 解析到 NodeIP上</span><br><span class="line"></span><br><span class="line"># windows 修改 hosts文件 </span><br><span class="line"></span><br><span class="line"># linux 修改 /etc/hosts</span><br><span class="line">[root@k8s-master1 demo]# cat /etc/hosts</span><br><span class="line">149.129.81.90 kubia.example.com </span><br><span class="line">47.240.12.170 kubia.example.com </span><br><span class="line">47.240.15.208 kubia.example.com </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# curl kubia.example.com </span><br><span class="line">You've hit kubia-zkkgt</span><br><span class="line">[root@k8s-master1 demo]# curl kubia.example.com </span><br><span class="line">You've hit kubia-55cbs</span><br><span class="line">[root@k8s-master1 demo]# curl kubia.example.com </span><br><span class="line">You've hit kubia-jpzvx</span><br></pre></td></tr></table></figure>
+<h4 id="通过不同路径-映射不同服务"><a href="#通过不同路径-映射不同服务" class="headerlink" title="通过不同路径 映射不同服务"></a>通过不同路径 映射不同服务</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 在同一个主机(host)，不同的路径上,ingress暴露出多个服务</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-ingress2.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: networking.k8s.io/v1beta1</span><br><span class="line">kind: Ingress</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  rules:</span><br><span class="line">  - host: kubia.example.com</span><br><span class="line">    http:</span><br><span class="line">      paths:</span><br><span class="line">      - path: /kubia                    # kubia.example.com/kubia  转发给 kubia-nodeport</span><br><span class="line">        backend:</span><br><span class="line">          serviceName: kubia-nodeport</span><br><span class="line">          servicePort: 80</span><br><span class="line">      - path: /index</span><br><span class="line">        backend:</span><br><span class="line">          serviceName: kubia-index      # # kubia.example.com/index  转发给 kubia-index</span><br><span class="line">          servicePort: 80</span><br></pre></td></tr></table></figure>
+<h4 id="不同的服务映射到不同的主机上-host"><a href="#不同的服务映射到不同的主机上-host" class="headerlink" title="不同的服务映射到不同的主机上(host)"></a>不同的服务映射到不同的主机上(host)</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># dns本地解析</span><br><span class="line">149.129.81.90 kubia.example.com foo.example.com</span><br><span class="line">47.240.12.170 kubia.example.com foo.example.com </span><br><span class="line">47.240.15.208 kubia.example.com foo.example.com </span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-ingress3.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: networking.k8s.io/v1beta1</span><br><span class="line">kind: Ingress</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  rules:</span><br><span class="line">  - host: kubia.example.com</span><br><span class="line">    http:</span><br><span class="line">      paths:</span><br><span class="line">      - path: /</span><br><span class="line">        backend:</span><br><span class="line">          serviceName: kubia-nodeport</span><br><span class="line">          servicePort: 80</span><br><span class="line">  - host: foo.example.com</span><br><span class="line">    http:</span><br><span class="line">      paths:</span><br><span class="line">      - path: /</span><br><span class="line">        backend:</span><br><span class="line">          serviceName: kubia-index</span><br><span class="line">          servicePort: 80</span><br></pre></td></tr></table></figure>
+<h4 id="配置-Ingress-处理-TLS-传输"><a href="#配置-Ingress-处理-TLS-传输" class="headerlink" title="配置 Ingress 处理 TLS 传输"></a>配置 Ingress 处理 TLS 传输</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"># 处理 HTTPS 流量数据</span><br><span class="line"># 证书和私钥需要放到 Ingress </span><br><span class="line"># 需要先放在 secret 中，然后再yaml文件中引用</span><br><span class="line"></span><br><span class="line"># 自制证书</span><br><span class="line">[root@k8s-master1 demo]# openssl genrsa -out tls.key 2048</span><br><span class="line">[root@k8s-master1 demo]# openssl req -new -x509 -key tls.key -out tls.cert -days 360 -subj /CN=kubia.example.com</span><br><span class="line"></span><br><span class="line"># 创建 secret </span><br><span class="line">[root@k8s-master1 demo]# kubectl create secret tls tls-secret --cert=tls.cert --key=tls.key</span><br><span class="line">secret/tls-secret created</span><br><span class="line"></span><br><span class="line"># 更新 yaml 文件</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# vim kubia-ingress.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: networking.k8s.io/v1beta1</span><br><span class="line">kind: Ingress</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  tls:                        # tls 配置</span><br><span class="line">  - hosts:          </span><br><span class="line">    - kubia.example.com       # 主机为 kubia.example.com 的 tls 连接</span><br><span class="line">    secretName: tls-secret    # 从 tls-secret 中获取私钥和证书</span><br><span class="line">  rules:</span><br><span class="line">  - host: kubia.example.com</span><br><span class="line">    http:</span><br><span class="line">      paths:</span><br><span class="line">      - path: /</span><br><span class="line">        backend:</span><br><span class="line">          serviceName: kubia-nodeport</span><br><span class="line">          servicePort: 80</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl apply -f kubia-ingress.yaml </span><br><span class="line">ingress.networking.k8s.io/kubia created</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# curl -k -v https://kubia.example.com/</span><br><span class="line">* About to connect() to kubia.example.com port 443 (#0)</span><br><span class="line">*   Trying 149.129.81.90...</span><br><span class="line">* Connected to kubia.example.com (149.129.81.90) port 443 (#0)</span><br><span class="line">* Initializing NSS with certpath: sql:/etc/pki/nssdb</span><br><span class="line">* skipping SSL peer certificate verification</span><br><span class="line">* SSL connection using TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span><br><span class="line">* Server certificate:</span><br><span class="line">* 	subject: CN=kubia.example.com</span><br><span class="line">* 	start date: Mar 14 01:40:52 2020 GMT</span><br><span class="line">* 	expire date: Mar 09 01:40:52 2021 GMT</span><br><span class="line">* 	common name: kubia.example.com</span><br><span class="line">* 	issuer: CN=kubia.example.com</span><br><span class="line">&gt; GET / HTTP/1.1</span><br><span class="line">&gt; User-Agent: curl/7.29.0</span><br><span class="line">&gt; Host: kubia.example.com</span><br><span class="line">&gt; Accept: */*</span><br><span class="line">&gt; </span><br><span class="line"><span class="tag">&lt; <span class="attr">HTTP</span>/<span class="attr">1.1</span> <span class="attr">200</span> <span class="attr">OK</span></span></span><br><span class="line">&lt; Server: nginx/1.15.5</span><br><span class="line"><span class="tag">&lt; <span class="attr">Date:</span> <span class="attr">Sat</span>, <span class="attr">14</span> <span class="attr">Mar</span> <span class="attr">2020</span> <span class="attr">01:48:28</span> <span class="attr">GMT</span></span></span><br><span class="line">&lt; Transfer-Encoding: chunked</span><br><span class="line"><span class="tag">&lt; <span class="attr">Connection:</span> <span class="attr">keep-alive</span></span></span><br><span class="line">&lt; Strict-Transport-Security: max-age=15724800; includeSubDomains</span><br><span class="line"><span class="tag">&lt; </span></span><br><span class="line"><span class="tag"><span class="attr">You</span>'<span class="attr">ve</span> <span class="attr">hit</span> <span class="attr">kubia-jpzvx</span></span></span><br><span class="line"><span class="tag">* <span class="attr">Connection</span> #<span class="attr">0</span> <span class="attr">to</span> <span class="attr">host</span> <span class="attr">kubia.example.com</span> <span class="attr">left</span> <span class="attr">intact</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="Pod-就绪指针-就绪后发出信号"><a href="#Pod-就绪指针-就绪后发出信号" class="headerlink" title="Pod 就绪指针 就绪后发出信号"></a>Pod 就绪指针 就绪后发出信号</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># pod 现在作为 svc 服务的后端</span><br><span class="line"># 新建的pod 只要具有服务的标签就会被服务代理，请求也会重定向新建的pod </span><br><span class="line"># 如果 pod 没有准备好 如何处理这些请求 </span><br><span class="line"># 不想该pod 立即接收请求，直到完全准备就绪</span><br><span class="line"></span><br><span class="line"># pod的指针 </span><br><span class="line">1. 存活指针</span><br><span class="line">2. 就绪指针</span><br><span class="line"></span><br><span class="line"># 当容器准备就绪探测返回成功时,标识容器准备好接收请求</span><br><span class="line"></span><br><span class="line"># 存活指针 三类型 </span><br><span class="line">1. exec 探针 判断进程退出的状态码</span><br><span class="line">2. httpget 探针 通过状态码</span><br><span class="line">3. tcp socket 探针 判断端口连接</span><br><span class="line"></span><br><span class="line"># 就绪指针操作流程:</span><br><span class="line"># 1. 启动容器时 k8s配置一个等待时间 经过等待时间后才执行准备继续检查</span><br><span class="line"># 2. 之后会周期性的调用探针,根据结果采取行动,如果pod未准备就绪，则会从服务中删除pod ，如果再次准备就绪就加入。</span><br><span class="line"># 3. 就绪探针 与 存活探针不同，如果容器未通过检查，不会终止或者重新启动，这是主要区别</span><br><span class="line"># 4. 存活探针杀死异常的容器并用心的容器替代来保持pod的正常工作</span><br><span class="line"># 5. 就绪探针确保只有准备好处理请求的pod，才可以接收请求</span><br><span class="line"># 6. 这在一个容器启动时都是必要的，当然在容器运行一段时间后也是有用的</span><br></pre></td></tr></table></figure>
+<h3 id="添加就绪指针"><a href="#添加就绪指针" class="headerlink" title="添加就绪指针"></a>添加就绪指针</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim kubia-rs.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: ReplicaSet</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: kubia</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: kubia</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - image: 172.31.228.68/project/kubia</span><br><span class="line">        name: kubia</span><br><span class="line">        readinessProbe:</span><br><span class="line">          exec:</span><br><span class="line">            command:</span><br><span class="line">            - ls</span><br><span class="line">            - /var/ready</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 8080</span><br><span class="line"></span><br><span class="line"># 就绪探针会定期在容器内执行 ls /var/ready ,如果文件存在,ls命令返回退出状态码0，否则非零 </span><br><span class="line"># 文件存在探针将成功，否则失败</span><br><span class="line"># 更改 rs的模板对现有pod没有影响 需要删除pod重新创建</span><br><span class="line"># 新建的应该处于就绪失败状态，不会作为服务的端点，直到每个pod中创建了 /var/ready 文件</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl delete rs kubia</span><br><span class="line">replicaset.apps "kubia" deleted</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl create -f kubia-rs.yaml </span><br><span class="line">replicaset.apps/kubia created</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-7nwtf   0/1     Running   0          5m52s</span><br><span class="line">kubia-cz2qh   0/1     Running   0          5m52s</span><br><span class="line">kubia-shf8g   0/1     Running   0          5m52s</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get ep</span><br><span class="line">NAME             ENDPOINTS            AGE</span><br><span class="line">kubernetes       172.31.228.67:6443   4d17h</span><br><span class="line">kubia-nodeport                        23h</span><br><span class="line"></span><br><span class="line"># 在其中一个pod 创建文件</span><br><span class="line">[root@k8s-master1 demo]# kubectl exec -it kubia-7nwtf -- touch /var/ready</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pods</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-7nwtf   1/1     Running   0          7m</span><br><span class="line">kubia-cz2qh   0/1     Running   0          7m</span><br><span class="line">kubia-shf8g   0/1     Running   0          7m</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get ep</span><br><span class="line">NAME             ENDPOINTS            AGE</span><br><span class="line">kubernetes       172.31.228.67:6443   4d17h</span><br><span class="line">kubia-nodeport   10.244.2.33:8080     23h</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl describe pod kubia-7nwtf</span><br><span class="line">Readiness:      exec [ls /var/ready] delay=0s timeout=1s period=10s #success=1 #failure=3</span><br><span class="line"># period 每10秒检查一次</span><br><span class="line"></span><br><span class="line"># 所有请求都到了这个 pod</span><br><span class="line">[root@k8s-master1 demo]# curl 10.0.0.87</span><br><span class="line">You've hit kubia-7nwtf</span><br><span class="line">[root@k8s-master1 demo]# curl 10.0.0.87</span><br><span class="line">You've hit kubia-7nwtf</span><br><span class="line">[root@k8s-master1 demo]# curl 10.0.0.87</span><br><span class="line">You've hit kubia-7nwtf</span><br></pre></td></tr></table></figure>
+<h3 id="就绪探针的实际作用"><a href="#就绪探针的实际作用" class="headerlink" title="就绪探针的实际作用"></a>就绪探针的实际作用</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 应该通过删除pod 或者 更改pod标签来移除pod，而不是更改探针</span><br><span class="line">2. enabled=true 可作为开关标签</span><br><span class="line">3. 务必定义就绪探针 ，不能让pod立即成为服务端点 </span><br><span class="line">4. 不要将停止pod的逻辑纳入就绪探针，直接删除该容器,移除 Pod</span><br></pre></td></tr></table></figure>
+<h2 id="使用-headless-服务来发现独立的-Pod"><a href="#使用-headless-服务来发现独立的-Pod" class="headerlink" title="使用 headless 服务来发现独立的 Pod"></a>使用 headless 服务来发现独立的 Pod</h2><h3 id="返回所有的-Pod-IP"><a href="#返回所有的-Pod-IP" class="headerlink" title="返回所有的 Pod IP"></a>返回所有的 Pod IP</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 常规 Service：执行服务的DNS时,返回服务的集群 IP(svc IP)</span><br><span class="line">2. Headless Service: 不需要Cluster-IP，设置为Node ,客户端通过DNS A记录查找会获取该服务所有的Pod IP</span><br><span class="line">3. 客户端可以使用该信息连接到其中的1个、多个或全部</span><br></pre></td></tr></table></figure>
+<h3 id="创建-headless-服务"><a href="#创建-headless-服务" class="headerlink" title="创建 headless 服务"></a>创建 headless 服务</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# vim kubia-svc-headless.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: kubia-headless</span><br><span class="line">spec:</span><br><span class="line">  clusterIP: None          # 设置为None</span><br><span class="line">  ports:</span><br><span class="line">  - name: http</span><br><span class="line">    port: 80</span><br><span class="line">    targetPort: 8080</span><br><span class="line">  selector:</span><br><span class="line">    app: kubia</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl get svc</span><br><span class="line">NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE</span><br><span class="line">kubernetes       ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP   4d18h</span><br><span class="line">kubia-headless   ClusterIP   None         <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80/TCP    49s</span><br></pre></td></tr></table></figure>
+<h3 id="通过DNS来发现-Pod"><a href="#通过DNS来发现-Pod" class="headerlink" title="通过DNS来发现 Pod"></a>通过DNS来发现 Pod</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 临时任务 不重启 执行后销毁</span><br><span class="line">[root@k8s-master1 demo]# vim busybox.yaml </span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: dns-test</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: busybox</span><br><span class="line">    image: busybox:1.28.4</span><br><span class="line">    args:</span><br><span class="line">    - /bin/sh</span><br><span class="line">    - -c</span><br><span class="line">    - sleep 36000</span><br><span class="line">  restartPolicy: Never</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master1 demo]# kubectl apply -f busybox.yaml </span><br><span class="line"></span><br><span class="line"># 测试</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get svc</span><br><span class="line">NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">kubernetes       ClusterIP   10.0.0.1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>        443/TCP        4d18h</span><br><span class="line">kubia-headless   ClusterIP   None         <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80/TCP         8m43s</span><br><span class="line">kubia-nodeport   NodePort    10.0.0.157   <span class="tag">&lt;<span class="name">none</span>&gt;</span>        80:30123/TCP   34s</span><br><span class="line">[root@k8s-master1 demo]# kubectl exec dns-test nslookup kubia-nodeport</span><br><span class="line">Server:    10.0.0.2</span><br><span class="line">Address 1: 10.0.0.2 kube-dns.kube-system.svc.cluster.local</span><br><span class="line"></span><br><span class="line">Name:      kubia-nodeport</span><br><span class="line">Address 1: 10.0.0.157 kubia-nodeport.default.svc.cluster.local</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl exec dns-test nslookup kubia-headless</span><br><span class="line">Server:    10.0.0.2</span><br><span class="line">Address 1: 10.0.0.2 kube-dns.kube-system.svc.cluster.local</span><br><span class="line"></span><br><span class="line">Name:      kubia-headless</span><br><span class="line">Address 1: 10.244.1.32 10-244-1-32.kubia-headless.default.svc.cluster.local</span><br><span class="line">Address 2: 10.244.2.33 10-244-2-33.kubia-headless.default.svc.cluster.local</span><br><span class="line">Address 3: 10.244.0.27 10-244-0-27.kubia-headless.default.svc.cluster.local</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl get pod -o wide</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE     IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">dns-test      1/1     Running   0          5m37s   10.244.1.33   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-7nwtf   1/1     Running   0          47m     10.244.2.33   k8s-master1   <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-cz2qh   1/1     Running   0          47m     10.244.1.32   k8s-node2     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line">kubia-shf8g   1/1     Running   0          47m     10.244.0.27   k8s-node1     <span class="tag">&lt;<span class="name">none</span>&gt;</span>           <span class="tag">&lt;<span class="name">none</span>&gt;</span></span><br><span class="line"></span><br><span class="line"># headless 直接返回了 pod的IP ，在容器中可以通过 该解析访问 为后面的有状态部署提供帮助</span><br><span class="line"></span><br><span class="line">[root@k8s-master1 demo]# kubectl exec dns-test ping 10-244-0-27.kubia-headless.default.svc.cluster.local</span><br><span class="line">PING 10-244-0-27.kubia-headless.default.svc.cluster.local (10.244.0.27): 56 data bytes</span><br><span class="line">64 bytes from 10.244.0.27: seq=0 ttl=62 time=0.724 ms</span><br></pre></td></tr></table></figure>
+<h2 id="排查服务故障"><a href="#排查服务故障" class="headerlink" title="排查服务故障"></a>排查服务故障</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 先确保从集群内连接到服务集群IP(svc ip)</span><br><span class="line">2. 是否定义了 就绪探针 ，返回是否成功</span><br><span class="line">3. 检查端点 查看pod是否加入到 service , kubectl get ep </span><br><span class="line">4. 检查svc暴露的端口</span><br><span class="line">5. 检查pod的服务是否正常</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/11/k8s-base15/" rel="next" title="13 副本机制和其他控制器">
+                <i class="fa fa-chevron-left"></i> 13 副本机制和其他控制器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/11/k8s-base17/" rel="prev" title="15 K8S 存储 卷">
+                15 K8S 存储 卷 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/Greeen.jpg" alt="Harris Li">
+            
+              <p class="site-author-name" itemprop="name">Harris Li</p>
+              <p class="site-description motion-element" itemprop="description">Beijing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">119</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建服务资源"><span class="nav-number">1.</span> <span class="nav-text">创建服务资源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#利用单个地址访问一组-Pod"><span class="nav-number">1.1.</span> <span class="nav-text">利用单个地址访问一组 Pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kubuctl-exec-在运行的容器中远程执行命令"><span class="nav-number">1.2.</span> <span class="nav-text">kubuctl exec 在运行的容器中远程执行命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#会话亲和性"><span class="nav-number">1.3.</span> <span class="nav-text">会话亲和性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定多个端口-80-443"><span class="nav-number">1.4.</span> <span class="nav-text">指定多个端口 80 443</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务发现"><span class="nav-number">2.</span> <span class="nav-text">服务发现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过环境变量发现服务"><span class="nav-number">2.1.</span> <span class="nav-text">通过环境变量发现服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-DNS-发现"><span class="nav-number">2.2.</span> <span class="nav-text">通过 DNS 发现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#暴露服务"><span class="nav-number">3.</span> <span class="nav-text">暴露服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#endpoint"><span class="nav-number">3.1.</span> <span class="nav-text">endpoint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将服务暴露到外部"><span class="nav-number">3.2.</span> <span class="nav-text">将服务暴露到外部</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-NodePort"><span class="nav-number">3.3.</span> <span class="nav-text">创建 NodePort</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#查看-ipvsadm-规则"><span class="nav-number">3.3.1.</span> <span class="nav-text">查看 ipvsadm 规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#域名应该找哪个node"><span class="nav-number">3.3.2.</span> <span class="nav-text">域名应该找哪个node</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Load-Badancer-通过负载均衡将服务暴露出来"><span class="nav-number">3.4.</span> <span class="nav-text">Load Badancer 通过负载均衡将服务暴露出来</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过-Ingress-暴露服务"><span class="nav-number">3.5.</span> <span class="nav-text">通过 Ingress 暴露服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建-Ingress"><span class="nav-number">3.5.1.</span> <span class="nav-text">创建 Ingress</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过不同路径-映射不同服务"><span class="nav-number">3.5.2.</span> <span class="nav-text">通过不同路径 映射不同服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#不同的服务映射到不同的主机上-host"><span class="nav-number">3.5.3.</span> <span class="nav-text">不同的服务映射到不同的主机上(host)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-Ingress-处理-TLS-传输"><span class="nav-number">3.5.4.</span> <span class="nav-text">配置 Ingress 处理 TLS 传输</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod-就绪指针-就绪后发出信号"><span class="nav-number">4.</span> <span class="nav-text">Pod 就绪指针 就绪后发出信号</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加就绪指针"><span class="nav-number">4.1.</span> <span class="nav-text">添加就绪指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#就绪探针的实际作用"><span class="nav-number">4.2.</span> <span class="nav-text">就绪探针的实际作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-headless-服务来发现独立的-Pod"><span class="nav-number">5.</span> <span class="nav-text">使用 headless 服务来发现独立的 Pod</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#返回所有的-Pod-IP"><span class="nav-number">5.1.</span> <span class="nav-text">返回所有的 Pod IP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-headless-服务"><span class="nav-number">5.2.</span> <span class="nav-text">创建 headless 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过DNS来发现-Pod"><span class="nav-number">5.3.</span> <span class="nav-text">通过DNS来发现 Pod</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#排查服务故障"><span class="nav-number">6.</span> <span class="nav-text">排查服务故障</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harris Li</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
